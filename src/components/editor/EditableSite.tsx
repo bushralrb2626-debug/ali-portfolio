@@ -675,11 +675,9 @@ export function EditableSite({
       ),
     );
     startTransition(() => {
-      void patchSection(id, data)
-        .then(() => router.refresh())
-        .catch((error) => {
-          console.error("Save failed", error);
-        });
+      void patchSection(id, data).catch((error) => {
+        console.error("Save failed", error);
+      });
     });
   }
 
@@ -688,11 +686,9 @@ export function EditableSite({
       current.map((section) => (section.id === id ? { ...section, items } : section)),
     );
     startTransition(() => {
-      void patchSection(id, { itemsJson: JSON.stringify(items) })
-        .then(() => router.refresh())
-        .catch((error) => {
-          console.error("Save failed", error);
-        });
+      void patchSection(id, { itemsJson: JSON.stringify(items) }).catch((error) => {
+        console.error("Save failed", error);
+      });
     });
   }
 

@@ -984,6 +984,8 @@ export function getEvidencePitch(
   });
   const slides = options?.cues
     ? slidesDeduped
-    : slidesDeduped.filter((slide) => !/^what to say/i.test(slide.title.trim()));
+    : slidesDeduped.filter(
+        (slide) => !/^what to (say|remember)/i.test(slide.title.trim()),
+      );
   return { ...withClips, slides };
 }

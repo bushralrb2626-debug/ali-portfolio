@@ -22,11 +22,13 @@ export function TripleCharts({
   compact,
   slideKey,
   scrollEl,
+  notes,
 }: {
   chart: PitchChart;
   compact?: boolean;
   slideKey: number;
   scrollEl?: HTMLDivElement | null;
+  notes?: boolean;
 }) {
   const formats = tripleChart(chart);
   return (
@@ -39,7 +41,7 @@ export function TripleCharts({
           replay
           className="pitch-chart-reveal"
         >
-          <TerminalChart chart={entry} compact={compact} />
+          <TerminalChart chart={entry} compact={compact} notes={notes} />
         </Reveal>
       ))}
     </div>
@@ -49,9 +51,11 @@ export function TripleCharts({
 export function TerminalChart({
   chart,
   compact,
+  notes,
 }: {
   chart: PitchChart;
   compact?: boolean;
+  notes?: boolean;
 }) {
   const kind = chart.type ?? "bar";
   const W = 640;
@@ -63,7 +67,9 @@ export function TerminalChart({
     <figure className={`pitch-chart pitch-chart--${kind}${compact ? " pitch-chart--compact" : ""}`}>
       <figcaption className="pitch-chart-head">
         <span>{chart.title}</span>
-        {chart.kind === "model" ? <span className="pitch-chart-tag">MODEL</span> : null}
+        {notes && chart.kind === "model" ? (
+          <span className="pitch-chart-tag">MODEL</span>
+        ) : null}
       </figcaption>
       {kind === "pie" ? <PieChart chart={chart} compact={compact} /> : null}
       {kind === "bar" ? (
@@ -72,7 +78,7 @@ export function TerminalChart({
       {kind === "line" ? <LineChart chart={chart} compact={compact} W={W} H={H} /> : null}
       {chart.caption ? (
         <p className="terminal-chart-cap">
-          {chart.kind === "model" ? (
+          {notes && chart.kind === "model" ? (
             <strong>Briefing graph, not a published ranking. </strong>
           ) : null}
           {chart.caption}

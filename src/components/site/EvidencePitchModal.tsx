@@ -66,9 +66,7 @@ function ClipFrame({
           <img src={poster} alt="" className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center px-4 text-center text-xs text-cyan-200/50">
-            {cues
-              ? "Typical local recite-and-post · drop a clip in admin"
-              : "Typical local recite-and-post"}
+            {cues ? "Typical local recite-and-post · drop a clip in admin" : null}
           </div>
         )}
       </div>
@@ -181,6 +179,7 @@ function SlideStage({
               compact
               slideKey={slideKey}
               scrollEl={scrollEl}
+              notes={cues}
             />
           ))}
         </div>

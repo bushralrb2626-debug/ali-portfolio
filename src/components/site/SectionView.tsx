@@ -136,7 +136,7 @@ function MediaOverlay({
 
 function ProjectMedia({
   item,
-  emptyHint = "Video coming soon",
+  emptyHint,
   overlayTitle,
   showOverlay = true,
   staticOnly = false,
@@ -201,10 +201,14 @@ function ProjectMedia({
 
   return (
     <div className="video-frame flex aspect-video w-full flex-col items-center justify-center gap-1 border-b border-cyan-500/10">
-      <span className="text-[10px] uppercase tracking-[0.2em] text-cyan-600">
-        Nano frame
-      </span>
-      <span className="text-xs text-cyan-800">{emptyHint}</span>
+      {emptyHint ? (
+        <>
+          <span className="text-[10px] uppercase tracking-[0.2em] text-cyan-600">
+            Nano frame
+          </span>
+          <span className="text-xs text-cyan-800">{emptyHint}</span>
+        </>
+      ) : null}
     </div>
   );
 }
@@ -636,9 +640,9 @@ export function ProjectCard({
     <article className="circuit-card overflow-hidden rounded-2xl">
       {!extra ? (
         <div className="relative">
-          <ProjectMedia item={item} />
+          <ProjectMedia item={item} emptyHint={undefined} />
           <span className="pointer-events-none absolute bottom-3 right-3 rounded-full border border-cyan-400/25 bg-cyan-950/75 px-2 py-0.5 text-[10px] uppercase tracking-wide text-cyan-200/90">
-            Open briefing
+            Play
           </span>
         </div>
       ) : null}
@@ -659,11 +663,7 @@ export function ProjectCard({
               >
                 View details →
               </a>
-            ) : (
-              <p className="mt-3 text-xs text-cyan-600">
-                Click card for full presentation
-              </p>
-            )}
+            ) : null}
           </>
         ) : (
           extra
@@ -702,10 +702,6 @@ export function EvidenceCard({
     return extra;
   }
 
-  const isLocal =
-    item.id === "ev-pk-school" ||
-    item.id === "ev-fazaia" ||
-    /pakistan|fazaia/i.test(item.title);
   const card = (
     <article className="circuit-card overflow-hidden rounded-2xl">
       {!extra ? (
@@ -713,16 +709,9 @@ export function EvidenceCard({
           <ProjectMedia
             item={item}
             staticOnly
-            emptyHint={
-              isLocal
-                ? "Drop Pakistan school video in admin"
-                : item.url
-                  ? "Open presentation for full briefing"
-                  : "Add photo or video in admin"
-            }
           />
           <span className="pointer-events-none absolute bottom-3 right-3 rounded-full border border-cyan-400/25 bg-cyan-950/75 px-2 py-0.5 text-[10px] uppercase tracking-wide text-cyan-200/90">
-            Open briefing
+            Play
           </span>
         </div>
       ) : null}
@@ -756,15 +745,7 @@ export function EvidenceCard({
               >
                 Open article →
               </a>
-            ) : isLocal ? (
-              <p className="mt-3 text-xs text-cyan-700">
-                Upload video/poster in admin preview
-              </p>
-            ) : (
-              <p className="mt-3 text-xs text-cyan-600">
-                Click card for full presentation
-              </p>
-            )}
+            ) : null}
           </>
         ) : (
           extra
