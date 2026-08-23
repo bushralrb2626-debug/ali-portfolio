@@ -15,7 +15,9 @@ export default async function PreviewPage() {
   }
 
   return (
-    <EditableSite
+    <>
+      <p className="sr-only">Visual editor</p>
+      <EditableSite
       initialSections={rows.map((row) => ({
         id: row.id,
         type: row.type,
@@ -28,5 +30,6 @@ export default async function PreviewPage() {
         visible: row.visible,
       }))}
     />
+    </>
   );
 }

@@ -16,6 +16,8 @@ services:
         value: file:./dev.db
       - key: AUTH_TRUST_HOST
         value: "true"
+      - key: AUTH_URL
+        value: "https://ali-portfolio-web.onrender.com"
       - key: AUTH_SECRET
         generateValue: true
       - key: ADMIN_EMAIL

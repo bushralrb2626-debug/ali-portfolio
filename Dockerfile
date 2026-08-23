@@ -22,6 +22,7 @@ RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists
 WORKDIR /app
 ENV NODE_ENV=production
 ENV AUTH_TRUST_HOST="true"
+ENV AUTH_URL="https://ali-portfolio-web.onrender.com"
 ENV DATABASE_URL="file:./dev.db"
 ENV PORT=10000
 ENV HOSTNAME=0.0.0.0
