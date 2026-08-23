@@ -1,22 +1,21 @@
-# Blueprint for Render. SQLite lives on the instance filesystem unless you
-# attach a persistent disk at /opt/render/project/src and point DATABASE_URL there.
+# Same pattern as ramuza: GitHub repo → Render Web Service.
+# This file does not affect ramuza.
 services:
   - type: web
     name: ali-portfolio
-    runtime: node
+    runtime: docker
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    dockerfilePath: ./Dockerfile
     healthCheckPath: /
     envVars:
-      - key: NODE_VERSION
-        value: "20"
+      - key: NODE_ENV
+        value: production
       - key: DATABASE_URL
         value: file:./dev.db
-      - key: AUTH_SECRET
-        generateValue: true
       - key: AUTH_TRUST_HOST
         value: "true"
+      - key: AUTH_SECRET
+        generateValue: true
       - key: ADMIN_EMAIL
         value: "12345"
       - key: ADMIN_PASSWORD
