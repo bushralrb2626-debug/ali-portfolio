@@ -12,7 +12,10 @@ export function AdminChrome({
   signedIn: boolean;
 }) {
   const pathname = usePathname();
-  if (pathname?.startsWith("/admin/preview")) {
+  if (
+    pathname?.startsWith("/admin/preview") ||
+    pathname === "/admin/login"
+  ) {
     return <>{children}</>;
   }
 
