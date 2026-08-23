@@ -1,0 +1,26 @@
+runConfig:
+  cpu: 1
+  memoryMiB: 1024
+  minInstances: 0
+  maxInstances: 4
+env:
+  - variable: DATABASE_URL
+    value: file:./dev.db
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: AUTH_TRUST_HOST
+    value: "true"
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: ADMIN_EMAIL
+    value: "12345"
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: ADMIN_PASSWORD
+    value: "12345"
+    availability:
+      - BUILD
+      - RUNTIME

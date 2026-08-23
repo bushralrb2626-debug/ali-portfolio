@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <defs>
+    <radialGradient id="g" cx="70%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#0a1018" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="d" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.8" fill="#38bdf8" opacity="0.25"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="450" fill="#0a1018"/>
+  <rect width="800" height="450" fill="url(#d)"/>
+  <rect width="800" height="450" fill="url(#g)"/>
+  <rect x="40" y="40" width="720" height="370" rx="24" fill="none" stroke="#38bdf8" stroke-opacity="0.35" stroke-width="2"/>
+  <text x="70" y="120" fill="#38bdf8" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" letter-spacing="4">☰</text>
+  <text x="70" y="200" fill="#e8f4f8" font-family="Segoe UI, Arial, sans-serif" font-size="36" font-weight="700">SEQUENCING</text>
+  <text x="70" y="250" fill="#7dd3fc" font-family="Segoe UI, Arial, sans-serif" font-size="20" opacity="0.85">Higher Ed Marketing source</text>
+</svg>

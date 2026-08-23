@@ -1,0 +1,23 @@
+# Blueprint for Render. SQLite lives on the instance filesystem unless you
+# attach a persistent disk at /opt/render/project/src and point DATABASE_URL there.
+services:
+  - type: web
+    name: ali-portfolio
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        value: file:./dev.db
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: AUTH_TRUST_HOST
+        value: "true"
+      - key: ADMIN_EMAIL
+        value: "12345"
+      - key: ADMIN_PASSWORD
+        value: "12345"
