@@ -3,6 +3,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function HomePage() {
   const sections = await prisma.section.findMany({

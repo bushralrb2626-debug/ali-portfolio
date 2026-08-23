@@ -33,7 +33,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 export type EditorSection = {
   id: string;
@@ -80,16 +80,49 @@ function InlineText({
   multiline?: boolean;
 }) {
   const [draft, setDraft] = useState(value);
+  const draftRef = useRef(draft);
+  const valueRef = useRef(value);
+  const onSaveRef = useRef(onSave);
+  draftRef.current = draft;
+  valueRef.current = value;
+  onSaveRef.current = onSave;
 
   useEffect(() => {
     setDraft(value);
   }, [value]);
 
   function commit() {
-    if (draft !== value) {
-      onSave(draft);
+    if (draftRef.current !== valueRef.current) {
+      onSaveRef.current(draftRef.current);
     }
   }
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      if (draft !== value) onSave(draft);
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [draft, value, onSave]);
+
+  useEffect(() => {
+    const flush = () => {
+      if (draftRef.current !== valueRef.current) {
+        onSaveRef.current(draftRef.current);
+      }
+    };
+    const onHide = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    window.addEventListener("pagehide", flush);
+    window.addEventListener("beforeunload", flush);
+    document.addEventListener("visibilitychange", onHide);
+    return () => {
+      flush();
+      window.removeEventListener("pagehide", flush);
+      window.removeEventListener("beforeunload", flush);
+      document.removeEventListener("visibilitychange", onHide);
+    };
+  }, []);
 
   const Tag = multiline ? "textarea" : "input";
   return (
@@ -642,7 +675,11 @@ export function EditableSite({
       ),
     );
     startTransition(() => {
-      void patchSection(id, data).then(() => router.refresh());
+      void patchSection(id, data)
+        .then(() => router.refresh())
+        .catch((error) => {
+          console.error("Save failed", error);
+        });
     });
   }
 
@@ -651,9 +688,11 @@ export function EditableSite({
       current.map((section) => (section.id === id ? { ...section, items } : section)),
     );
     startTransition(() => {
-      void patchSection(id, { itemsJson: JSON.stringify(items) }).then(() =>
-        router.refresh(),
-      );
+      void patchSection(id, { itemsJson: JSON.stringify(items) })
+        .then(() => router.refresh())
+        .catch((error) => {
+          console.error("Save failed", error);
+        });
     });
   }
 

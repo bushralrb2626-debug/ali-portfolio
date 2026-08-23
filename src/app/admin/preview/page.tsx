@@ -3,6 +3,7 @@ import { parseItems } from "@/lib/section-items";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function PreviewPage() {
   let rows: Awaited<ReturnType<typeof prisma.section.findMany>> = [];
