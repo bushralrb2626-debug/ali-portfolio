@@ -556,6 +556,28 @@ export function SectionView({
   );
 }
 
+const CARD_ICONS: Record<string, string> = {
+  "about-hire": "/icons/icon-hire.png",
+  "about-world": "/icons/icon-world.png",
+  "about-web": "/icons/icon-web.png",
+  "about-ai-web": "/icons/icon-ai-web.png",
+  "about-chat": "/icons/icon-chat.png",
+  "about-ali": "/icons/icon-ali.png",
+  "stack-search": "/icons/icon-web.png",
+  "stack-ads": "/icons/icon-world.png",
+  "stack-bot": "/icons/icon-chat.png",
+  "stack-method": "/icons/icon-ai-web.png",
+};
+
+const CARD_ICON_FALLBACK = [
+  "/icons/icon-hire.png",
+  "/icons/icon-world.png",
+  "/icons/icon-web.png",
+  "/icons/icon-ai-web.png",
+  "/icons/icon-chat.png",
+  "/icons/icon-ali.png",
+];
+
 export function AboutCard({
   item,
   index,
@@ -568,12 +590,17 @@ export function AboutCard({
   if (!item) {
     return extra;
   }
+  const iconSrc =
+    (item.id && CARD_ICONS[item.id]) || CARD_ICON_FALLBACK[index % CARD_ICON_FALLBACK.length];
   return (
     <article className="circuit-card rounded-2xl p-6">
-      <div className="relative mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-cyan-500/25 bg-cyan-950/60">
-        <span className="text-lg text-cyan-300">
-          {["⊘", "⚡", "◇"][index % 3]}
-        </span>
+      <div className="relative mb-5 inline-flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border border-cyan-500/25 bg-cyan-950/60">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={iconSrc}
+          alt=""
+          className="h-full w-full object-cover"
+        />
         <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-cyan-300 text-[10px] font-semibold text-cyan-950">
           {String(index + 1).padStart(2, "0")}
         </span>
