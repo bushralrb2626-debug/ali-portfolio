@@ -1,16 +1,4 @@
-import { execSync } from "node:child_process";
 import type { NextConfig } from "next";
-
-const isProdBuild =
-  process.env.NODE_ENV === "production" &&
-  process.argv.some((arg) => arg === "build" || arg.endsWith("build"));
-
-if (isProdBuild && !process.env.SKIP_DB_BOOTSTRAP) {
-  execSync(
-    "npx prisma generate && npx prisma db push && npx tsx prisma/reseed-ads.ts",
-    { stdio: "inherit" },
-  );
-}
 
 const nextConfig: NextConfig = {
   output: "standalone",

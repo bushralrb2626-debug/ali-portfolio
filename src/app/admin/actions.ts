@@ -55,9 +55,7 @@ export async function loginAction(formData: FormData) {
 }
 
 export async function logoutAction() {
-  const { clearAdminCookie } = await import("@/lib/admin-session");
-  await clearAdminCookie();
-  await signOut({ redirectTo: "/admin/login" });
+  await signOut({ redirectTo: "/admin/preview" });
 }
 
 export async function createSection(formData: FormData) {

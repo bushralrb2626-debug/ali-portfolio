@@ -15,7 +15,10 @@ ENV AUTH_TRUST_HOST="true"
 ENV AUTH_SECRET="build-only-secret"
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV SKIP_DB_BOOTSTRAP=1
-RUN npx prisma generate && npx prisma db push && npx tsx prisma/reseed-ads.ts && npx next build --webpack
+RUN DATABASE_URL="file:./dev.db" npx prisma generate \
+ && DATABASE_URL="file:./dev.db" npx prisma db push \
+ && DATABASE_URL="file:./dev.db" npx tsx prisma/reseed-ads.ts \
+ && DATABASE_URL="file:./dev.db" npx next build --webpack
 
 FROM node:20-bookworm-slim AS runner
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
