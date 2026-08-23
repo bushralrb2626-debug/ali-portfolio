@@ -41,6 +41,45 @@ export type PitchDeck = {
   slides: PitchSlide[];
 };
 
+function deriveBars(chart: PitchChart): PitchChartBar[] {
+  if (chart.bars?.length) return chart.bars;
+  return (chart.series ?? []).map((s) => ({
+    label: s.name,
+    value: s.values[s.values.length - 1] ?? 0,
+  }));
+}
+
+function deriveSeries(chart: PitchChart): {
+  series: PitchChartSeries[];
+  xLabels: string[];
+} {
+  if (chart.series?.length) {
+    return {
+      series: chart.series,
+      xLabels:
+        chart.xLabels ??
+        chart.series[0].values.map((_, i) => `M${i + 1}`),
+    };
+  }
+  const bars = chart.bars ?? [];
+  return {
+    xLabels: bars.map((b) => b.label),
+    series: [{ name: chart.title, values: bars.map((b) => b.value) }],
+  };
+}
+
+/** One briefing graph becomes bar + line/area + doughnut from the same series. */
+export function tripleChart(data: PitchChart): PitchChart[] {
+  const bars = deriveBars(data);
+  const { series, xLabels } = deriveSeries(data);
+  const shared = { ...data, bars, series, xLabels };
+  return [
+    { ...shared, type: "bar" },
+    { ...shared, type: "line" },
+    { ...shared, type: "pie" },
+  ];
+}
+
 export const CHART_TIME: PitchChart = {
   type: "bar",
   title: "Days to ship one parent hook",
@@ -109,13 +148,19 @@ export const CHART_TUNG_VIEWS: PitchChart = {
 export const CHART_TUNG_LIFT: PitchChart = {
   type: "line",
   kind: "model",
-  title: "Five-month campus model after the long AI film",
+  title: "Popularity and income after the long AI film",
   caption:
-    "Invented monthly series. Not QS, THE, or an enrollment PDF. YouTube H79QCj-gPlc is the real film.",
+    "Briefing model: before vs after bars, five-month popularity + income line, doughnut mix. Not QS, THE, or an enrollment PDF. Cite YouTube ~2.9M vs Fazaia ~326 only.",
   xLabels: ["M1", "M2", "M3", "M4", "M5"],
   series: [
-    { name: "Popularity index", values: [100, 108, 118, 127, 135] },
-    { name: "Students index", values: [100, 105, 114, 123, 132] },
+    { name: "Popularity index", values: [100, 118, 132, 148, 162] },
+    { name: "Income index", values: [100, 112, 124, 141, 155] },
+  ],
+  bars: [
+    { label: "Pop. before", value: 100 },
+    { label: "Pop. after", value: 162 },
+    { label: "Income before", value: 100 },
+    { label: "Income after", value: 155 },
   ],
 };
 
@@ -334,8 +379,10 @@ const WHY_ALI: PitchSlide = {
   ],
 };
 
+const TUNG_SHORT = "https://www.youtube.com/watch?v=x0KQfpqpq3Y";
 const TUNG_LONG = "https://www.youtube.com/watch?v=H79QCj-gPlc";
 const FIC_CLIP = "https://www.youtube.com/watch?v=4ZtmP_QrErk";
+const MOTO_CLIP = "https://www.youtube.com/watch?v=0uF69-ZyNYc";
 const Q_MOBILE = "https://www.youtube.com/watch?v=XQ3X4CWStoM";
 
 const EDUCATION_IDS = new Set([
@@ -356,6 +403,7 @@ function educationCompareSlide(leftVideo: string): PitchSlide {
       "Tunghai long film ~2.9M views on ~1.6k subs. FIC ~326 views, no original brand website, no authentic social home.",
     ],
     videoUrl: leftVideo,
+    contrastVideoUrl: FIC_CLIP,
     videoSourceLabel: "Tunghai University official YouTube",
     contrastVideoSourceLabel: "Fazaia Inter College E-9 Islamabad YouTube",
     compareAiLabel: "Tunghai University · AI",
@@ -374,6 +422,7 @@ function phoneCompareSlide(leftVideo: string): PitchSlide {
       "Motorola skipped the crew. That is faster and cheaper to make than a live shoot — Ali’s method, not a price list.",
     ],
     videoUrl: leftVideo,
+    contrastVideoUrl: Q_MOBILE,
     videoSourceLabel: "Motorola official YouTube",
     contrastVideoSourceLabel: "Q Mobile official YouTube",
     compareAiLabel: "Motorola · AI, no crew",
@@ -400,27 +449,28 @@ function deck(
   extra?: PitchSlide[],
   videoUrl?: string,
 ): PitchDeck {
-  const slides: PitchSlide[] = [hook, proofs];
+  const slides: PitchSlide[] = [
+    {
+      ...hook,
+      videoUrl: hook.videoUrl ?? videoUrl,
+      videoSourceLabel:
+        hook.videoSourceLabel ??
+        (hook.videoUrl || videoUrl ? VIDEO_SOURCES[id] : undefined),
+    },
+    proofs,
+  ];
   const alreadyCompare = [hook, proofs, ...(extra ?? [])].some(
     (slide) => slide.compareHumanLabel,
   );
-  if (videoUrl && !alreadyCompare) {
+  if (!alreadyCompare) {
     if (EDUCATION_IDS.has(id)) {
       slides.push(
-        educationCompareSlide(id === "ev-fazaia" ? TUNG_LONG : videoUrl),
+        educationCompareSlide(id === "ev-fazaia" ? TUNG_LONG : videoUrl ?? TUNG_LONG),
       );
     } else if (id === "ev-ai-moto" || id === "ev-qmobile") {
       slides.push(
-        phoneCompareSlide(
-          id === "ev-qmobile" ? "https://youtu.be/0uF69-ZyNYc" : videoUrl,
-        ),
+        phoneCompareSlide(id === "ev-qmobile" ? MOTO_CLIP : videoUrl ?? MOTO_CLIP),
       );
-    } else if (!hook.videoUrl) {
-      slides[0] = {
-        ...hook,
-        videoUrl,
-        videoSourceLabel: VIDEO_SOURCES[id] ?? hook.videoSourceLabel,
-      };
     }
   }
   if (extra?.length) slides.push(...extra);
@@ -596,7 +646,7 @@ const DECKS: Record<string, PitchDeck> = {
       ],
     },
     undefined,
-    "https://youtu.be/0uF69-ZyNYc",
+    MOTO_CLIP,
   ),
   "ev-qmobile": deck(
     "ev-qmobile",
@@ -642,7 +692,7 @@ const DECKS: Record<string, PitchDeck> = {
       ],
     },
     undefined,
-    "https://www.youtube.com/watch?v=x0KQfpqpq3Y",
+    TUNG_SHORT,
   ),
   "ev-ai-tunghai-long": deck(
     "ev-ai-tunghai-long",
@@ -662,8 +712,8 @@ const DECKS: Record<string, PitchDeck> = {
     {
       title: "Ali campus model — not a published ranking",
       bullets: [
-        "Invented graph: popularity / students / ranking +30–40% in 5 months after the AI film.",
-        "Cite YouTube for views. Do not cite QS or THE for this lift.",
+        "Invented graph: popularity and campus income index after the long AI film. Briefing model, not a ranking PDF.",
+        "Cite YouTube for views (~2.9M vs Fazaia ~326). Do not cite QS or THE for this lift.",
       ],
       charts: [CHART_TUNG_LIFT],
     },
@@ -692,7 +742,7 @@ const DECKS: Record<string, PitchDeck> = {
       ],
     },
     undefined,
-    TUNG_LONG,
+    FIC_CLIP,
   ),
   "ev-ai-dumpling": deck(
     "ev-ai-dumpling",

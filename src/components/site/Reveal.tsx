@@ -7,11 +7,13 @@ export function Reveal({
   className,
   delayMs = 0,
   rootEl,
+  replay = false,
 }: {
   children: ReactNode;
   className?: string;
   delayMs?: number;
   rootEl?: Element | null;
+  replay?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [on, setOn] = useState(false);
@@ -29,6 +31,7 @@ export function Reveal({
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) setOn(true);
+        else if (replay) setOn(false);
       },
       {
         root: rootEl ?? null,
@@ -38,7 +41,7 @@ export function Reveal({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [rootEl]);
+  }, [rootEl, replay]);
 
   return (
     <div

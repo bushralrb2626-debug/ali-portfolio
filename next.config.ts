@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["192.168.100.10", "127.0.0.1"],
   serverExternalPackages: ["@prisma/client", "prisma"],
   outputFileTracingIncludes: {
-    "*": ["./prisma/**/*", "./dev.db"],
+    "*": ["./prisma/**/*", "./prisma/dev.db"],
   },
 };
 

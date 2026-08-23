@@ -253,6 +253,7 @@ function SortableSection({
         }
         itemNodes={
           section.type === "about" ||
+          section.type === "stack" ||
           section.type === "projects" ||
           section.type === "evidence" ||
           section.type === "skills"
@@ -391,7 +392,7 @@ function SortableItem({
     );
   }
 
-  if (type === "about") {
+  if (type === "about" || type === "stack") {
     return (
       <div ref={sortable.setNodeRef} style={style}>
         <AboutCard

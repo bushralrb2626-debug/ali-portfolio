@@ -363,12 +363,13 @@ export function SectionView({
     );
   }
 
-  if (section.type === "about") {
+  if (section.type === "about" || section.type === "stack") {
+    const isStack = section.type === "stack";
     return (
-      <section id="about" className="scroll-mt-20 py-20">
+      <section id={isStack ? "campus-stack" : "about"} className="scroll-mt-20 py-20">
         {dragHandle}
         <div className="mb-12">
-          <Pill>Thesis</Pill>
+          <Pill>{isStack ? "Campus page" : "Thesis"}</Pill>
           <PublicHeading
             as="h2"
             text={title}
@@ -378,8 +379,13 @@ export function SectionView({
           {section.subtitle || editable ? (
             <p className="mt-3 text-cyan-200/40">{subtitle}</p>
           ) : null}
+          {isStack && (section.body || editable) ? (
+            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-cyan-100/50">
+              {body}
+            </p>
+          ) : null}
         </div>
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className={`grid gap-6 ${isStack ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
           {itemNodes
             ? itemNodes
             : visibleItems.map((item, index) => (

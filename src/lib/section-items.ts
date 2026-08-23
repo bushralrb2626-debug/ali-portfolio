@@ -1,6 +1,7 @@
 export const SECTION_TYPES = [
   "hero",
   "about",
+  "stack",
   "evidence",
   "projects",
   "skills",
@@ -131,6 +132,9 @@ export function itemsHint(type: string): string {
   }
   if (type === "skills") {
     return "One skill per line";
+  }
+  if (type === "stack") {
+    return "One card per line: Title | Description";
   }
   return "Optional list — one item per line";
 }

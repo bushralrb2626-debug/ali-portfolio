@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useCallback, useState, useRef, type RefObject } from "react";
-import { TerminalChart } from "@/components/site/TerminalChart";
-import { Reveal } from "@/components/site/Reveal";
+import { TripleCharts } from "@/components/site/TerminalChart";
 import type { PitchDeck, PitchSlide } from "@/lib/evidence-pitch";
 
 function youtubeId(url: string): string | null {
@@ -176,14 +175,13 @@ function SlideStage({
       {charts.length ? (
         <div className="pitch-chart-grid">
           {charts.map((chart, i) => (
-            <Reveal
-              key={`${slideKey}-${chart.title}`}
-              rootEl={scrollEl}
-              delayMs={120 + i * 140}
-              className="pitch-chart-reveal"
-            >
-              <TerminalChart chart={chart} compact />
-            </Reveal>
+            <TripleCharts
+              key={`${slideKey}-${chart.title}-${i}`}
+              chart={chart}
+              compact
+              slideKey={slideKey}
+              scrollEl={scrollEl}
+            />
           ))}
         </div>
       ) : null}

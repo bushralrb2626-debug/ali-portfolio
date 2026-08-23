@@ -26,6 +26,7 @@ if (useEphemeralSqlite()) {
     }
   }
   process.env.DATABASE_URL = `file:${dest}`;
+  process.env.DATABASE_URL = `file:${dest}`;
 }
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };

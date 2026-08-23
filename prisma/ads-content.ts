@@ -60,6 +60,41 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
     visible: true,
   },
   {
+    type: "stack",
+    title: "Why the campus page and chatbot matter",
+    subtitle: "Parents search on the phone. Ads need a URL. Night questions need a bot.",
+    body: "A YouTube clip is not a conversion page. Ali’s AI site method is faster and cheaper than a long agency build — never “free,” and never a fake price list.",
+    imageUrl: "",
+    items: JSON.stringify([
+      {
+        id: "stack-search",
+        title: "Parents search on the phone",
+        description:
+          "They type the campus name. No original page means not trusted and not original. FIC has no original site — that is the hole ads cannot paper over.",
+      },
+      {
+        id: "stack-ads",
+        title: "Ads need a landing URL",
+        description:
+          "Paid Meta and TikTok send parents somewhere. YouTube-only is not conversion. The campus page holds story, photos, O vs A, and the apply path after the clip ends.",
+      },
+      {
+        id: "stack-bot",
+        title: "Chatbot for night questions",
+        description:
+          "Admissions, O vs A, location — parents ask after hours. A silent page loses the lead. The bot answers and captures contact while Ali still runs the ads.",
+      },
+      {
+        id: "stack-method",
+        title: "Ali’s AI site method",
+        description:
+          "Brief, generate layout and copy, ship in days — the same week as the ads. Faster and cheaper than a long web project. Ali’s method, not a published cost study. Never “free.” No fake prices.",
+      },
+    ]),
+    sortOrder: 2,
+    visible: true,
+  },
+  {
     type: "evidence",
     title: "Proof from the field",
     subtitle:
@@ -324,7 +359,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         timeRange: "No clip — open the live demo",
       },
     ]),
-    sortOrder: 2,
+    sortOrder: 3,
     visible: true,
   },
   {
@@ -378,7 +413,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         timeRange: "No clip yet",
       },
     ]),
-    sortOrder: 3,
+    sortOrder: 4,
     visible: true,
   },
   {
@@ -397,7 +432,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
       { title: "Short-Form Edit" },
       { title: "Solo Campaign Ops" },
     ]),
-    sortOrder: 4,
+    sortOrder: 5,
     visible: true,
   },
   {
@@ -409,7 +444,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
     items: JSON.stringify([
       { title: "Email", url: "mailto:ali@example.com" },
     ]),
-    sortOrder: 5,
+    sortOrder: 6,
     visible: true,
   },
 ];

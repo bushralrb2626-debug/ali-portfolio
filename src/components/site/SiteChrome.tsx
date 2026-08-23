@@ -39,6 +39,9 @@ export function SiteHeader({
           <a href="#about" className="hover:text-cyan-100">
             About
           </a>
+          <a href="#campus-stack" className="hover:text-cyan-100">
+            Site
+          </a>
           <a href="#evidence" className="hover:text-cyan-100">
             Proof
           </a>
