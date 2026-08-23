@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+.firebase
+*.db
+.env
+.env.*
+!.env.example
