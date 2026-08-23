@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { mkdir, writeFile } from "fs/promises";
 import { NextResponse } from "next/server";
 import path from "path";
@@ -15,11 +14,6 @@ const IMAGE_MAX = 4 * 1024 * 1024;
 const VIDEO_MAX = 50 * 1024 * 1024;
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const form = await request.formData();
   const file = form.get("file");
   if (!(file instanceof File)) {

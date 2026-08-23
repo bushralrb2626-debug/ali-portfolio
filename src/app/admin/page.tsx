@@ -4,13 +4,11 @@ import {
   toggleSection,
 } from "@/app/admin/actions";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/require-admin";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminHomePage() {
-  await requireAdmin();
   const sections = await prisma.section.findMany({
     orderBy: { sortOrder: "asc" },
   });

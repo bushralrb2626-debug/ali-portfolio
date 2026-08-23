@@ -1,7 +1,6 @@
 import { updateSection } from "@/app/admin/actions";
 import { SectionForm } from "@/components/admin/SectionForm";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/require-admin";
 import { itemsToText } from "@/lib/section-items";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -11,7 +10,6 @@ export default async function EditSectionPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireAdmin();
   const { id } = await params;
   const section = await prisma.section.findUnique({ where: { id } });
   if (!section) {

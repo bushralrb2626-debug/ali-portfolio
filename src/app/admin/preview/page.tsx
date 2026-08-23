@@ -1,15 +1,18 @@
 import { EditableSite } from "@/components/editor/EditableSite";
 import { parseItems } from "@/lib/section-items";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/require-admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function PreviewPage() {
-  await requireAdmin();
-  const rows = await prisma.section.findMany({
-    orderBy: { sortOrder: "asc" },
-  });
+  let rows: Awaited<ReturnType<typeof prisma.section.findMany>> = [];
+  try {
+    rows = await prisma.section.findMany({
+      orderBy: { sortOrder: "asc" },
+    });
+  } catch {
+    rows = [];
+  }
 
   return (
     <EditableSite

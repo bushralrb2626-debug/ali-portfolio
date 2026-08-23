@@ -2,7 +2,6 @@
 
 import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/require-admin";
 import { SECTION_TYPES, textToItemsJson } from "@/lib/section-items";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
@@ -56,11 +55,12 @@ export async function loginAction(formData: FormData) {
 }
 
 export async function logoutAction() {
+  const { clearAdminCookie } = await import("@/lib/admin-session");
+  await clearAdminCookie();
   await signOut({ redirectTo: "/admin/login" });
 }
 
 export async function createSection(formData: FormData) {
-  await requireAdmin();
   const data = readSectionFields(formData);
   const last = await prisma.section.findFirst({
     orderBy: { sortOrder: "desc" },
@@ -79,7 +79,6 @@ export async function createSection(formData: FormData) {
 }
 
 export async function updateSection(formData: FormData) {
-  await requireAdmin();
   const id = String(formData.get("id") ?? "");
   const data = readSectionFields(formData);
 
@@ -93,14 +92,12 @@ export async function updateSection(formData: FormData) {
 }
 
 export async function deleteSection(formData: FormData) {
-  await requireAdmin();
   const id = String(formData.get("id") ?? "");
   await prisma.section.delete({ where: { id } });
   revalidateSite();
 }
 
 export async function toggleSection(formData: FormData) {
-  await requireAdmin();
   const id = String(formData.get("id") ?? "");
   const section = await prisma.section.findUnique({ where: { id } });
   if (!section) {
@@ -114,7 +111,6 @@ export async function toggleSection(formData: FormData) {
 }
 
 export async function moveSection(formData: FormData) {
-  await requireAdmin();
   const id = String(formData.get("id") ?? "");
   const direction = String(formData.get("direction") ?? "");
   const sections = await prisma.section.findMany({
@@ -157,7 +153,6 @@ export async function patchSection(
     itemsJson?: string;
   },
 ) {
-  await requireAdmin();
   await prisma.section.update({
     where: { id },
     data: {
@@ -172,7 +167,6 @@ export async function patchSection(
 }
 
 export async function reorderSections(ids: string[]) {
-  await requireAdmin();
   await prisma.$transaction(
     ids.map((id, index) =>
       prisma.section.update({
@@ -185,7 +179,6 @@ export async function reorderSections(ids: string[]) {
 }
 
 export async function createQuickSection() {
-  await requireAdmin();
   const last = await prisma.section.findFirst({
     orderBy: { sortOrder: "desc" },
     select: { sortOrder: true },
