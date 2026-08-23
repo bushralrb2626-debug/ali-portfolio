@@ -62,10 +62,7 @@ export function TerminalChart({
   return (
     <figure className={`pitch-chart pitch-chart--${kind}${compact ? " pitch-chart--compact" : ""}`}>
       <figcaption className="pitch-chart-head">
-        <span>
-          {kind === "pie" ? "DOUGHNUT" : kind === "line" ? "LINE / AREA" : "BARS"} ·{" "}
-          {chart.title}
-        </span>
+        <span>{chart.title}</span>
         {chart.kind === "model" ? <span className="pitch-chart-tag">MODEL</span> : null}
       </figcaption>
       {kind === "pie" ? <PieChart chart={chart} compact={compact} /> : null}
