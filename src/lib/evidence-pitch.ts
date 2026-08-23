@@ -653,8 +653,6 @@ const DECKS: Record<string, PitchDeck> = {
       accent: "win",
       videoUrl: "https://www.youtube.com/watch?v=H79QCj-gPlc",
       videoSourceLabel: "Tunghai University official YouTube",
-      videoUrl: "https://www.youtube.com/watch?v=H79QCj-gPlc",
-      videoSourceLabel: "Tunghai University official YouTube",
       bullets: [
         "Official complete version. Universities already use AI. Schools will follow.",
         "Two education systems: Tunghai AI film vs FIC human admissions (~326 views, no original website).",
