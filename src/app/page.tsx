@@ -10,8 +10,7 @@ export default async function HomePage() {
     where: { visible: true, NOT: { type: "skills" } },
     orderBy: { sortOrder: "asc" },
   });
-  const brand =
-    sections.find((section) => section.type === "hero")?.title ?? "Ali";
+  const brand = "Ali";
 
   return (
     <SiteShell brand={brand}>

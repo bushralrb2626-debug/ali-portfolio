@@ -20,15 +20,13 @@ function resolveSqliteUrl() {
   }
 
   const dest = "/tmp/ali-portfolio.db";
-  if (!existsSync(dest)) {
-    for (const src of [
-      join(process.cwd(), "prisma", "dev.db"),
-      join(process.cwd(), "dev.db"),
-    ]) {
-      if (existsSync(/* turbopackIgnore: true */ src)) {
-        copyFileSync(/* turbopackIgnore: true */ src, dest);
-        break;
-      }
+  for (const src of [
+    join(process.cwd(), "prisma", "dev.db"),
+    join(process.cwd(), "dev.db"),
+  ]) {
+    if (existsSync(/* turbopackIgnore: true */ src)) {
+      copyFileSync(/* turbopackIgnore: true */ src, dest);
+      break;
     }
   }
   return `file:${dest}`;

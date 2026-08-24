@@ -12,11 +12,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function SecurityPage() {
-  const hero = await prisma.section.findFirst({
-    where: { type: "hero" },
-    select: { title: true },
-  });
-  const brand = hero?.title ?? "Ali";
+  const brand = "Ali";
 
   return (
     <SiteShell brand={brand}>

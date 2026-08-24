@@ -722,8 +722,7 @@ export function EditableSite({
     }
   }
 
-  const brand =
-    sections.find((section) => section.type === "hero")?.title ?? "Ali";
+  const brand = "Ali";
 
   if (!dndReady) {
     return (

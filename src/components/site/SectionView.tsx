@@ -282,14 +282,14 @@ export function SectionView({
             {typeof title === "string" && !editable ? (
               <TypeLine
                 as="h1"
-                text={title}
+                text={title.replace(/^Ali\.\s*/i, "")}
                 delayMs={80}
                 msPerChar={70}
                 className="mt-4 max-w-3xl text-5xl font-semibold tracking-tight text-cyan-50 md:text-7xl"
               />
             ) : (
               <h1 className="mt-4 max-w-3xl text-5xl font-semibold tracking-tight text-cyan-50 md:text-7xl">
-                {title}
+                {typeof title === "string" ? title.replace(/^Ali\.\s*/i, "") : title}
               </h1>
             )}
             {section.body || editable ? (
