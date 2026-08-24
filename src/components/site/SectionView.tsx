@@ -1,7 +1,12 @@
 "use client";
 
 import type { Section } from "@prisma/client";
-import { parseItems, type SectionItem } from "@/lib/section-items";
+import {
+  parseItems,
+  timeCues,
+  youtubeAtTime,
+  type SectionItem,
+} from "@/lib/section-items";
 import type { ReactNode } from "react";
 import { YouTubePosterPlayer } from "@/components/site/YouTubePosterPlayer";
 import { EvidencePitchTrigger } from "@/components/site/EvidencePitchTrigger";
@@ -493,6 +498,7 @@ export function SectionView({
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           {visibleItems.map((item) => {
             const watch = item.videoUrl || item.url;
+            const cues = item.timeRange ? timeCues(item.timeRange) : [];
             return (
               <article
                 key={item.id ?? item.title}
@@ -504,20 +510,38 @@ export function SectionView({
                     {item.sourceLabel}
                   </p>
                 ) : null}
+                {item.timeRange ? (
+                  <p className="mt-2 text-sm text-cyan-300/80">
+                    Said at {item.timeRange}
+                  </p>
+                ) : null}
                 {item.description ? (
                   <p className="mt-3 text-sm leading-relaxed text-cyan-200/45">
                     {item.description}
                   </p>
                 ) : null}
                 {watch ? (
-                  <a
-                    href={watch}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-4 inline-flex text-sm text-cyan-300 hover:underline"
-                  >
-                    Open video
-                  </a>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    {(cues.length ? cues : [{ label: "Open video", start: "" }]).map(
+                      (cue) => (
+                        <a
+                          key={cue.label}
+                          href={
+                            cue.start
+                              ? youtubeAtTime(watch, cue.start)
+                              : watch
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex text-sm text-cyan-300 hover:underline"
+                        >
+                          {cues.length
+                            ? `Open video ${cue.label}`
+                            : "Open video"}
+                        </a>
+                      ),
+                    )}
+                  </div>
                 ) : null}
               </article>
             );

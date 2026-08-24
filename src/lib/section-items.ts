@@ -142,3 +142,39 @@ export function itemsHint(type: string): string {
   }
   return "Optional list — one item per line";
 }
+
+export function clockToSeconds(clock: string): number | null {
+  const parts = clock.trim().split(":").map(Number);
+  if (parts.length < 2 || parts.some((n) => Number.isNaN(n))) {
+    return null;
+  }
+  if (parts.length === 3) {
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  }
+  return parts[0] * 60 + parts[1];
+}
+
+export function youtubeAtTime(url: string, clock: string): string {
+  const seconds = clockToSeconds(clock);
+  if (!url || seconds == null) {
+    return url;
+  }
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.set("t", String(seconds));
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+}
+
+export function timeCues(range: string): { label: string; start: string }[] {
+  return range
+    .split("·")
+    .map((part) => part.trim())
+    .filter((part) => /\d/.test(part))
+    .map((label) => ({
+      label,
+      start: label.split(/[–-]/)[0].trim(),
+    }));
+}
