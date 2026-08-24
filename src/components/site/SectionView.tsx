@@ -500,100 +500,49 @@ export function SectionView({
     return (
       <section id="why-ai" className="scroll-mt-20 py-20">
         {dragHandle}
-        <Pill>Why AI</Pill>
-        <PublicHeading
-          as="h2"
-          text={title}
-          editable={editable}
-          className="mt-4 text-4xl font-semibold tracking-tight text-cyan-50"
-        />
-        {section.subtitle || editable ? (
-          <p className="mt-3 max-w-3xl text-cyan-200/40">{subtitle}</p>
-        ) : null}
-        {section.body || editable ? (
-          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-cyan-100/50">
-            {body}
-          </p>
-        ) : null}
-        <div className="mt-10 grid gap-4 md:grid-cols-2">
-          {visibleItems.map((item, index) => {
-            const watch = item.videoUrl || "";
-            const sourceHref =
-              item.articleUrl ||
-              (item.url && item.url !== item.videoUrl ? item.url : "");
-            const cues = item.timeRange ? timeCues(item.timeRange) : [];
-            const youtube = /youtube\.com|youtu\.be/.test(watch);
-            return (
-              <article
-                key={item.id ?? item.title}
-                className="circuit-card rounded-2xl p-6"
-              >
-                <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-cyan-500/70">
-                  Briefing {String(index + 1).padStart(2, "0")}
-                </p>
-                <h3 className="mt-2 text-lg font-medium text-cyan-50">{item.title}</h3>
-                {item.sourceLabel ? (
-                  <p className="mt-1 text-xs uppercase tracking-[0.14em] text-cyan-500/70">
-                    {item.sourceLabel}
-                  </p>
-                ) : null}
-                {item.timeRange ? (
-                  <p className="mt-2 text-sm text-cyan-300/80">
-                    Said at {item.timeRange}
-                  </p>
-                ) : null}
-                {item.description ? (
-                  <p className="mt-3 text-sm leading-relaxed text-cyan-200/45">
-                    {item.description}
-                  </p>
-                ) : null}
-                {sourceHref || watch ? (
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    {sourceHref ? (
-                      <a
-                        href={sourceHref}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex text-sm text-cyan-300 hover:underline"
-                      >
-                        Source
-                      </a>
+        <div className="mb-10">
+          <Pill>Why AI</Pill>
+          <PublicHeading
+            as="h2"
+            text={title}
+            editable={editable}
+            className="mt-4 text-4xl font-semibold tracking-tight text-cyan-50"
+          />
+          {section.subtitle || editable ? (
+            <p className="mt-3 max-w-3xl text-cyan-200/40">{subtitle}</p>
+          ) : null}
+          {section.body || editable ? (
+            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-cyan-100/50">
+              {body}
+            </p>
+          ) : null}
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {itemNodes
+            ? itemNodes
+            : visibleItems.map((item, index) => (
+                <Reveal key={item.id ?? item.title} delayMs={index * 60}>
+                  <div>
+                    <EvidenceCard item={item} order={300 + index} cues />
+                    {item.id === "why-vercel-supabase" ? (
+                      <div className="mt-4">
+                        <TripleCharts
+                          chart={CHART_HOST_LOGOS}
+                          notes
+                          slideKey={0}
+                        />
+                        <div className="mt-4">
+                          <TripleCharts
+                            chart={CHART_HOST_OPS}
+                            notes
+                            slideKey={1}
+                          />
+                        </div>
+                      </div>
                     ) : null}
-                    {watch
-                      ? (cues.length
-                          ? cues
-                          : [{ label: "Open video", start: "" }]
-                        ).map((cue) => (
-                          <a
-                            key={cue.label}
-                            href={
-                              cue.start && youtube
-                                ? youtubeAtTime(watch, cue.start)
-                                : watch
-                            }
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex text-sm text-cyan-300 hover:underline"
-                          >
-                          {cues.length
-                            ? `Open video ${cue.label}`
-                            : "Open video"}
-                        </a>
-                      ))
-                    : null}
-                </div>
-              ) : null}
-                {item.id === "why-vercel-supabase" ? (
-                  <div className="mt-5">
-                    <TripleCharts chart={CHART_HOST_LOGOS} notes slideKey={0} />
-                    <div className="mt-4">
-                      <TripleCharts chart={CHART_HOST_OPS} notes slideKey={1} />
-                    </div>
                   </div>
-                ) : null}
-              </article>
-            );
-          })}
+                </Reveal>
+              ))}
         </div>
       </section>
     );
@@ -828,11 +777,13 @@ export function EvidenceCard({
   extra,
   contrastVideoUrl,
   order = 0,
+  cues = false,
 }: {
   item?: SectionItem;
   extra?: ReactNode;
   contrastVideoUrl?: string;
   order?: number;
+  cues?: boolean;
 }) {
   if (!item) {
     return extra;
@@ -854,34 +805,80 @@ export function EvidenceCard({
       <div className="p-6">
         {!extra ? (
           <>
-            <h3 className="text-lg font-medium text-cyan-50">{item.title}</h3>
+            {item.sourceLabel ? (
+              <p className="text-xs uppercase tracking-[0.14em] text-cyan-500/70">
+                {item.sourceLabel}
+              </p>
+            ) : null}
+            <h3 className="mt-2 text-lg font-medium text-cyan-50">{item.title}</h3>
+            {item.timeRange ? (
+              <p className="mt-2 text-sm text-cyan-300/80">
+                Said at {item.timeRange}
+              </p>
+            ) : null}
             {item.description ? (
               <p className="mt-2 text-sm leading-relaxed text-cyan-200/45">
                 {item.description}
               </p>
             ) : null}
-            {item.videoUrl ? (
-              <a
-                href={item.videoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="mt-3 mr-3 inline-block text-sm text-[var(--ice)] hover:underline"
-              >
-                Open video →
-              </a>
-            ) : null}
-            {item.articleUrl || item.url ? (
-              <a
-                href={item.articleUrl || item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="mt-3 inline-block text-sm text-[var(--ice)] hover:underline"
-              >
-                Open article →
-              </a>
-            ) : null}
+            {(() => {
+              const watch = item.videoUrl || "";
+              const sourceHref =
+                item.articleUrl ||
+                (item.url && item.url !== item.videoUrl ? item.url : "");
+              const cueList = item.timeRange ? timeCues(item.timeRange) : [];
+              const youtube = /youtube\.com|youtu\.be/.test(watch);
+              if (!sourceHref && !watch) return null;
+              return (
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {sourceHref ? (
+                    <a
+                      href={sourceHref}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-block text-sm text-[var(--ice)] hover:underline"
+                    >
+                      Source
+                    </a>
+                  ) : null}
+                  {watch
+                    ? (cueList.length
+                        ? cueList
+                        : [{ label: "Open video", start: "" }]
+                      ).map((cue) => (
+                        <a
+                          key={cue.label}
+                          href={
+                            cue.start && youtube
+                              ? youtubeAtTime(watch, cue.start)
+                              : watch
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-block text-sm text-[var(--ice)] hover:underline"
+                        >
+                          {cueList.length
+                            ? `Open video ${cue.label}`
+                            : "Open video →"}
+                        </a>
+                      ))
+                    : null}
+                  {item.articleUrl || (!watch && item.url) ? (
+                    <a
+                      href={item.articleUrl || item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-block text-sm text-[var(--ice)] hover:underline"
+                    >
+                      Open article →
+                    </a>
+                  ) : null}
+                </div>
+              );
+            })()}
           </>
         ) : (
           extra
@@ -899,6 +896,7 @@ export function EvidenceCard({
       item={item}
       contrastVideoUrl={contrastVideoUrl}
       order={order}
+      cues={cues}
     >
       {card}
     </EvidencePitchTrigger>

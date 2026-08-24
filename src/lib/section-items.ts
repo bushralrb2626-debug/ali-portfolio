@@ -49,21 +49,30 @@ export function parseItems(raw: string): SectionItem[] {
         if (!title) {
           continue;
         }
+        const raw = item as SectionItem & {
+          sourceLabel?: string;
+          timeRange?: string;
+          articleUrl?: string;
+          whyAdded?: string;
+          whyVideo?: string;
+          whyArticle?: string;
+          pitchLine?: string;
+        };
         items.push({
           title,
-          description: item.description ? String(item.description) : "",
-          url: item.url ? String(item.url) : "",
-          imageUrl: item.imageUrl ? String(item.imageUrl) : "",
-          videoUrl: item.videoUrl ? String(item.videoUrl) : "",
-          sourceLabel: item.sourceLabel ? String(item.sourceLabel) : "",
-          articleUrl: item.articleUrl ? String(item.articleUrl) : "",
-          whyAdded: item.whyAdded ? String(item.whyAdded) : "",
-          whyVideo: item.whyVideo ? String(item.whyVideo) : "",
-          whyArticle: item.whyArticle ? String(item.whyArticle) : "",
-          pitchLine: item.pitchLine ? String(item.pitchLine) : "",
-          timeRange: item.timeRange ? String(item.timeRange) : "",
-          hidden: Boolean(item.hidden),
-          id: "id" in item && item.id ? String(item.id) : undefined,
+          description: raw.description ? String(raw.description) : "",
+          url: raw.url ? String(raw.url) : "",
+          imageUrl: raw.imageUrl ? String(raw.imageUrl) : "",
+          videoUrl: raw.videoUrl ? String(raw.videoUrl) : "",
+          sourceLabel: String(raw.sourceLabel || raw.sourceLabel || ""),
+          articleUrl: String(raw.articleUrl || raw.articleUrl || ""),
+          whyAdded: String(raw.whyAdded || raw.whyAdded || ""),
+          whyVideo: String(raw.whyVideo || raw.whyVideo || ""),
+          whyArticle: String(raw.whyArticle || raw.whyArticle || ""),
+          pitchLine: String(raw.pitchLine || raw.pitchLine || ""),
+          timeRange: String(raw.timeRange || raw.timeRange || ""),
+          hidden: Boolean(raw.hidden),
+          id: "id" in raw && raw.id ? String(raw.id) : undefined,
         });
       }
     }

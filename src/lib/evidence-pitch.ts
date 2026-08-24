@@ -465,6 +465,12 @@ const VIDEO_SOURCES: Record<string, string> = {
   "ev-ai-tunghai": "Tunghai University official YouTube",
   "ev-ai-tunghai-long": "Tunghai University official YouTube",
   "ev-fazaia": "Fazaia Inter College E-9 Islamabad YouTube",
+  "why-musk": "The Economist — official interview",
+  "why-zuck": "Joe Rogan Experience #2255 — official",
+  "why-jassy": "CNBC Mad Money — Jassy on camera",
+  "why-gates": "The Tonight Show Starring Jimmy Fallon — official NBC",
+  "why-amodei": "CNN — Anderson Cooper, Amodei on camera",
+  "why-hastings": "Semafor — The CEO Signal, Hastings speaking",
 };
 
 function deck(
@@ -876,6 +882,147 @@ const DECKS: Record<string, PitchDeck> = {
         "Keep campus faces — cut for hooks and parent ads.",
         "Million-view AI method + in-radius targeting is the hire.",
       ],
+    },
+  ),
+  "why-musk": deck(
+    "why-musk",
+    "Elon Musk — original interview",
+    {
+      title: "AI is already better at the digital job",
+      subtitle: "The Economist — official interview",
+      accent: "win",
+      bullets: [
+        "There is nothing AI cannot do better than humans, except be human.",
+        "Digital jobs, including software, are already work AI does better than most engineers.",
+        "Campus line: site, chatbot, ads, and inbox do not need a human staff team.",
+      ],
+    },
+    {
+      title: "What to say",
+      bullets: [
+        "Play the original timestamps. This is Musk on camera, not a recap.",
+        "1:30–1:47 and 29:25–30:08.",
+      ],
+    },
+    undefined,
+    "https://www.youtube.com/watch?v=XuoqKYxDHVc&t=90",
+  ),
+  "why-zuck": deck(
+    "why-zuck",
+    "Mark Zuckerberg — original interview",
+    {
+      title: "The engineering seat is already an AI seat",
+      subtitle: "Joe Rogan Experience #2255 — official",
+      accent: "win",
+      bullets: [
+        "A mid-level engineer is an AI engineer.",
+        "New applications are built by AI engineers, not by people in those seats.",
+        "Campus line: site, chatbot, ads, and inbox do not need a human staff team.",
+      ],
+    },
+    {
+      title: "What to say",
+      bullets: ["Play 2:08:00–2:08:58 on the official JRE cut."],
+    },
+    undefined,
+    "https://www.youtube.com/watch?v=7k1ehaE0bdU&t=7680",
+  ),
+  "why-jassy": deck(
+    "why-jassy",
+    "Andy Jassy — original interview",
+    {
+      title: "Agents do the job. Fewer people on that job.",
+      subtitle: "CNBC Mad Money — Jassy on camera",
+      accent: "win",
+      bullets: [
+        "Agents already handle coding, research, and analytics.",
+        "Those jobs need fewer people because the agent is doing the work.",
+        "Campus line: site, chatbot, ads, and inbox do not need a human staff team.",
+      ],
+    },
+    {
+      title: "What to say",
+      bullets: ["Play 8:00–10:45 on the CNBC cut."],
+    },
+    undefined,
+    "https://www.youtube.com/watch?v=X1jpPk8hMVc&t=480",
+  ),
+  "why-gates": deck(
+    "why-gates",
+    "Bill Gates — original interview",
+    {
+      title: "Humans are not needed for most things",
+      subtitle: "The Tonight Show Starring Jimmy Fallon — official NBC",
+      accent: "win",
+      bullets: [
+        "Asked if we still need humans: not for most things.",
+        "Expert help becomes ordinary. Making, moving, and growing food become solved problems.",
+        "Campus line: site, chatbot, ads, and inbox do not need a human staff team.",
+      ],
+    },
+    {
+      title: "What to say",
+      bullets: ["Play 7:00–8:45 on the official NBC cut."],
+    },
+    undefined,
+    "https://www.youtube.com/watch?v=uHY5i9-0tJM&t=420",
+  ),
+  "why-amodei": deck(
+    "why-amodei",
+    "Dario Amodei — original interview",
+    {
+      title: "Entry-level digital work is already the model’s job",
+      subtitle: "CNN — Anderson Cooper, Amodei on camera",
+      accent: "win",
+      bullets: [
+        "Models already sit in the middle of entry-level office work — the college-student layer that writes reports and code.",
+        "Half of those jobs can go. Machines can do pretty much everything better.",
+        "Campus line: site, chatbot, ads, and inbox do not need a human staff team.",
+      ],
+    },
+    {
+      title: "What to say",
+      bullets: ["Play 0:36–1:58, 4:39–5:52, and 6:03–6:16. Source is Amodei on camera."],
+    },
+    undefined,
+    "https://www.youtube.com/watch?v=zju51INmW7U&t=36",
+  ),
+  "why-hastings": deck(
+    "why-hastings",
+    "Reed Hastings — original recording",
+    {
+      title: "Same business with half the humans",
+      subtitle: "Semafor — The CEO Signal, Hastings speaking",
+      accent: "win",
+      bullets: [
+        "AI getting twice as good each year is like doubling the workforce.",
+        "A CEO can cut the workforce in half and still run the same business lines.",
+        "Campus line: site, chatbot, ads, and inbox do not need a human staff team.",
+      ],
+      videoUrl:
+        "https://share.snipd.com/episode/44100913-1e27-4568-9d61-d1375d5e9763",
+      videoSourceLabel: "Semafor — The CEO Signal, Hastings speaking",
+    },
+    {
+      title: "What to say",
+      bullets: ["Open the original recording at 30:44–36:30. Do not use a recap."],
+    },
+  ),
+  "why-saas": deck(
+    "why-saas",
+    "Campus stack without a staff team",
+    {
+      title: "The same idea on a campus",
+      subtitle: "Ali’s implementation — not a third-party clip",
+      accent: "win",
+      bullets: [
+        "Site, chatbot, ads, and inbox run as an AI stack.",
+        "Those jobs do not need a human team on payroll.",
+      ],
+    },
+    {
+      title: "What to remember",
+      bullets: ["This card is Ali’s method. The speaker cards above are the original clips."],
     },
   ),
   "stack-vercel-supabase": deck(
