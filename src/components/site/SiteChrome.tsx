@@ -36,19 +36,25 @@ export function SiteHeader({
           )}
         </Link>
         <nav className="flex items-center gap-7 text-[13px] text-cyan-200/50">
-          <a href="#about" className="hover:text-cyan-100">
+          <a href="/#about" className="hover:text-cyan-100">
             About
           </a>
-          <a href="#campus-stack" className="hover:text-cyan-100">
+          <a href="/#campus-stack" className="hover:text-cyan-100">
             Site
           </a>
-          <a href="#evidence" className="hover:text-cyan-100">
+          <a href="/#evidence" className="hover:text-cyan-100">
             Proof
           </a>
-          <a href="#projects" className="hover:text-cyan-100">
+          <a href="/#why-ai" className="hover:text-cyan-100">
+            Why AI
+          </a>
+          <a href="/#projects" className="hover:text-cyan-100">
             Work
           </a>
-          <a href="#contact" className="hover:text-cyan-100">
+          <Link href="/security" className="hover:text-cyan-100">
+            Security
+          </Link>
+          <a href="/#contact" className="hover:text-cyan-100">
             Contact
           </a>
         </nav>
@@ -62,6 +68,10 @@ export function SiteFooter({ brand }: { brand?: string }) {
   return (
     <footer className="border-t border-cyan-500/10 px-6 py-10 text-center text-xs text-cyan-900">
       © {new Date().getFullYear()} {label}. Ads · AI video · solo ops.
+      {" · "}
+      <Link href="/security" className="text-cyan-700 hover:text-cyan-400">
+        Security
+      </Link>
     </footer>
   );
 }

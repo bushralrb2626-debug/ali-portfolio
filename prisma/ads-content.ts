@@ -4,9 +4,9 @@ import type { Prisma } from "@prisma/client";
 export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
   {
     type: "hero",
-    title: "Ali. made by Ali",
+    title: "made by Ali",
     subtitle: "O-Level campus growth · AI ads · solo",
-    body: "A new O-Level campus grows when AI-made ads reach parents who are choosing — I generate, cut, and run Meta/TikTok myself. Faster than a student film day. More accurate than hoping the feed helps. Built to get seen. I also make the campus website, school social pages, and a chatbot — then promote them faster and cheaper.",
+    body: "A new O-Level campus grows when AI-made ads reach parents who are choosing — I generate, cut, and run Meta/TikTok myself. Faster than a student film day. More accurate than hoping the feed helps. Built to get seen. I also make the campus website, school social pages, and a chatbot — then promote them faster.",
     imageUrl: "/evidence/hero.png",
     items: "[]",
     sortOrder: 0,
@@ -39,9 +39,9 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
       },
       {
         id: "about-ai-web",
-        title: "AI builds the site faster — and cheaper",
+        title: "AI builds the site faster",
         description:
-          "A normal web project takes weeks of copy rounds. Ali’s method: brief, generate layout and copy with AI, ship in days — the same week as the ads. Cheaper than a long agency build. Ali’s method, not a published cost study.",
+          "A normal web project takes weeks of copy rounds. Ali’s method: brief, generate layout and copy with AI, ship in days — the same week as the ads. Faster than a long agency build. Ali’s method, not a published study.",
       },
       {
         id: "about-chat",
@@ -63,7 +63,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
     type: "stack",
     title: "Why the campus page and chatbot matter",
     subtitle: "Parents search on the phone. Ads need a URL. Night questions need a bot.",
-    body: "A YouTube clip is not a conversion page. Ali’s AI site method is faster and cheaper than a long agency build — never “free,” and never a fake price list.",
+    body: "A YouTube clip is not a conversion page. Ali’s AI site method is faster than a long agency build — never a fake list of numbers.",
     imageUrl: "",
     items: JSON.stringify([
       {
@@ -88,7 +88,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         id: "stack-method",
         title: "Ali’s AI site method",
         description:
-          "Brief, generate layout and copy, ship in days — the same week as the ads. Faster and cheaper than a long web project. Ali’s method, not a published cost study. Never “free.” No fake prices.",
+          "Brief, generate layout and copy, ship in days — the same week as the ads. Faster than a long web project. Ali’s method, not a published study.",
       },
     ]),
     sortOrder: 2,
@@ -225,23 +225,23 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
       },
       {
         id: "ev-ai-castlery",
-        title: "Castlery — 100% AI ad, cheaper and stronger watch time",
+        title: "Castlery — 100% AI ad, stronger watch time",
         description:
-          "Article: furniture brand’s ‘Comfurtable’ spot made with Google Veo and related tools. Reported 60% lower production cost vs a live-action shoot and 23% above industry watch-time benchmarks — AI faster and more effective than a traditional crew.",
+          "Article: furniture brand’s ‘Comfurtable’ spot made with Google Veo and related tools. Watch time 23% above industry benchmarks — AI faster and more watched than a traditional crew.",
         url: "https://lbbonline.com/news/castlery-google-gen-ai",
         articleUrl: "https://lbbonline.com/news/castlery-google-gen-ai",
         sourceLabel: "LBB — Castlery x Google GenAI",
         imageUrl: "/evidence/ev-ai-castlery.png",
         videoUrl: "",
         whyAdded:
-          "Article that quantifies why AI is better: cost down, watch time up. Use after the brand ads.",
+          "Article that quantifies why AI is better: watch time up vs a live crew. Use after the brand ads.",
         whyVideo:
           "None — no official brand YouTube was confirmed. Do not invent an embed.",
         whyArticle:
-          "LBB: Castlery ‘Comfurtable’ with Veo. Reported ~60% cheaper vs live shoot and +23% watch time vs benchmarks.",
+          "LBB: Castlery ‘Comfurtable’ with Veo. Reported +23% watch time vs benchmarks.",
         pitchLine:
-          "Castlery’s AI ad cost about 60% less than a live shoot and beat watch-time benchmarks. That’s faster, more accurate spend, and more popular creative.",
-        timeRange: "No clip — quote 60% cheaper and +23% watch time from the article",
+          "Castlery’s AI ad beat watch-time benchmarks. That’s faster to ship and more popular creative.",
+        timeRange: "No clip — quote +23% watch time from the article",
       },
       {
         id: "ev-pk-school",
@@ -417,6 +417,61 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
     visible: true,
   },
   {
+    type: "briefing",
+    title: "Why AI now",
+    subtitle: "Original clips — the founders speaking, not recap videos",
+    body: "AI already does the digital work. SaaS-style site, chatbot, ads, and inbox can run without a campus staff team.",
+    imageUrl: "",
+    items: JSON.stringify([
+      {
+        id: "why-musk",
+        title: "Elon Musk",
+        description:
+          "Nothing AI cannot do better than humans except being human. Digital jobs AI does better. Software AI already beats most engineers.",
+        url: "https://www.youtube.com/watch?v=XuoqKYxDHVc",
+        videoUrl: "https://www.youtube.com/watch?v=XuoqKYxDHVc",
+        sourceLabel: "The Economist — official interview",
+        pitchLine: "Source: The Economist",
+        timeRange: "AI vs human work",
+      },
+      {
+        id: "why-zuck",
+        title: "Mark Zuckerberg",
+        description:
+          "Mid-level engineer AI. Apps built by AI engineers instead of people engineers.",
+        url: "https://www.youtube.com/watch?v=7k1ehaE0bdU",
+        videoUrl: "https://www.youtube.com/watch?v=7k1ehaE0bdU",
+        sourceLabel: "JRE #2255 — official",
+        pitchLine: "Source: JRE",
+        timeRange: "AI engineers",
+      },
+      {
+        id: "why-jassy",
+        title: "Andy Jassy",
+        description:
+          "Agents already do coding, research, and analytics. Fewer people needed on those jobs.",
+        url: "https://www.youtube.com/watch?v=X1jpPk8hMVc",
+        videoUrl: "https://www.youtube.com/watch?v=X1jpPk8hMVc",
+        sourceLabel: "CNBC / Mad Money — Jassy on camera",
+        pitchLine: "Source: CNBC",
+        timeRange: "Agents and fewer people",
+      },
+      {
+        id: "why-saas",
+        title: "SaaS without a staff team",
+        description:
+          "AI agents sit on the same stack as SaaS — site, chatbot, ads, inbox — so the campus does not need a human team to run those jobs. No staff needed. No humans needed.",
+        url: "",
+        videoUrl: "",
+        sourceLabel: "",
+        pitchLine: "Ali’s line, not a journal",
+        timeRange: "",
+      },
+    ]),
+    sortOrder: 5,
+    visible: true,
+  },
+  {
     type: "skills",
     title: "Stack",
     subtitle: "Tools I run alone for a new campus",
@@ -432,8 +487,8 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
       { title: "Short-Form Edit" },
       { title: "Solo Campaign Ops" },
     ]),
-    sortOrder: 5,
-    visible: true,
+    sortOrder: 6,
+    visible: false,
   },
   {
     type: "contact",
@@ -444,7 +499,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
     items: JSON.stringify([
       { title: "Email", url: "mailto:alimasterofall105@gmail.com" },
     ]),
-    sortOrder: 6,
+    sortOrder: 7,
     visible: true,
   },
 ];

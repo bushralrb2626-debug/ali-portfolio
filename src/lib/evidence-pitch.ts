@@ -116,7 +116,7 @@ export const CHART_EFF: PitchChart = {
 export const CHART_PHONE: PitchChart = {
   type: "bar",
   title: "Crew days to finish a phone commercial",
-  caption: "Briefing comparison of methods. Not Motorola or Q Mobile published cost.",
+  caption: "Briefing comparison of methods. Not Motorola or Q Mobile published figures.",
   bars: [
     { label: "Q Mobile live crew", value: 9, suffix: " days" },
     { label: "Motorola generated", value: 2, suffix: " days" },
@@ -252,8 +252,8 @@ export const CHART_HEINZ: PitchChart = {
 
 export const CHART_CAST_COST: PitchChart = {
   type: "pie",
-  title: "Castlery — live shoot vs AI ad cost share",
-  caption: "LBB: AI ad ~60% cheaper. Pie is 71 live / 29 AI of a 100-index budget.",
+  title: "Castlery — live shoot vs AI ad share",
+  caption: "LBB: AI ad watch time above benchmarks. Pie is 71 live / 29 AI of a 100-index mix.",
   bars: [
     { label: "Live-action shoot", value: 71, suffix: "%" },
     { label: "AI-made ad", value: 29, suffix: "%" },
@@ -344,12 +344,12 @@ export const CHART_FALL: PitchChart = {
 };
 
 const TRADITIONAL: PitchSlide = {
-  title: "Human-edited recite-and-post is slow, expensive, and small",
+  title: "Human-edited recite-and-post is slow and small",
   subtitle: "No AI tools — film students, say lines, upload",
   accent: "warn",
   bullets: [
     "Time: a film day for one take. No A/B. The week is gone.",
-    "Cost: crew, location, and unused footage. Castlery’s published AI ad was ~60% cheaper than a live shoot.",
+    "Crew, location, and unused footage. Castlery’s published AI ad beat live-shoot watch time.",
     "Efficiency: one hook, aimed at people who already follow you — not parents choosing O-Level.",
     "Reach: typical organic recite lands around 1–2k views. Million-view AI films are a different sport.",
   ],
@@ -358,10 +358,10 @@ const TRADITIONAL: PitchSlide = {
 
 const OLEVEL: PitchSlide = {
   title: "What this means for a new O-Level campus",
-  subtitle: "Faster · cheaper · more accurate · more popular",
+  subtitle: "Faster · more accurate · more popular",
   bullets: [
     "Faster: generate AI hooks the same week as a student film day.",
-    "Cheaper: skip the crew day; Castlery documented ~60% lower production cost.",
+    "Skip the crew day; Castlery documented stronger watch time than a live shoot.",
     "More accurate: Meta/TikTok aimed at parents in-radius.",
     "More popular: million-view AI films vs 1–2k typical recite posts.",
   ],
@@ -419,7 +419,7 @@ function phoneCompareSlide(leftVideo: string): PitchSlide {
     accent: "win",
     bullets: [
       "Same category: phones. Motorola generated the commercial. Q Mobile shot a conventional TV-style ad.",
-      "Motorola skipped the crew. That is faster and cheaper to make than a live shoot — Ali’s method, not a price list.",
+      "Motorola skipped the crew. That is faster to make than a live shoot — Ali’s method, not a numbers list.",
     ],
     videoUrl: leftVideo,
     contrastVideoUrl: Q_MOBILE,
@@ -538,12 +538,12 @@ const DECKS: Record<string, PitchDeck> = {
         ],
       },
       {
-        title: "AI builds the site faster — and cheaper",
-        subtitle: "Ali’s method — not a published web-cost study",
+        title: "AI builds the site faster",
+        subtitle: "Ali’s method — not a published web study",
         accent: "win",
         bullets: [
           "Agency site: weeks of copy rounds. Ali + AI: brief, generate layout and copy, ship in days — same week as the ads.",
-          "Cheaper than a long web project.",
+          "Faster than a long web project.",
         ],
       },
       {
@@ -552,7 +552,7 @@ const DECKS: Record<string, PitchDeck> = {
         accent: "win",
         bullets: [
           "Parents ask admissions, O vs A, location, after hours. A silent page loses them.",
-          "The bot answers instantly and captures the lead. Ali still runs the ads. Faster than a call-back. Cheaper than staffing every first question.",
+          "The bot answers instantly and captures the lead. Ali still runs the ads. Faster than a call-back. Faster than staffing every first question.",
         ],
       },
     ],
@@ -665,7 +665,7 @@ const DECKS: Record<string, PitchDeck> = {
       title: "What to say in the room",
       bullets: [
         "Same category. Two methods. Motorola is the AI side.",
-        "Play Q Mobile, then Motorola. Faster and cheaper to generate than to shoot.",
+        "Play Q Mobile, then Motorola. Faster to generate than to shoot.",
       ],
     },
     undefined,
@@ -812,22 +812,22 @@ const DECKS: Record<string, PitchDeck> = {
   ),
   "ev-ai-castlery": deck(
     "ev-ai-castlery",
-    "Castlery — AI ad that beat cost and watch time",
+    "Castlery — AI ad that beat watch time",
     {
-      title: "Published numbers: cheaper and stronger watch time",
+      title: "Published numbers: stronger watch time",
       subtitle: "LBB — Castlery ‘Comfurtable’ x Google Veo",
       accent: "win",
       bullets: [
-        "Reported ~60% lower production cost vs a live-action shoot.",
-        "Watch time 23% above industry benchmarks — more efficient creative, not just cheaper.",
+        "Skip the live-action crew day.",
+        "Watch time 23% above industry benchmarks — more watched creative.",
       ],
       charts: [CHART_CAST_COST, CHART_CAST_WATCH],
     },
     {
       title: "What to say in the room",
       bullets: [
-        "Open the LBB article. Quote 60% and +23%.",
-        "Human crew day is the expensive, slow default.",
+        "Open the LBB article. Quote +23% watch time.",
+        "Human crew day is the slow default.",
       ],
     },
   ),
@@ -839,7 +839,7 @@ const DECKS: Record<string, PitchDeck> = {
       subtitle: "Contrast only — not a cited source",
       accent: "warn",
       bullets: [
-        "Film students, say lines, upload. Slow, costly, one take.",
+        "Film students, say lines, upload. Slow, one take.",
         "Typical reach is 1–2k. Do not present this as a published authority.",
       ],
       charts: [CHART_PK_REACH],
@@ -932,7 +932,7 @@ const FALLBACK: PitchDeck = deck(
     title: "What to remember",
     bullets: [
       "Million-view official AI films vs 1–2k typical human posts.",
-      "Cite articles for cost/performance. Do not invent campus metrics.",
+      "Cite articles for performance. Do not invent campus metrics.",
     ],
   },
 );

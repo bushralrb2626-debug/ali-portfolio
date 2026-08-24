@@ -74,7 +74,7 @@ export function ContactForm() {
         {status === "sending" ? "Sending…" : "Send message"}
       </button>
       {status === "sent" ? (
-        <p className="text-sm text-cyan-200/70">Sent. Ali can read it in admin.</p>
+        <p className="text-sm text-cyan-200/70">Sent.</p>
       ) : null}
       {status === "error" ? (
         <p className="text-sm text-red-300/80">Could not send. Try again.</p>

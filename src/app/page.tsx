@@ -7,7 +7,7 @@ export const revalidate = 0;
 
 export default async function HomePage() {
   const sections = await prisma.section.findMany({
-    where: { visible: true },
+    where: { visible: true, NOT: { type: "skills" } },
     orderBy: { sortOrder: "asc" },
   });
   const brand =

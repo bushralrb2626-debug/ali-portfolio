@@ -100,7 +100,7 @@ function mediaHeadline(item: SectionItem): string {
     "ev-ai-dumpling": "AI clips · kids demand",
     "ev-ai-heinz": "850M+ impressions",
     "ev-slorsh": "Hidden gem · Slorsh",
-    "ev-ai-castlery": "60% cheaper · +23% watch",
+    "ev-ai-castlery": "+23% watch vs crew",
     "ev-pk-school": "Recite lines & post",
     "proj-meta": "Meta · parents in-radius",
     "proj-tiktok": "TikTok · weekly tests",
@@ -466,6 +466,62 @@ export function SectionView({
                   <ProjectCard item={item} order={200 + index} />
                 </Reveal>
               ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (section.type === "briefing") {
+    return (
+      <section id="why-ai" className="scroll-mt-20 py-20">
+        {dragHandle}
+        <Pill>Why AI</Pill>
+        <PublicHeading
+          as="h2"
+          text={title}
+          editable={editable}
+          className="mt-4 text-4xl font-semibold tracking-tight text-cyan-50"
+        />
+        {section.subtitle || editable ? (
+          <p className="mt-3 max-w-3xl text-cyan-200/40">{subtitle}</p>
+        ) : null}
+        {section.body || editable ? (
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-cyan-100/50">
+            {body}
+          </p>
+        ) : null}
+        <div className="mt-10 grid gap-4 md:grid-cols-2">
+          {visibleItems.map((item) => {
+            const watch = item.videoUrl || item.url;
+            return (
+              <article
+                key={item.id ?? item.title}
+                className="circuit-card rounded-2xl p-6"
+              >
+                <h3 className="text-lg font-medium text-cyan-50">{item.title}</h3>
+                {item.sourceLabel ? (
+                  <p className="mt-1 text-xs uppercase tracking-[0.14em] text-cyan-500/70">
+                    {item.sourceLabel}
+                  </p>
+                ) : null}
+                {item.description ? (
+                  <p className="mt-3 text-sm leading-relaxed text-cyan-200/45">
+                    {item.description}
+                  </p>
+                ) : null}
+                {watch ? (
+                  <a
+                    href={watch}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-4 inline-flex text-sm text-cyan-300 hover:underline"
+                  >
+                    Open video
+                  </a>
+                ) : null}
+              </article>
+            );
+          })}
         </div>
       </section>
     );

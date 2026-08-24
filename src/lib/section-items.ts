@@ -4,6 +4,7 @@ export const SECTION_TYPES = [
   "stack",
   "evidence",
   "projects",
+  "briefing",
   "skills",
   "contact",
   "custom",
@@ -129,6 +130,9 @@ export function itemsHint(type: string): string {
   }
   if (type === "contact") {
     return "One link per line: Label | URL";
+  }
+  if (type === "briefing") {
+    return "One card per line: Title | Description | Video URL | Source label";
   }
   if (type === "skills") {
     return "One skill per line";

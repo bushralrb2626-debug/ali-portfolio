@@ -67,7 +67,7 @@ const cards = [
   ["ev-ai-tunghai", "#081418", "#2dd4bf", "TUNGHAI", "University AI film", "◎"],
   ["ev-ai-tunghai-long", "#061018", "#5eead4", "TUNGHAI LONG", "~2.9M views", "◎"],
   ["ev-fazaia", "#141008", "#fbbf24", "FIC E-9", "Human admissions", "⚠"],
-  ["ev-ai-castlery", "#08120e", "#34d399", "CASTLERY", "60% cheaper · LBB", "☰"],
+  ["ev-ai-castlery", "#08120e", "#34d399", "CASTLERY", "+23% watch · LBB", "☰"],
   ["ev-ai-dumpling", "#101008", "#facc15", "SQUISHY DUMPLINGS", "AI ads · kids demand", "◎"],
   ["ev-ai-heinz", "#140808", "#ef4444", "HEINZ A.I.", "850M+ impressions", "↑"],
   ["ev-slorsh", "#0c1220", "#7dd3fc", "SLORSH", "Campus site pattern", "◇"],
