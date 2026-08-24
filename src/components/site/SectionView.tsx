@@ -497,8 +497,12 @@ export function SectionView({
         ) : null}
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           {visibleItems.map((item) => {
-            const watch = item.videoUrl || item.url;
+            const watch = item.videoUrl || "";
+            const sourceHref =
+              item.articleUrl ||
+              (item.url && item.url !== item.videoUrl ? item.url : "");
             const cues = item.timeRange ? timeCues(item.timeRange) : [];
+            const youtube = /youtube\.com|youtu\.be/.test(watch);
             return (
               <article
                 key={item.id ?? item.title}
@@ -520,27 +524,40 @@ export function SectionView({
                     {item.description}
                   </p>
                 ) : null}
-                {watch ? (
+                {sourceHref || watch ? (
                   <div className="mt-4 flex flex-wrap gap-3">
-                    {(cues.length ? cues : [{ label: "Open video", start: "" }]).map(
-                      (cue) => (
-                        <a
-                          key={cue.label}
-                          href={
-                            cue.start
-                              ? youtubeAtTime(watch, cue.start)
-                              : watch
-                          }
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex text-sm text-cyan-300 hover:underline"
-                        >
-                          {cues.length
-                            ? `Open video ${cue.label}`
-                            : "Open video"}
-                        </a>
-                      ),
-                    )}
+                    {sourceHref ? (
+                      <a
+                        href={sourceHref}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex text-sm text-cyan-300 hover:underline"
+                      >
+                        Source
+                      </a>
+                    ) : null}
+                    {watch
+                      ? (cues.length
+                          ? cues
+                          : [{ label: "Open video", start: "" }]
+                        ).map((cue) => (
+                          <a
+                            key={cue.label}
+                            href={
+                              cue.start && youtube
+                                ? youtubeAtTime(watch, cue.start)
+                                : watch
+                            }
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex text-sm text-cyan-300 hover:underline"
+                          >
+                            {cues.length
+                              ? `Open video ${cue.label}`
+                              : "Open video"}
+                          </a>
+                        ))
+                      : null}
                   </div>
                 ) : null}
               </article>
