@@ -442,7 +442,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
     body: "Hiring someone to film students saying lines and post them? Talk to me about AI creatives and ads that reach parents instead.",
     imageUrl: "",
     items: JSON.stringify([
-      { title: "Email", url: "mailto:ali@example.com" },
+      { title: "Email", url: "mailto:alimasterofall105@gmail.com" },
     ]),
     sortOrder: 6,
     visible: true,

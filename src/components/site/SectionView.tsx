@@ -496,7 +496,12 @@ export function SectionView({
   }
 
   if (section.type === "contact") {
+    const CONTACT_EMAIL = "alimasterofall105@gmail.com";
     const email = items.find((item) => item.url?.startsWith("mailto:"));
+    const mailto = email?.url?.includes("example.com") || !email?.url
+      ? `mailto:${CONTACT_EMAIL}`
+      : email.url;
+    const gmailCompose = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(CONTACT_EMAIL)}`;
     return (
       <section id="contact" className="scroll-mt-20 py-20">
         {dragHandle}
@@ -511,14 +516,20 @@ export function SectionView({
           <p className="mt-4 max-w-xl text-cyan-100/55">{body}</p>
         ) : null}
         <div className="mt-8 flex flex-wrap items-center gap-4">
-          {email ? (
-            <a
-              href={email.url}
-              className="gradient-cta inline-flex rounded-full px-5 py-2.5 text-sm font-semibold"
-            >
-              {email.title}
-            </a>
-          ) : null}
+          <a
+            href={mailto}
+            className="gradient-cta inline-flex rounded-full px-5 py-2.5 text-sm font-semibold"
+          >
+            {CONTACT_EMAIL}
+          </a>
+          <a
+            href={gmailCompose}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm text-[var(--ice)] hover:underline"
+          >
+            Open in Gmail →
+          </a>
           {items
             .filter((item) => item !== email)
             .map((item) =>
