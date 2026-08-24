@@ -7,6 +7,7 @@ export const SECTION_TYPES = [
   "briefing",
   "skills",
   "contact",
+  "booking",
   "custom",
 ] as const;
 
@@ -139,6 +140,9 @@ export function itemsHint(type: string): string {
   }
   if (type === "stack") {
     return "One card per line: Title | Description";
+  }
+  if (type === "booking") {
+    return "Leave empty. Dates and times are set under Slots in admin.";
   }
   return "Optional list — one item per line";
 }

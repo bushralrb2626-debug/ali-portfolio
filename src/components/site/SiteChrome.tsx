@@ -45,17 +45,20 @@ export function SiteHeader({
           <a href="/#evidence" className="hover:text-cyan-100">
             Proof
           </a>
-          <a href="/#why-ai" className="hover:text-cyan-100">
-            Why AI
-          </a>
           <a href="/#projects" className="hover:text-cyan-100">
             Work
+          </a>
+          <a href="/#why-ai" className="hover:text-cyan-100">
+            Why AI
           </a>
           <Link href="/security" className="hover:text-cyan-100">
             Security
           </Link>
           <a href="/#contact" className="hover:text-cyan-100">
             Contact
+          </a>
+          <a href="/#book" className="hover:text-cyan-100">
+            Book
           </a>
         </nav>
       </div>

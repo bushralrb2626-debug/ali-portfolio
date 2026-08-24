@@ -35,6 +35,12 @@ export function AdminChrome({
                 Messages
               </Link>
               <Link
+                href="/admin/slots"
+                className="text-sm text-zinc-400 hover:text-zinc-100"
+              >
+                Slots
+              </Link>
+              <Link
                 href="/admin"
                 className="text-sm text-zinc-400 hover:text-zinc-100"
               >

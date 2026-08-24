@@ -419,8 +419,8 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
   {
     type: "briefing",
     title: "Why AI now",
-    subtitle: "The builders on the original recordings — not recap videos",
-    body: "Each clip is the speaker on camera. The line is the same: AI already does this work better, so a campus site, chatbot, ads, and inbox do not need a human staff team.",
+    subtitle: "Briefing cards — original speakers, not recap videos",
+    body: "After the Proof briefing, this is the Why AI briefing. Each card is the speaker on camera saying AI already does this work better, so a campus site, chatbot, ads, and inbox do not need a human staff team.",
     imageUrl: "",
     items: JSON.stringify([
       {
@@ -525,7 +525,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
       { title: "Short-Form Edit" },
       { title: "Solo Campaign Ops" },
     ]),
-    sortOrder: 6,
+    sortOrder: 8,
     visible: false,
   },
   {
@@ -537,6 +537,16 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
     items: JSON.stringify([
       { title: "Email", url: "mailto:alimasterofall105@gmail.com" },
     ]),
+    sortOrder: 6,
+    visible: true,
+  },
+  {
+    type: "booking",
+    title: "Book a time with Ali",
+    subtitle: "Pick a date and time Ali posted",
+    body: "These slots are set in admin. Choose one that is still open.",
+    imageUrl: "",
+    items: "[]",
     sortOrder: 7,
     visible: true,
   },

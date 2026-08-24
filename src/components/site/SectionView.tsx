@@ -13,6 +13,7 @@ import { EvidencePitchTrigger } from "@/components/site/EvidencePitchTrigger";
 import { TypeLine } from "@/components/site/TypeLine";
 import { Reveal } from "@/components/site/Reveal";
 import { ContactForm } from "@/components/site/ContactForm";
+import { BookingForm } from "@/components/site/BookingForm";
 
 export type SectionRenderProps = {
   section: Section;
@@ -496,7 +497,7 @@ export function SectionView({
           </p>
         ) : null}
         <div className="mt-10 grid gap-4 md:grid-cols-2">
-          {visibleItems.map((item) => {
+          {visibleItems.map((item, index) => {
             const watch = item.videoUrl || "";
             const sourceHref =
               item.articleUrl ||
@@ -508,7 +509,10 @@ export function SectionView({
                 key={item.id ?? item.title}
                 className="circuit-card rounded-2xl p-6"
               >
-                <h3 className="text-lg font-medium text-cyan-50">{item.title}</h3>
+                <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-cyan-500/70">
+                  Briefing {String(index + 1).padStart(2, "0")}
+                </p>
+                <h3 className="mt-2 text-lg font-medium text-cyan-50">{item.title}</h3>
                 {item.sourceLabel ? (
                   <p className="mt-1 text-xs uppercase tracking-[0.14em] text-cyan-500/70">
                     {item.sourceLabel}
@@ -614,6 +618,31 @@ export function SectionView({
           </p>
         ) : (
           <ContactForm />
+        )}
+      </section>
+    );
+  }
+
+  if (section.type === "booking") {
+    return (
+      <section id="book" className="scroll-mt-20 py-20">
+        {dragHandle}
+        <Pill>Book</Pill>
+        <PublicHeading
+          as="h2"
+          text={title}
+          editable={editable}
+          className="mt-4 text-4xl font-semibold tracking-tight text-cyan-50"
+        />
+        {section.body || editable ? (
+          <p className="mt-4 max-w-xl text-cyan-100/55">{body}</p>
+        ) : null}
+        {editable ? (
+          <p className="mt-8 text-sm text-cyan-200/40">
+            Set dates and times under Slots in admin. Visitors book the open ones.
+          </p>
+        ) : (
+          <BookingForm />
         )}
       </section>
     );

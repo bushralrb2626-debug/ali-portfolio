@@ -13,6 +13,7 @@ function revalidateSite() {
   revalidatePath("/admin");
   revalidatePath("/admin/preview");
   revalidatePath("/admin/messages");
+  revalidatePath("/admin/slots");
 }
 
 function readSectionFields(formData: FormData) {
@@ -174,6 +175,34 @@ export async function reorderSections(ids: string[]) {
       }),
     ),
   );
+  revalidateSite();
+}
+
+export async function createAppointmentSlot(formData: FormData) {
+  const startsAtRaw = String(formData.get("startsAt") ?? "");
+  const label = String(formData.get("label") ?? "").trim();
+  const startsAt = new Date(startsAtRaw);
+  if (!startsAtRaw || Number.isNaN(startsAt.getTime())) {
+    throw new Error("Pick a valid date and time");
+  }
+
+  await prisma.appointmentSlot.create({
+    data: {
+      startsAt,
+      label,
+      open: true,
+    },
+  });
+  revalidateSite();
+  redirect("/admin/slots");
+}
+
+export async function deleteAppointmentSlot(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  if (!id) {
+    return;
+  }
+  await prisma.appointmentSlot.delete({ where: { id } });
   revalidateSite();
 }
 

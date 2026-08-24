@@ -28,3 +28,22 @@ model ContactMessage {
   message   String
   createdAt DateTime @default(now())
 }
+
+model AppointmentSlot {
+  id        String               @id @default(cuid())
+  startsAt  DateTime
+  label     String               @default("")
+  open      Boolean              @default(true)
+  createdAt DateTime             @default(now())
+  booking   AppointmentBooking?
+}
+
+model AppointmentBooking {
+  id        String           @id @default(cuid())
+  slotId    String           @unique
+  slot      AppointmentSlot  @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  name      String
+  email     String
+  note      String           @default("")
+  createdAt DateTime         @default(now())
+}
