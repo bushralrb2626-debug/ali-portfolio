@@ -22,14 +22,46 @@ export default async function AdminSlotsPage() {
 
       <form action={createAppointmentSlot} className="mt-8 flex max-w-xl flex-col gap-3">
         <label className="text-sm text-zinc-300">
-          Date and time
+          Date
           <input
-            name="startsAt"
-            type="datetime-local"
+            name="slotDate"
+            type="date"
             required
             className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
           />
         </label>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="text-sm text-zinc-300">
+            Hour (24h)
+            <select
+              name="slotHour"
+              required
+              defaultValue="10"
+              className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
+            >
+              {Array.from({ length: 24 }, (_, hour) => (
+                <option key={hour} value={String(hour).padStart(2, "0")}>
+                  {String(hour).padStart(2, "0")}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-sm text-zinc-300">
+            Minute
+            <select
+              name="slotMinute"
+              required
+              defaultValue="00"
+              className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
+            >
+              {Array.from({ length: 60 }, (_, minute) => (
+                <option key={minute} value={String(minute).padStart(2, "0")}>
+                  {String(minute).padStart(2, "0")}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
         <label className="text-sm text-zinc-300">
           Label (optional)
           <input

@@ -179,10 +179,12 @@ export async function reorderSections(ids: string[]) {
 }
 
 export async function createAppointmentSlot(formData: FormData) {
-  const startsAtRaw = String(formData.get("startsAt") ?? "");
+  const date = String(formData.get("slotDate") ?? "");
+  const hour = String(formData.get("slotHour") ?? "").padStart(2, "0");
+  const minute = String(formData.get("slotMinute") ?? "").padStart(2, "0");
   const label = String(formData.get("label") ?? "").trim();
-  const startsAt = new Date(startsAtRaw);
-  if (!startsAtRaw || Number.isNaN(startsAt.getTime())) {
+  const startsAt = new Date(`${date}T${hour}:${minute}:00+05:00`);
+  if (!date || Number.isNaN(startsAt.getTime())) {
     throw new Error("Pick a valid date and time");
   }
 
