@@ -761,6 +761,9 @@ export function EditableSite({
             >
               Add section
             </button>
+            <Link href="/admin/messages" className="text-zinc-400 hover:text-white">
+              Messages
+            </Link>
             <Link href="/admin" className="text-zinc-400 hover:text-white">
               List
             </Link>

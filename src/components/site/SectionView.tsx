@@ -7,6 +7,7 @@ import { YouTubePosterPlayer } from "@/components/site/YouTubePosterPlayer";
 import { EvidencePitchTrigger } from "@/components/site/EvidencePitchTrigger";
 import { TypeLine } from "@/components/site/TypeLine";
 import { Reveal } from "@/components/site/Reveal";
+import { ContactForm } from "@/components/site/ContactForm";
 
 export type SectionRenderProps = {
   section: Section;
@@ -283,6 +284,7 @@ export function SectionView({
                 as="h1"
                 text={title}
                 delayMs={80}
+                msPerChar={70}
                 className="mt-4 max-w-3xl text-5xl font-semibold tracking-tight text-cyan-50 md:text-7xl"
               />
             ) : (
@@ -496,12 +498,6 @@ export function SectionView({
   }
 
   if (section.type === "contact") {
-    const CONTACT_EMAIL = "alimasterofall105@gmail.com";
-    const email = items.find((item) => item.url?.startsWith("mailto:"));
-    const mailto = email?.url?.includes("example.com") || !email?.url
-      ? `mailto:${CONTACT_EMAIL}`
-      : email.url;
-    const gmailCompose = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(CONTACT_EMAIL)}`;
     return (
       <section id="contact" className="scroll-mt-20 py-20">
         {dragHandle}
@@ -515,37 +511,13 @@ export function SectionView({
         {section.body || editable ? (
           <p className="mt-4 max-w-xl text-cyan-100/55">{body}</p>
         ) : null}
-        <div className="mt-8 flex flex-wrap items-center gap-4">
-          <a
-            href={mailto}
-            className="gradient-cta inline-flex rounded-full px-5 py-2.5 text-sm font-semibold"
-          >
-            {CONTACT_EMAIL}
-          </a>
-          <a
-            href={gmailCompose}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm text-[var(--ice)] hover:underline"
-          >
-            Open in Gmail →
-          </a>
-          {items
-            .filter((item) => item !== email)
-            .map((item) =>
-              item.url ? (
-                <a
-                  key={item.title}
-                  href={item.url}
-                  className="text-sm text-[var(--ice)] hover:underline"
-                >
-                  {item.title} →
-                </a>
-              ) : (
-                <span key={item.title}>{item.title}</span>
-              ),
-            )}
-        </div>
+        {editable ? (
+          <p className="mt-8 text-sm text-cyan-200/40">
+            Visitors send a message here. Read them at Messages in admin.
+          </p>
+        ) : (
+          <ContactForm />
+        )}
       </section>
     );
   }

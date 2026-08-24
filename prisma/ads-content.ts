@@ -4,9 +4,9 @@ import type { Prisma } from "@prisma/client";
 export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
   {
     type: "hero",
-    title: "Ali.",
+    title: "Ali. made by Ali",
     subtitle: "O-Level campus growth · AI ads · solo",
-    body: "A new O-Level campus grows when AI-made ads reach parents who are choosing — I generate, cut, and run Meta/TikTok myself. Faster than a student film day. More accurate than hoping the feed helps. Built to get seen.",
+    body: "A new O-Level campus grows when AI-made ads reach parents who are choosing — I generate, cut, and run Meta/TikTok myself. Faster than a student film day. More accurate than hoping the feed helps. Built to get seen. I also make the campus website, school social pages, and a chatbot — then promote them faster and cheaper.",
     imageUrl: "/evidence/hero.png",
     items: "[]",
     sortOrder: 0,
@@ -47,7 +47,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         id: "about-chat",
         title: "Why a chatbot on that page",
         description:
-          "Parents ask the same things at night — admissions, O vs A, location. A page without a bot loses them. Ali sends that traffic into a stack he uses (chatbot plus inbound/outbound) and still runs the ads. Faster than waiting for a call back.",
+          "Parents ask the same things at night — admissions, O vs A, location. A page without a bot loses them. Ali sends that traffic into a stack he uses (chatbot plus inbound/outbound) and still runs the ads. Faster than waiting for a call back. The bot can book appointments and hand off to a human when needed.",
       },
       {
         id: "about-ali",
@@ -82,7 +82,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         id: "stack-bot",
         title: "Chatbot for night questions",
         description:
-          "Admissions, O vs A, location — parents ask after hours. A silent page loses the lead. The bot answers and captures contact while Ali still runs the ads.",
+          "Admissions, O vs A, location — parents ask after hours. A silent page loses the lead. The bot answers, books appointments, contacts a human when needed, and captures contact while Ali still runs the ads.",
       },
       {
         id: "stack-method",

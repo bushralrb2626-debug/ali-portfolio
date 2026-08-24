@@ -29,6 +29,12 @@ export function AdminChrome({
                 Visual editor
               </Link>
               <Link
+                href="/admin/messages"
+                className="text-sm text-zinc-400 hover:text-zinc-100"
+              >
+                Messages
+              </Link>
+              <Link
                 href="/admin"
                 className="text-sm text-zinc-400 hover:text-zinc-100"
               >

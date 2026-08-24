@@ -12,6 +12,7 @@ function revalidateSite() {
   revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/admin/preview");
+  revalidatePath("/admin/messages");
 }
 
 function readSectionFields(formData: FormData) {

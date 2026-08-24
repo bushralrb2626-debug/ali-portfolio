@@ -15,8 +15,8 @@ export function TypeLine({
   delayMs?: number;
   msPerChar?: number;
 }) {
-  const [shown, setShown] = useState(text);
-  const [done, setDone] = useState(true);
+  const [shown, setShown] = useState("");
+  const [done, setDone] = useState(false);
 
   useEffect(() => {
     const reduce =
