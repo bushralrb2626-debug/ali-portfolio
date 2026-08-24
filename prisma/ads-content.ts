@@ -90,6 +90,12 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         description:
           "Brief, generate layout and copy, ship in days — the same week as the ads. Faster than a long web project. Ali’s method, not a published study.",
       },
+      {
+        id: "stack-vercel-supabase",
+        title: "Vercel + Supabase, not Electrode.io",
+        description:
+          "The campus site ships on Vercel (global Next.js host) with Supabase (Postgres, login, storage). Electrode.io is Walmart’s open-source React/Node kit for huge in-house teams — you still run servers and wire a database yourself. Vercel + Supabase is the hosted path: deploy from git, data and auth included, no Electrode stack to maintain. Better fit for a solo campus site, chatbot, and inbox.",
+      },
     ]),
     sortOrder: 2,
     visible: true,
@@ -503,6 +509,18 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         videoUrl: "",
         sourceLabel: "Ali’s implementation — not a third-party clip",
         pitchLine: "No staff team on the digital stack.",
+        timeRange: "",
+      },
+      {
+        id: "why-vercel-supabase",
+        title: "Vercel + Supabase over Electrode.io",
+        description:
+          "Ali builds the campus web on Vercel and Supabase. Electrode.io is a Walmart React/Node platform for giant internal apps — you still host servers and build your own database, auth, and storage. Vercel puts the site on a global edge from git. Supabase is the backend: Postgres, auth, files. Together they replace an Electrode-style self-run stack. Faster to ship, less ops, built for a solo campus site rather than a retailer micro-frontend farm.",
+        url: "https://vercel.com",
+        videoUrl: "",
+        articleUrl: "https://supabase.com",
+        sourceLabel: "Vercel (host) · Supabase (data) — vs electrode.io",
+        pitchLine: "Hosted site + database. Not a DIY Electrode farm.",
         timeRange: "",
       },
     ]),
