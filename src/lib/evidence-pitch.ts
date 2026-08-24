@@ -228,6 +228,32 @@ export const CHART_FIC_STACK: PitchChart = {
   ],
 };
 
+/** Named public logos / case studies on vendor sites — not a market-share study. */
+export const CHART_HOST_LOGOS: PitchChart = {
+  type: "bar",
+  title: "Named public company stories (sample)",
+  caption:
+    "Count of named logos/case studies: Vercel (Washington Post, eBay, Sonos, Box, Runway, HashiCorp), Supabase (Mozilla, GitHub, 1Password, Pika). Electrode.io is Walmart’s own React/Node kit. Not a market-share report.",
+  kind: "model",
+  bars: [
+    { label: "Vercel", value: 6, suffix: " names" },
+    { label: "Supabase", value: 4, suffix: " names" },
+    { label: "Electrode.io", value: 1, suffix: " (Walmart)" },
+  ],
+};
+
+export const CHART_HOST_OPS: PitchChart = {
+  type: "bar",
+  title: "What you still have to run yourself",
+  caption:
+    "Briefing: Electrode is a scaffold — you still host servers, database, auth, files. Vercel + Supabase is hosted. Not a published ops audit.",
+  kind: "model",
+  bars: [
+    { label: "Electrode.io", value: 4, suffix: " layers" },
+    { label: "Vercel + Supabase", value: 0, suffix: " extra" },
+  ],
+};
+
 export const CHART_DUMPLING: PitchChart = {
   type: "line",
   title: "Squishy dumpling demand after AI clips",
@@ -849,6 +875,50 @@ const DECKS: Record<string, PitchDeck> = {
       bullets: [
         "Keep campus faces — cut for hooks and parent ads.",
         "Million-view AI method + in-radius targeting is the hire.",
+      ],
+    },
+  ),
+  "stack-vercel-supabase": deck(
+    "stack-vercel-supabase",
+    "Vercel + Supabase, not Electrode.io",
+    {
+      title: "Big names already sit on this stack",
+      subtitle: "Named public stories — not a market-share study",
+      accent: "win",
+      bullets: [
+        "Vercel case studies name The Washington Post, eBay, Sonos, Box, Runway, HashiCorp.",
+        "Supabase customer lists name Mozilla, GitHub, 1Password, Pika.",
+        "Electrode.io is Walmart’s open-source React/Node kit. Walmart built it for Walmart. You still run the servers and the database.",
+        "A campus site needs a host and a database. Vercel + Supabase is that pair. Electrode is not a host.",
+      ],
+      charts: [CHART_HOST_LOGOS, CHART_HOST_OPS],
+    },
+    {
+      title: "What to say",
+      bullets: [
+        "Point at named logos on vercel.com and supabase.com. Do not invent a Fortune 500 percentage.",
+        "Electrode is a DIY platform. Vercel ships the site. Supabase holds the data.",
+      ],
+    },
+  ),
+  "why-vercel-supabase": deck(
+    "why-vercel-supabase",
+    "Vercel + Supabase over Electrode.io",
+    {
+      title: "Same stack the big sites already use",
+      subtitle: "Host + database, not a Walmart scaffold",
+      accent: "win",
+      bullets: [
+        "Washington Post ran election night pages on Vercel. That is a named Vercel story.",
+        "Mozilla and GitHub show up on Supabase’s public customer list.",
+        "Electrode.io does not replace that. It is a React/Node toolkit. You still operate the farm.",
+      ],
+      charts: [CHART_HOST_LOGOS, CHART_HOST_OPS],
+    },
+    {
+      title: "What to remember",
+      bullets: [
+        "Logos are from vendor sites. The bar chart is a count of those names, not market share.",
       ],
     },
   ),

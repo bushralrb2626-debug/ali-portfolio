@@ -14,6 +14,8 @@ import { TypeLine } from "@/components/site/TypeLine";
 import { Reveal } from "@/components/site/Reveal";
 import { ContactForm } from "@/components/site/ContactForm";
 import { BookingForm } from "@/components/site/BookingForm";
+import { TripleCharts } from "@/components/site/TerminalChart";
+import { CHART_HOST_LOGOS, CHART_HOST_OPS } from "@/lib/evidence-pitch";
 
 export type SectionRenderProps = {
   section: Section;
@@ -402,10 +404,27 @@ export function SectionView({
             ? itemNodes
             : visibleItems.map((item, index) => (
                 <Reveal key={item.id ?? item.title} delayMs={index * 70}>
-                  <AboutCard item={item} index={index} />
+                  {item.id === "stack-vercel-supabase" ? (
+                    <EvidencePitchTrigger item={item} order={40 + index}>
+                      <AboutCard item={item} index={index} />
+                    </EvidencePitchTrigger>
+                  ) : (
+                    <AboutCard item={item} index={index} />
+                  )}
                 </Reveal>
               ))}
         </div>
+        {isStack ? (
+          <div className="mt-10">
+            <p className="mb-4 text-xs uppercase tracking-[0.16em] text-cyan-500/70">
+              Who already uses this — named public stories, not market share
+            </p>
+            <TripleCharts chart={CHART_HOST_LOGOS} notes slideKey={0} />
+            <div className="mt-6">
+              <TripleCharts chart={CHART_HOST_OPS} notes slideKey={1} />
+            </div>
+          </div>
+        ) : null}
       </section>
     );
   }
@@ -556,12 +575,20 @@ export function SectionView({
                             rel="noreferrer"
                             className="inline-flex text-sm text-cyan-300 hover:underline"
                           >
-                            {cues.length
-                              ? `Open video ${cue.label}`
-                              : "Open video"}
-                          </a>
-                        ))
-                      : null}
+                          {cues.length
+                            ? `Open video ${cue.label}`
+                            : "Open video"}
+                        </a>
+                      ))
+                    : null}
+                </div>
+              ) : null}
+                {item.id === "why-vercel-supabase" ? (
+                  <div className="mt-5">
+                    <TripleCharts chart={CHART_HOST_LOGOS} notes slideKey={0} />
+                    <div className="mt-4">
+                      <TripleCharts chart={CHART_HOST_OPS} notes slideKey={1} />
+                    </div>
                   </div>
                 ) : null}
               </article>
