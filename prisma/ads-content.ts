@@ -92,9 +92,9 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
       },
       {
         id: "stack-vercel-supabase",
-        title: "Vercel + Supabase, not Electrode.io",
+        title: "Hosted site + database, not a DIY farm",
         description:
-          "The campus site ships on Vercel (global Next.js host) with Supabase (Postgres, login, storage). Electrode.io is Walmart’s open-source React/Node kit for huge in-house teams — you still run servers and wire a database yourself. Vercel + Supabase is the hosted path: deploy from git, data and auth included, no Electrode stack to maintain. Better fit for a solo campus site, chatbot, and inbox.",
+          "The campus site ships on a hosted edge with a managed database (login and files included). A retailer-style DIY kit means you still run servers and wire storage yourself. Hosted is the path: deploy from git, data and auth included, no in-house platform to maintain. Better fit for a solo campus site, chatbot, and inbox.",
       },
     ]),
     sortOrder: 2,
@@ -513,14 +513,14 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
       },
       {
         id: "why-vercel-supabase",
-        title: "Vercel + Supabase over Electrode.io",
+        title: "Hosted site + database over a DIY kit",
         description:
-          "Ali builds the campus web on Vercel and Supabase. Electrode.io is a Walmart React/Node platform for giant internal apps — you still host servers and build your own database, auth, and storage. Vercel puts the site on a global edge from git. Supabase is the backend: Postgres, auth, files. Together they replace an Electrode-style self-run stack. Faster to ship, less ops, built for a solo campus site rather than a retailer micro-frontend farm.",
-        url: "https://vercel.com",
+          "Ali builds the campus web on a hosted edge and a managed database. A retailer-style DIY kit is for giant internal apps — you still host servers and build your own database, auth, and storage. Hosted puts the site on a global edge from git. The managed backend is Postgres, auth, and files. Together they replace a self-run stack. Faster to ship, less ops, built for a solo campus site rather than a micro-frontend farm.",
+        url: "",
         videoUrl: "",
-        articleUrl: "https://supabase.com",
-        sourceLabel: "Vercel (host) · Supabase (data) — vs electrode.io",
-        pitchLine: "Hosted site + database. Not a DIY Electrode farm.",
+        articleUrl: "",
+        sourceLabel: "Hosted edge · managed data — vs DIY kit",
+        pitchLine: "Hosted site + database. Not a DIY farm.",
         timeRange: "",
       },
     ]),
