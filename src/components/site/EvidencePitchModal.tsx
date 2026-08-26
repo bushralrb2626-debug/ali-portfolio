@@ -63,7 +63,14 @@ function ClipFrame({
           />
         ) : poster ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={poster} alt="" className="h-full w-full object-cover" />
+          <img
+            src={poster}
+            alt=""
+            className="h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
+            fetchPriority="low"
+          />
         ) : (
           <div className="flex h-full items-center justify-center px-4 text-center text-xs text-cyan-200/50">
             {cues ? "Typical local recite-and-post · drop a clip in admin" : null}

@@ -1,6 +1,6 @@
+import { SecurityMatrix } from "@/components/site/SecurityMatrix";
 import { SiteShell } from "@/components/site/SiteShell";
-import { SECURITY_RECOVERY, SECURITY_ROWS } from "@/lib/security-pitch";
-import { prisma } from "@/lib/prisma";
+import { SECURITY_RECOVERY } from "@/lib/security-pitch";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -27,28 +27,7 @@ export default async function SecurityPage() {
           Here is the security I will add. If it is still hit, here is how I lock it again.
         </p>
 
-        <div className="mt-12 overflow-x-auto rounded-2xl border border-cyan-500/20">
-          <table className="w-full min-w-[640px] text-left text-sm">
-            <thead className="bg-cyan-950/60 text-xs uppercase tracking-[0.12em] text-cyan-400/80">
-              <tr>
-                <th className="px-4 py-3 font-medium">Google Security Principle</th>
-                <th className="px-4 py-3 font-medium">My Implementation</th>
-                <th className="px-4 py-3 font-medium">Tools Used</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-cyan-500/10 text-cyan-100/70">
-              {SECURITY_ROWS.map((row) => (
-                <tr key={row.principle}>
-                  <td className="px-4 py-3 font-medium text-cyan-50">
-                    {row.principle}
-                  </td>
-                  <td className="px-4 py-3">{row.implementation}</td>
-                  <td className="px-4 py-3 text-cyan-200/80">{row.tools}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <SecurityMatrix />
 
         <h2 className="mt-16 text-2xl font-semibold tracking-tight text-cyan-50">
           If it is hacked

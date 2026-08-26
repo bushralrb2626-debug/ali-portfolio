@@ -68,7 +68,7 @@ function deriveSeries(chart: PitchChart): {
   };
 }
 
-/** One briefing graph becomes bar + line/area + doughnut from the same series. */
+/** Same series rendered as bar + line/area + doughnut. */
 export function tripleChart(data: PitchChart): PitchChart[] {
   const bars = deriveBars(data);
   const { series, xLabels } = deriveSeries(data);
@@ -84,7 +84,7 @@ export const CHART_TIME: PitchChart = {
   type: "bar",
   title: "Days to ship one parent hook",
   caption:
-    "Briefing shape: film-day recite vs generate-and-cut the same week. Not a published campus study.",
+    "Film-day recite vs generate-and-cut the same week. Not a published campus study.",
   bars: [
     { label: "Human recite", value: 5, suffix: " days" },
     { label: "AI ads stack", value: 1, suffix: " day" },
@@ -94,7 +94,7 @@ export const CHART_TIME: PitchChart = {
 export const CHART_TRAD_WEEK: PitchChart = {
   type: "pie",
   title: "Where a recite week actually goes",
-  caption: "Briefing mix of one human film week. Not a timesheet study.",
+  caption: "Mix of one human film week. Not a timesheet study.",
   bars: [
     { label: "Shoot day", value: 46, suffix: "%" },
     { label: "Waiting / unused takes", value: 33, suffix: "%" },
@@ -105,7 +105,7 @@ export const CHART_TRAD_WEEK: PitchChart = {
 export const CHART_EFF: PitchChart = {
   type: "line",
   title: "Hooks shipped across seven days",
-  caption: "Human stays at one take. AI stack adds variants. Briefing series, not an A/B paper.",
+  caption: "Human stays at one take. AI stack adds variants. Model series, not an A/B paper.",
   xLabels: ["D1", "D2", "D3", "D4", "D5", "D6", "D7"],
   series: [
     { name: "Human one-take", values: [1, 1, 1, 1, 1, 1, 1] },
@@ -116,7 +116,7 @@ export const CHART_EFF: PitchChart = {
 export const CHART_PHONE: PitchChart = {
   type: "bar",
   title: "Crew days to finish a phone commercial",
-  caption: "Briefing comparison of methods. Not Motorola or Q Mobile published figures.",
+  caption: "Comparison of methods. Not Motorola or Q Mobile published figures.",
   bars: [
     { label: "Q Mobile live crew", value: 9, suffix: " days" },
     { label: "Motorola generated", value: 2, suffix: " days" },
@@ -126,7 +126,7 @@ export const CHART_PHONE: PitchChart = {
 export const CHART_Q_MIX: PitchChart = {
   type: "pie",
   title: "Live phone ad — spend mix",
-  caption: "Briefing pie of a traditional shoot. Not a Q Mobile budget leak.",
+  caption: "Pie of a traditional shoot. Not a Q Mobile budget leak.",
   bars: [
     { label: "Camera + crew", value: 52, suffix: "%" },
     { label: "Talent / set", value: 31, suffix: "%" },
@@ -150,7 +150,7 @@ export const CHART_TUNG_LIFT: PitchChart = {
   kind: "model",
   title: "Popularity and income after the long AI film",
   caption:
-    "Briefing model: before vs after bars, five-month popularity + income line, doughnut mix. Not QS, THE, or an enrollment PDF. Cite YouTube ~2.9M vs Fazaia ~326 only.",
+    "Model: before vs after bars, five-month popularity + income line, doughnut mix. Not QS, THE, or an enrollment PDF. Cite YouTube ~2.9M vs Fazaia ~326 only.",
   xLabels: ["M1", "M2", "M3", "M4", "M5"],
   series: [
     { name: "Popularity index", values: [100, 118, 132, 148, 162] },
@@ -179,7 +179,7 @@ export const CHART_CPL: PitchChart = {
 export const CHART_UNI_AI: PitchChart = {
   type: "pie",
   title: "Who already ships AI campus film",
-  caption: "Briefing mix: universities vs local recite habit. Not a ranking table.",
+  caption: "Mix: universities vs local recite habit. Not a ranking table.",
   bars: [
     { label: "University AI film", value: 64, suffix: "%" },
     { label: "Local recite posts", value: 36, suffix: "%" },
@@ -189,7 +189,7 @@ export const CHART_UNI_AI: PitchChart = {
 export const CHART_SORA_MIX: PitchChart = {
   type: "pie",
   title: "Sora reel — clip mix in the official cut",
-  caption: "Briefing share of the OpenAI reel. Not a shot list from OpenAI.",
+  caption: "Share of the OpenAI reel. Not a shot list from OpenAI.",
   bars: [
     { label: "Animals / weather", value: 38, suffix: "%" },
     { label: "People / action", value: 34, suffix: "%" },
@@ -220,7 +220,7 @@ export const CHART_TOYS_ROLE: PitchChart = {
 export const CHART_FIC_STACK: PitchChart = {
   type: "pie",
   title: "What parents find when they search FIC",
-  caption: "Briefing mix: no original site, thin social, YouTube-only clip.",
+  caption: "Mix: no original site, thin social, YouTube-only clip.",
   bars: [
     { label: "No original website", value: 44, suffix: "%" },
     { label: "No authentic social home", value: 31, suffix: "%" },
@@ -246,7 +246,7 @@ export const CHART_HOST_OPS: PitchChart = {
   type: "bar",
   title: "What you still have to run yourself",
   caption:
-    "Briefing: Electrode is a scaffold — you still host servers, database, auth, files. Vercel + Supabase is hosted. Not a published ops audit.",
+    "Electrode is a scaffold — you still host servers, database, auth, files. Vercel + Supabase is hosted. Not a published ops audit.",
   kind: "model",
   bars: [
     { label: "Electrode.io", value: 4, suffix: " layers" },
@@ -268,7 +268,7 @@ export const CHART_DUMPLING: PitchChart = {
 export const CHART_HEINZ: PitchChart = {
   type: "pie",
   title: "Heinz A.I. Ketchup — impression mix",
-  caption: "Campaign case: 850M+ earned impressions. Mix is briefing shape, not a media audit.",
+  caption: "Campaign case: 850M+ earned impressions. Mix is a model shape, not a media audit.",
   bars: [
     { label: "Earned / PR", value: 51, suffix: "%" },
     { label: "Social cutdowns", value: 29, suffix: "%" },
@@ -309,7 +309,7 @@ export const CHART_SLORSH_BUYERS: PitchChart = {
   kind: "model",
   title: "Buyers — campuses using Slorsh vs no stack",
   caption:
-    "Briefing graph, not a Slorsh earnings report. +80% more buyers with the stack vs recite with no landing stack.",
+    "Model shape, not a Slorsh earnings report. +80% more buyers with the stack vs recite with no landing stack.",
   bars: [
     { label: "No Slorsh", value: 100, suffix: "" },
     { label: "Using Slorsh", value: 180, suffix: " (+80%)" },
@@ -744,7 +744,7 @@ const DECKS: Record<string, PitchDeck> = {
     {
       title: "Ali campus model — not a published ranking",
       bullets: [
-        "Invented graph: popularity and campus income index after the long AI film. Briefing model, not a ranking PDF.",
+        "Invented graph: popularity and campus income index after the long AI film. Model shape, not a ranking PDF.",
         "Cite YouTube for views (~2.9M vs Fazaia ~326). Do not cite QS or THE for this lift.",
       ],
       charts: [CHART_TUNG_LIFT],
@@ -836,7 +836,7 @@ const DECKS: Record<string, PitchDeck> = {
       subtitle: "Graph, not a published Slorsh study",
       accent: "win",
       bullets: [
-        "Campuses using Slorsh vs no stack: buyers index 180 vs 100 — eighty percent more in this briefing graph.",
+        "Campuses using Slorsh vs no stack: buyers index 180 vs 100 — eighty percent more in this model.",
         "Weekly leads on the line chart are a different series — not the same 100 vs 180 bars.",
       ],
       charts: [CHART_SLORSH_BUYERS, CHART_SLORSH_INQ],

@@ -729,29 +729,40 @@ body {
 }
 
 .pitch-pie-wrap {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.6rem 0.7rem;
+  gap: 0.55rem;
+  padding: 0.55rem 0.65rem 0.75rem;
+}
+
+.pitch-pie-svg {
+  width: min(100%, 240px);
+  height: auto;
+  margin: 0 auto;
 }
 
 .pitch-pie-legend {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  gap: 0.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 0.85rem;
+  width: 100%;
   font-size: 11px;
   color: #cbd5e1;
+  text-align: center;
 }
 
 .pitch-pie-legend i {
   display: inline-block;
   width: 8px;
   height: 8px;
-  margin-right: 0.4rem;
+  margin-right: 0.35rem;
   border-radius: 1px;
+  vertical-align: middle;
 }
 
 .chart-bar-grow {

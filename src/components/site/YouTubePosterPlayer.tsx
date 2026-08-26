@@ -18,17 +18,22 @@ export function YouTubePosterPlayer({
 }) {
   const [playing, setPlaying] = useState(false);
 
+  const poster = posterUrl ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={posterUrl}
+      alt=""
+      className="h-full w-full object-cover"
+      loading="lazy"
+      decoding="async"
+      fetchPriority="low"
+    />
+  ) : null;
+
   if (staticOnly) {
     return (
       <div className="video-frame relative aspect-video w-full overflow-hidden">
-        {posterUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={posterUrl}
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        ) : (
+        {poster ?? (
           <div className="flex h-full w-full items-center justify-center bg-cyan-950/40">
             <span className="text-xs text-cyan-600">{title}</span>
           </div>
@@ -67,14 +72,7 @@ export function YouTubePosterPlayer({
       className="video-frame relative aspect-video w-full overflow-hidden text-left"
       aria-label={`Play ${title}`}
     >
-      {posterUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={posterUrl}
-          alt=""
-          className="h-full w-full object-cover"
-        />
-      ) : (
+      {poster ?? (
         <div className="flex h-full w-full items-center justify-center bg-cyan-950/40">
           <span className="text-xs text-cyan-600">Play video</span>
         </div>

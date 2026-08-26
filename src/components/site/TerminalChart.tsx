@@ -79,7 +79,7 @@ export function TerminalChart({
       {chart.caption ? (
         <p className="terminal-chart-cap">
           {notes && chart.kind === "model" ? (
-            <strong>Briefing graph, not a published ranking. </strong>
+            <strong>Model shape, not a published ranking. </strong>
           ) : null}
           {chart.caption}
         </p>
@@ -231,10 +231,10 @@ function BarChart({
 function PieChart({ chart, compact }: { chart: PitchChart; compact?: boolean }) {
   const bars = chart.bars ?? [];
   const total = bars.reduce((s, b) => s + b.value, 0) || 1;
-  const size = compact ? 220 : 280;
+  const size = compact ? 200 : 240;
   const cx = size / 2;
-  const cy = size / 2 - 8;
-  const r = compact ? 68 : 88;
+  const cy = size / 2;
+  const r = compact ? 62 : 78;
   let a = -Math.PI / 2;
 
   return (

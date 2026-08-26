@@ -170,7 +170,7 @@ function ProjectMedia({
         title={item.title}
         posterUrl={
           item.imageUrl ||
-          `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`
+          `https://i.ytimg.com/vi/${ytId}/mqdefault.jpg`
         }
         overlay={overlay}
         staticOnly={staticOnly}
@@ -202,6 +202,9 @@ function ProjectMedia({
           src={item.imageUrl}
           alt=""
           className="h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+          fetchPriority="low"
         />
         {overlay}
       </div>
