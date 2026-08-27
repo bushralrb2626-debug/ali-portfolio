@@ -24,19 +24,3 @@ services:
         value: "12345"
       - key: ADMIN_PASSWORD
         value: "12345"
-
-  - type: web
-    name: brightsteps-academy
-    runtime: docker
-    plan: free
-    repo: https://github.com/bushralrb2626-debug/BrightStepsAcademy
-    branch: main
-    dockerfilePath: ./Dockerfile
-    healthCheckPath: /
-    envVars:
-      - key: USE_SQLITE
-        value: "1"
-      - key: ConnectionStrings__DefaultConnection
-        value: Data Source=/tmp/brightsteps.db
-      - key: ASPNETCORE_ENVIRONMENT
-        value: Production

@@ -5,6 +5,38 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/admin/login", destination: "/admin/preview", permanent: false },
+      {
+        source: "/demos/brightsteps",
+        destination: "/demos/brightsteps/index.html",
+        permanent: false,
+      },
+      {
+        source: "/demos/brightsteps/",
+        destination: "/demos/brightsteps/index.html",
+        permanent: false,
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: "/evidence/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/demos/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400",
+          },
+        ],
+      },
     ];
   },
   allowedDevOrigins: [

@@ -9,6 +9,7 @@ import {
 } from "@/lib/section-items";
 import type { ReactNode } from "react";
 import { YouTubePosterPlayer } from "@/components/site/YouTubePosterPlayer";
+import { LazyThumb } from "@/components/site/LazyThumb";
 import { EvidencePitchTrigger } from "@/components/site/EvidencePitchTrigger";
 import { TypeLine } from "@/components/site/TypeLine";
 import { Reveal } from "@/components/site/Reveal";
@@ -198,15 +199,7 @@ function ProjectMedia({
   if (item.imageUrl) {
     return (
       <div className="relative aspect-video w-full overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={item.imageUrl}
-          alt=""
-          className="h-full w-full object-cover"
-          loading="lazy"
-          decoding="async"
-          fetchPriority="low"
-        />
+        <LazyThumb src={item.imageUrl} className="h-full w-full" />
         {overlay}
       </div>
     );

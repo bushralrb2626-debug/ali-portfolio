@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LazyThumb } from "@/components/site/LazyThumb";
 
 export function YouTubePosterPlayer({
   videoId,
@@ -19,15 +20,7 @@ export function YouTubePosterPlayer({
   const [playing, setPlaying] = useState(false);
 
   const poster = posterUrl ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={posterUrl}
-      alt=""
-      className="h-full w-full object-cover"
-      loading="lazy"
-      decoding="async"
-      fetchPriority="low"
-    />
+    <LazyThumb src={posterUrl} className="h-full w-full" />
   ) : null;
 
   if (staticOnly) {
