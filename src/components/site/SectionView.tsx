@@ -113,6 +113,7 @@ function mediaHeadline(item: SectionItem): string {
     "proj-meta": "Meta · parents in-radius",
     "proj-tiktok": "TikTok · weekly tests",
     "proj-cutdown": "Cutdowns · paid lengths",
+    "proj-brightsteps": "Open web · BrightSteps",
   };
   return (item.id && map[item.id]) || item.title;
 }
@@ -700,6 +701,19 @@ export function AboutCard({
   );
 }
 
+function isOpenWebItem(item: SectionItem): boolean {
+  const href = (item.articleUrl || item.url || "").trim();
+  if (!/^https?:\/\//i.test(href)) return false;
+  if (item.videoUrl?.trim()) return false;
+  const cue = `${item.timeRange ?? ""} ${item.whyArticle ?? ""}`.toLowerCase();
+  return (
+    cue.includes("open web") ||
+    cue.includes("live demo") ||
+    cue.includes("open the live") ||
+    Boolean(item.id?.startsWith("proj-brightsteps"))
+  );
+}
+
 export function ProjectCard({
   item,
   extra,
@@ -714,13 +728,32 @@ export function ProjectCard({
   if (!item) {
     return extra;
   }
+  const openWeb = !extra && isOpenWebItem(item);
+  const openHref = (item.articleUrl || item.url || "").trim();
   const card = (
     <article className="circuit-card overflow-hidden rounded-2xl">
       {!extra ? (
         <div className="relative">
-          <ProjectMedia item={item} emptyHint={undefined} />
-          <span className="pointer-events-none absolute bottom-3 right-3 rounded-full border border-cyan-400/25 bg-cyan-950/75 px-2 py-0.5 text-[10px] uppercase tracking-wide text-cyan-200/90">
-            Play
+          <ProjectMedia item={item} emptyHint={undefined} staticOnly={openWeb} />
+          <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full border border-cyan-400/25 bg-cyan-950/75 px-2 py-0.5 text-[10px] uppercase tracking-wide text-cyan-200/90">
+            {openWeb ? (
+              <>
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-3 w-3"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  aria-hidden
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+                </svg>
+                Open web
+              </>
+            ) : (
+              "Play"
+            )}
           </span>
         </div>
       ) : null}
@@ -733,14 +766,19 @@ export function ProjectCard({
                 {item.description}
               </p>
             ) : null}
-            {item.url ? (
+            {openHref && !openWeb ? (
               <a
-                href={item.url}
-                className="mt-4 inline-block text-sm text-[var(--ice)] hover:underline"
+                href={openHref}
+                className="mt-4 inline-flex items-center gap-1.5 text-sm text-[var(--ice)] hover:underline"
                 onClick={(e) => e.stopPropagation()}
               >
                 View details →
               </a>
+            ) : null}
+            {openWeb ? (
+              <span className="mt-4 inline-flex items-center gap-1.5 text-sm text-[var(--ice)]">
+                Open live site →
+              </span>
             ) : null}
           </>
         ) : (
@@ -752,6 +790,20 @@ export function ProjectCard({
 
   if (extra) {
     return card;
+  }
+
+  if (openWeb) {
+    return (
+      <a
+        href={openHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block rounded-2xl outline-none transition hover:brightness-[1.03] focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+        aria-label={`Open web: ${item.title}`}
+      >
+        {card}
+      </a>
+    );
   }
 
   return (
