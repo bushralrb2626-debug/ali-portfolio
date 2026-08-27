@@ -418,7 +418,7 @@ export function SectionView({
               ))}
         </div>
         {isStack ? (
-          <div className="mt-10">
+          <div className="chart-band mt-10">
             <p className="mb-4 text-xs uppercase tracking-[0.16em] text-cyan-500/70">
               Who already uses this — named public stories, not market share
             </p>
@@ -525,28 +525,18 @@ export function SectionView({
             ? itemNodes
             : visibleItems.map((item, index) => (
                 <Reveal key={item.id ?? item.title} delayMs={index * 60}>
-                  <div>
-                    <EvidenceCard item={item} order={300 + index} cues />
-                    {item.id === "why-vercel-supabase" ? (
-                      <div className="mt-4">
-                        <TripleCharts
-                          chart={CHART_HOST_LOGOS}
-                          notes
-                          slideKey={0}
-                        />
-                        <div className="mt-4">
-                          <TripleCharts
-                            chart={CHART_HOST_OPS}
-                            notes
-                            slideKey={1}
-                          />
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
+                  <EvidenceCard item={item} order={300 + index} cues />
                 </Reveal>
               ))}
         </div>
+        {visibleItems.some((item) => item.id === "why-vercel-supabase") ? (
+          <div className="chart-band mt-10">
+            <TripleCharts chart={CHART_HOST_LOGOS} notes slideKey={0} />
+            <div className="mt-6">
+              <TripleCharts chart={CHART_HOST_OPS} notes slideKey={1} />
+            </div>
+          </div>
+        ) : null}
       </section>
     );
   }

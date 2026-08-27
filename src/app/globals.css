@@ -680,11 +680,32 @@ body {
   display: grid;
   gap: 0.65rem;
   grid-template-columns: 1fr;
+  width: 100%;
+}
+
+.chart-band {
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding-left: max(1.5rem, calc((100vw - min(100vw, 72rem)) / 2 + 1.5rem));
+  padding-right: max(1.5rem, calc((100vw - min(100vw, 72rem)) / 2 + 1.5rem));
+}
+
+.chart-band .pitch-chart,
+.chart-band .pitch-chart-reveal {
+  width: 100%;
 }
 
 @media (min-width: 900px) {
-  .pitch-chart-triple {
-    grid-template-columns: 1fr 1fr 1fr;
+  .chart-band .pitch-chart-triple {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .pitch-chart-grid .pitch-chart-triple {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -737,9 +758,13 @@ body {
 }
 
 .pitch-pie-svg {
-  width: min(100%, 240px);
+  width: min(100%, 320px);
   height: auto;
   margin: 0 auto;
+}
+
+.chart-band .pitch-pie-svg {
+  width: min(100%, 360px);
 }
 
 .pitch-pie-legend {
