@@ -7,7 +7,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
     title: "Made by Ali",
     subtitle: "O-Level campus growth · AI ads · solo",
     body: "A new O-Level campus grows when AI-made ads reach parents who are choosing. More accurate than hoping the feed helps. Built to get seen. I also ship the parent landing page and night chatbot — then run the ads into them.",
-    imageUrl: "/evidence/hero.png",
+    imageUrl: "/evidence/hero.jpg",
     items: "[]",
     sortOrder: 0,
     visible: true,
@@ -116,7 +116,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         url: "https://www.youtube.com/watch?v=HK6y8DAPN_0",
         articleUrl: "https://openai.com/sora",
         sourceLabel: "OpenAI official",
-        imageUrl: "/evidence/ev-ai-sora.png",
+        imageUrl: "/evidence/ev-ai-sora.jpg",
         videoUrl: "https://www.youtube.com/watch?v=HK6y8DAPN_0",
         whyAdded:
           "Use when they ask if AI video is actually popular. Highest-view original AI film we cite (~4.2M official YouTube).",
@@ -137,7 +137,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         articleUrl:
           "https://www.marketingdive.com/news/why-coca-cola-keeps-pushing-limits-generative-ai-despite-backlash/804739/",
         sourceLabel: "Coca-Cola official + Marketing Dive",
-        imageUrl: "/evidence/ev-ai-coke.png",
+        imageUrl: "/evidence/ev-ai-coke.jpg",
         videoUrl: "https://www.youtube.com/watch?v=Yy6fByUmPuE",
         whyAdded:
           "Most famous AI brand ad with a real official YouTube count in the millions. ~10× the Toys“R”Us teaser.",
@@ -157,7 +157,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         url: "https://www.cnn.com/2024/06/25/tech/toys-r-us-sora-ai",
         articleUrl: "https://www.cnn.com/2024/06/25/tech/toys-r-us-sora-ai",
         sourceLabel: "CNN — Toys“R”Us x Sora",
-        imageUrl: "/evidence/ev-ai-toys.png",
+        imageUrl: "/evidence/ev-ai-toys.jpg",
         videoUrl: "",
         whyAdded:
           "Historic first Sora brand film. Not a view-count card — the teaser is ~292k.",
@@ -178,7 +178,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         articleUrl:
           "https://www.gogi.in/motorola-just-made-two-ads-without-a-single-camera-actor-or-film-crew.html",
         sourceLabel: "Motorola official + coverage",
-        imageUrl: "/evidence/ev-ai-moto.png",
+        imageUrl: "/evidence/ev-ai-moto.jpg",
         videoUrl: "https://youtu.be/0uF69-ZyNYc",
         whyAdded:
           "Shows a global brand skipping the crew. Contrast with hiring someone only to film students saying lines.",
@@ -198,7 +198,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         url: "https://www.youtube.com/watch?v=XQ3X4CWStoM",
         articleUrl: "",
         sourceLabel: "Q Mobile official",
-        imageUrl: "/evidence/ev-qmobile.png",
+        imageUrl: "/evidence/ev-qmobile.jpg",
         videoUrl: "https://www.youtube.com/watch?v=XQ3X4CWStoM",
         whyAdded:
           "Phone-brand contrast for Motorola. Do not replace Motorola’s film or article. Admin can hide.",
@@ -217,7 +217,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         url: "https://www.youtube.com/watch?v=x0KQfpqpq3Y",
         articleUrl: "https://eng.thu.edu.tw/web/news/detail.php?id=495",
         sourceLabel: "Tunghai University official news + film",
-        imageUrl: "/evidence/ev-ai-tunghai.png",
+        imageUrl: "/evidence/ev-ai-tunghai.jpg",
         videoUrl: "https://www.youtube.com/watch?v=x0KQfpqpq3Y",
         whyAdded:
           "Closest famous education original: a university published an AI film. Use when they say “schools don’t use AI video.” Pair with Fazaia human admissions (~326 views) and the long-film card for ~2.9M.",
@@ -237,7 +237,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         url: "https://lbbonline.com/news/castlery-google-gen-ai",
         articleUrl: "https://lbbonline.com/news/castlery-google-gen-ai",
         sourceLabel: "LBB — Castlery x Google GenAI",
-        imageUrl: "/evidence/ev-ai-castlery.png",
+        imageUrl: "/evidence/ev-ai-castlery.jpg",
         videoUrl: "",
         whyAdded:
           "Article that quantifies why AI is better: watch time up vs a live crew. Use after the brand ads.",
@@ -257,7 +257,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         url: "",
         articleUrl: "",
         sourceLabel: "",
-        imageUrl: "/evidence/ev-pk-school.png",
+        imageUrl: "/evidence/ev-pk-school.jpg",
         videoUrl: "",
         whyAdded:
           "Human-edit contrast after famous AI ads. Not an authority. Typical 1–2k views.",
@@ -277,7 +277,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         url: "https://www.youtube.com/watch?v=H79QCj-gPlc",
         articleUrl: "https://eng.thu.edu.tw/web/news/detail.php?id=495",
         sourceLabel: "Tunghai University official long film",
-        imageUrl: "/evidence/ev-ai-tunghai-long.png",
+        imageUrl: "/evidence/ev-ai-tunghai-long.jpg",
         videoUrl: "https://www.youtube.com/watch?v=H79QCj-gPlc",
         whyAdded:
           "View-count card. Do not replace the short-film card. Use vs Fazaia ~326 views.",
@@ -297,7 +297,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         url: "https://www.youtube.com/watch?v=4ZtmP_QrErk",
         articleUrl: "",
         sourceLabel: "Fazaia Inter College E-9 Islamabad",
-        imageUrl: "/evidence/ev-fazaia.png",
+        imageUrl: "/evidence/ev-fazaia.jpg",
         videoUrl: "https://www.youtube.com/watch?v=4ZtmP_QrErk",
         whyAdded:
           "Named human contrast plus FIC web/social pain. Admin can hide. Cue: ficed.pk is a thin page, not an original brand home — do not say zero URLs exist.",
@@ -318,7 +318,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         articleUrl:
           "https://www.dailynorthern.com/21130/ai-generated-ads-fuel-squishy-dumplings-craze-among-children/",
         sourceLabel: "Daily Northern",
-        imageUrl: "/evidence/ev-ai-dumpling.png",
+        imageUrl: "/evidence/ev-ai-dumpling.jpg",
         videoUrl: "",
         whyAdded: "Kids/product demand via AI video. Article only.",
         whyVideo: "None — do not add a YouTube.",
@@ -336,7 +336,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         url: "https://www.adsoftheworld.com/campaigns/a-i-ketchup",
         articleUrl: "https://www.adsoftheworld.com/campaigns/a-i-ketchup",
         sourceLabel: "Ads of the World — Heinz A.I. Ketchup",
-        imageUrl: "/evidence/ev-ai-heinz.png",
+        imageUrl: "/evidence/ev-ai-heinz.jpg",
         videoUrl: "",
         whyAdded: "Published impression number for AI creative. Article only.",
         whyVideo: "None — article first.",
@@ -354,7 +354,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         url: "https://genine-1bc47.web.app/",
         articleUrl: "https://genine-1bc47.web.app/",
         sourceLabel: "Slorsh",
-        imageUrl: "/evidence/ev-slorsh.png",
+        imageUrl: "/evidence/ev-slorsh.jpg",
         videoUrl: "",
         whyAdded:
           "Last card. Ali uses Slorsh as a landing stack. Do not pitch him as the founder.",
@@ -381,7 +381,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         description:
           "Offer framing, 15s cuts, parent audiences around the campus, daily creative swaps. Solo.",
         url: "",
-        imageUrl: "/evidence/proj-meta.png",
+        imageUrl: "/evidence/proj-meta.jpg",
         videoUrl: "",
         whyAdded: "Ali’s Meta ops card. Do not paste Proof sources here.",
         whyVideo: "Empty until Ali’s campaign cuts are uploaded.",
@@ -396,7 +396,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         description:
           "Native lengths, new angles each week, kill losers, scale winners. Ali runs creative and the ads.",
         url: "",
-        imageUrl: "/evidence/proj-tiktok.png",
+        imageUrl: "/evidence/proj-tiktok.jpg",
         videoUrl: "",
         whyAdded: "Ali’s TikTok ops. Keep Proof comparisons off this card.",
         whyVideo: "Empty until native tests are uploaded.",
@@ -410,7 +410,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         description:
           "One campus idea into 6s / 15s / 30s with AI assist, built for the ad account.",
         url: "",
-        imageUrl: "/evidence/proj-cutdown.png",
+        imageUrl: "/evidence/proj-cutdown.jpg",
         videoUrl: "",
         whyAdded: "Ali’s cutdown pipeline. No Proof URLs.",
         whyVideo: "Empty until the system film is ready.",
