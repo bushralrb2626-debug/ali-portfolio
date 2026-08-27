@@ -536,7 +536,7 @@ const DECKS: Record<string, PitchDeck> = {
         "A new O-Level campus grows when AI-made ads reach parents who are choosing — not when students recite lines on a timeline.",
         "Universities already ship AI films. Schools will follow. Tunghai long AI ~2.9M views on ~1.6k subs in ~5 months vs Fazaia human admissions ~326 views.",
         "FIC has no original website and no authentic social page. Parents who search don’t find a real campus. Ads still need a landing page.",
-        "I generate, cut, and run Meta/TikTok myself. One seat.",
+        "One seat runs the creative and the ads.",
       ],
       chart: CHART_TIME,
     },
