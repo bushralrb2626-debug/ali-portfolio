@@ -77,12 +77,7 @@ export function TerminalChart({
       ) : null}
       {kind === "line" ? <LineChart chart={chart} compact={compact} W={W} H={H} /> : null}
       {chart.caption ? (
-        <p className="terminal-chart-cap">
-          {notes && chart.kind === "model" ? (
-            <strong>Model shape, not a published ranking. </strong>
-          ) : null}
-          {chart.caption}
-        </p>
+        <p className="terminal-chart-cap">{chart.caption}</p>
       ) : null}
     </figure>
   );
