@@ -168,10 +168,7 @@ function ProjectMedia({
       <YouTubePosterPlayer
         videoId={ytId}
         title={item.title}
-        posterUrl={
-          item.imageUrl ||
-          `https://i.ytimg.com/vi/${ytId}/mqdefault.jpg`
-        }
+        posterUrl={`https://i.ytimg.com/vi/${ytId}/mqdefault.jpg`}
         overlay={overlay}
         staticOnly={staticOnly}
       />
