@@ -241,18 +241,22 @@
   }
 
   function ensureSwitcher() {
-    if (document.getElementById("langSwitch")) return;
-    var nav = document.querySelector(".site-nav__menu");
-    if (!nav) return;
-    var wrap = document.createElement("div");
-    wrap.id = "langSwitch";
-    wrap.className = "lang-switch";
-    wrap.setAttribute("role", "group");
-    wrap.setAttribute("aria-label", "Language");
-    wrap.innerHTML =
-      '<button type="button" class="lang-switch__btn" data-set-lang="en" aria-pressed="false">EN</button>' +
-      '<button type="button" class="lang-switch__btn" data-set-lang="it" aria-pressed="false">IT</button>';
-    nav.appendChild(wrap);
+    var wrap = document.getElementById("langSwitch");
+    if (!wrap) {
+      var nav = document.querySelector(".site-nav__menu");
+      if (!nav) return;
+      wrap = document.createElement("div");
+      wrap.id = "langSwitch";
+      wrap.className = "lang-switch";
+      wrap.setAttribute("role", "group");
+      wrap.setAttribute("aria-label", "Language");
+      wrap.innerHTML =
+        '<button type="button" class="lang-switch__btn" data-set-lang="en" aria-pressed="false">EN</button>' +
+        '<button type="button" class="lang-switch__btn" data-set-lang="it" aria-pressed="false">IT</button>';
+      nav.parentElement.insertBefore(wrap, nav.nextSibling);
+    }
+    if (wrap.dataset.bound === "1") return;
+    wrap.dataset.bound = "1";
     wrap.addEventListener("click", function (e) {
       var btn = e.target.closest("[data-set-lang]");
       if (!btn) return;

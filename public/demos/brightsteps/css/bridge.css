@@ -92,6 +92,10 @@
 }
 .site-nav__cta { margin-left: 0.35rem; }
 
+.site-nav__inner > .lang-switch {
+  flex-shrink: 0;
+  align-self: center;
+}
 .lang-switch {
   display: inline-flex;
   align-items: center;
@@ -101,6 +105,13 @@
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--cream-2) 80%, white);
   border: 1px solid var(--line);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--ink) 8%, transparent);
+}
+@media (max-width: 992px) {
+  .site-nav__inner > .lang-switch {
+    margin-left: auto;
+    margin-right: 0.15rem;
+  }
 }
 .lang-switch__btn {
   border: 0;
