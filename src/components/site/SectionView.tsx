@@ -679,8 +679,8 @@ export function AboutCard({
     (item.id && CARD_ICONS[item.id]) || CARD_ICON_FALLBACK[index % CARD_ICON_FALLBACK.length];
   return (
     <article className="circuit-card rounded-2xl p-6">
-      <div className="relative mb-5 inline-flex">
-        <div className="h-14 w-14 overflow-hidden rounded-xl border border-cyan-500/25 bg-cyan-950/60">
+      <div className="relative mb-5 h-14 w-14">
+        <div className="h-full w-full overflow-hidden rounded-xl border border-cyan-500/25 bg-cyan-950/60">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={iconSrc}
@@ -688,7 +688,7 @@ export function AboutCard({
             className="h-full w-full object-cover"
           />
         </div>
-        <span className="absolute -right-2 -top-2 z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-cyan-300 px-1 text-[10px] font-semibold leading-none text-cyan-950">
+        <span className="pointer-events-none absolute right-0 top-0 z-10 flex h-6 min-w-6 -translate-y-1/4 translate-x-1/4 items-center justify-center rounded-full bg-cyan-300 px-1.5 text-[11px] font-bold leading-none text-cyan-950 shadow-[0_0_0_2px_rgba(5,12,18,0.9)]">
           {String(index + 1).padStart(2, "0")}
         </span>
       </div>
