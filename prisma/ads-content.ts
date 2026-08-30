@@ -7,7 +7,7 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
     title: "Made by Ali",
     subtitle: "O-Level campus growth · AI ads · solo",
     body: "A new O-Level campus grows when AI-made ads reach parents who are choosing. More accurate than hoping the feed helps. Built to get seen. I also ship the parent landing page and night chatbot — then run the ads into them.",
-    imageUrl: "/evidence/hero.jpg",
+    imageUrl: "/evidence/hero.jpg?v=2",
     items: "[]",
     sortOrder: 0,
     visible: true,

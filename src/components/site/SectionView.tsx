@@ -342,8 +342,17 @@ export function SectionView({
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={section.imageUrl}
-                      alt=""
+                      alt="Made by Ali — campus growth and AI ads"
+                      width={288}
+                      height={288}
+                      decoding="async"
                       className="h-full w-full object-cover"
+                      onError={(e) => {
+                        const el = e.currentTarget;
+                        if (el.dataset.fallback === "1") return;
+                        el.dataset.fallback = "1";
+                        el.src = "/evidence/hero.jpg";
+                      }}
                     />
                   ) : (
                     <div className="video-frame flex h-full w-full items-center justify-center">
