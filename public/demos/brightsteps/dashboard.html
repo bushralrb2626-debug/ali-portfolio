@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard · BrightSteps Academy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/demos/brightsteps/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/site.css?v=v4xah3ygNzDE6i0z2nBrefn5aVmdSfduQ5LofnpRUCo" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/bridge.css?v=7eZ7z0-isDSPkIrEmY5kX2w3anNvmJBqC8XONQyJlhc" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/vibrant.css?v=_MlOwKhNsDIIyZrj__65eFxm0nqMbGR8UMI4j8NWuoA" />
+</head>
+<body class="dash-body playful" data-no-translate>
+    <div class="dash-shell">
+        <aside class="dash-sidebar">
+            <a class="dash-brand" href="/demos/brightsteps/dashboard.html">
+                <span class="brand-mark" aria-hidden="true">🎓</span>
+                <span class="brand-text">
+                    <strong>BrightSteps</strong>
+                    <small id="dashRoleBadge">Portal</small>
+                </span>
+            </a>
+            <ul class="dash-nav" id="dashNav"></ul>
+            <div class="sidebar-foot">
+                <p class="text-muted small mb-1" id="dashUserName"></p>
+                <button type="button" class="btn-bsa btn-bsa-ghost w-100" id="dashLogout">Log out</button>
+            </div>
+        </aside>
+        <div class="dash-main">
+            <header class="dash-topbar">
+                <a class="btn-bsa btn-bsa-ghost btn-bsa-sm" href="/demos/brightsteps/portal.html">School portals</a>
+                <a class="btn-bsa btn-bsa-soft btn-bsa-sm" href="/demos/brightsteps/index.html">Public site</a>
+            </header>
+            <div class="dash-content" id="dashContent"></div>
+        </div>
+    </div>
+    <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+    <script src="/demos/brightsteps/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/demos/brightsteps/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/demos/brightsteps/js/site.js?v=luiJ4SEN_KdAVDB3Pna67snIoueCu41p_1cu6Rh0fuY"></script>
+    <script src="/demos/brightsteps/js/demo-auth.js"></script>
+    <script src="/demos/brightsteps/js/demo-dashboard.js"></script>
+</body>
+</html>

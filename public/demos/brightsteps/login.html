@@ -54,9 +54,10 @@
                 </form>
 
                 <div class="login-page__hint" style="margin-top:1.5rem;padding:1rem;background:#f0f7ff;border-radius:12px;font-size:0.9rem;">
-                    <strong>Demo credentials</strong><br />
+                    <strong>Demo credentials</strong> (works on this site — no external login)<br />
                     Student: <code>student_demo</code> / <code>Demo@12345</code><br />
-                    Parent: <code>parent_demo</code> / <code>Demo@12345</code>
+                    Parent: <code>parent_demo</code> / <code>Demo@12345</code><br />
+                    Teacher: <code>teacher_demo</code> / <code>Demo@12345</code>
                 </div>
             </div>
         </section>
@@ -66,20 +67,36 @@
     <script src="/demos/brightsteps/lib/jquery/dist/jquery.min.js"></script>
     <script src="/demos/brightsteps/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/demos/brightsteps/js/site.js?v=luiJ4SEN_KdAVDB3Pna67snIoueCu41p_1cu6Rh0fuY"></script>
+    <script src="/demos/brightsteps/js/demo-auth.js"></script>
     <script>
     (function () {
+      var auth = window.BrightStepsDemoAuth;
       var params = new URLSearchParams(window.location.search);
       var login = params.get("login") || params.get("email") || "";
       var field = document.getElementById("loginId");
       if (field && login) field.value = login;
 
+      if (auth && auth.getSession()) {
+        window.location.replace(auth.paths.dashboard);
+        return;
+      }
+
       var form = document.getElementById("loginForm");
-      if (!form) return;
+      if (!form || !auth) return;
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        if (window.showToast) {
-          window.showToast("This is a static demo site. Connect the live BrightSteps app for real sign-in.", "info");
+        var loginId = (document.getElementById("loginId") || {}).value || "";
+        var password = (form.querySelector('[name="password"]') || {}).value || "";
+        var remember = !!(form.querySelector('[name="remember"]') || {}).checked;
+        var result = auth.login(loginId, password, remember);
+        if (!result.ok) {
+          if (window.showToast) window.showToast(result.message, "error");
+          return;
         }
+        if (window.showToast) window.showToast("Welcome, " + result.session.name + "!", "success");
+        window.setTimeout(function () {
+          window.location.href = auth.paths.dashboard;
+        }, 400);
       });
     })();
     </script>
