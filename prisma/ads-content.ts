@@ -423,8 +423,8 @@ export const adsPortfolioSections: Prisma.SectionCreateManyInput[] = [
         title: "BrightSteps Academy — campus platform",
         description:
           "Public school site plus parent/teacher/student portals. Click opens the live web demo on any PC.",
-        url: "https://ali-portfolio-web.onrender.com/demos/brightsteps/",
-        articleUrl: "https://ali-portfolio-web.onrender.com/demos/brightsteps/",
+        url: "https://brightsteps-academy.onrender.com/",
+        articleUrl: "https://brightsteps-academy.onrender.com/",
         sourceLabel: "Open web",
         imageUrl: "/evidence/proj-brightsteps.jpg",
         videoUrl: "",
