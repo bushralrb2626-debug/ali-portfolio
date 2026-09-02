@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>School Login · BrightSteps Academy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/demos/brightsteps/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/site.css?v=v4xah3ygNzDE6i0z2nBrefn5aVmdSfduQ5LofnpRUCo" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/bridge.css?v=7eZ7z0-isDSPkIrEmY5kX2w3anNvmJBqC8XONQyJlhc" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/vibrant.css?v=_MlOwKhNsDIIyZrj__65eFxm0nqMbGR8UMI4j8NWuoA" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/fancy.css?v=bOP9eHgb89n0I_cKxXSxDNCgKsnhNRWykcSpIgOqgGQ" />
+</head>
+<body class="site-body">
+    <main>
+        <section class="login-page" data-no-translate>
+            <div class="login-page__visual">
+                <div class="blob accent-yellow"></div>
+                <div class="blob accent-mint"></div>
+                <div class="login-page__quote reveal">
+                    <a class="brand-logo" href="/demos/brightsteps/index.html" style="margin-bottom:1rem;display:inline-flex">
+                        <span class="brand-text">
+                            <strong>BrightSteps Academy</strong>
+                            <small>Learn. Explore. Grow.</small>
+                        </span>
+                    </a>
+                    <h1>Welcome back</h1>
+                    <p>Authorized school staff and users only. Your dashboard opens based on your account.</p>
+                </div>
+            </div>
+            <div class="login-page__form reveal">
+                <p class="eyebrow">Sign in</p>
+                <h2>School Login</h2>
+                <p class="login-page__hint">Enter your login ID and password. Your role is determined from your account.</p>
+
+                <form class="form-bsa" id="loginForm" method="get" action="#" novalidate>
+                    <label>
+                        Email or Login ID
+                        <input type="text" name="login" id="loginId" required placeholder="e.g. student_demo" autocomplete="username" />
+                    </label>
+                    <label>
+                        Password
+                        <input type="password" name="password" required placeholder="••••••••" autocomplete="current-password" />
+                    </label>
+                    <label class="form-bsa__check">
+                        <input type="checkbox" name="remember" value="true" />
+                        <span>Remember me</span>
+                    </label>
+                    <button type="submit" class="btn-bsa btn-bsa-primary">Login</button>
+                    <a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/portal.html">School portals</a>
+                    <a class="btn-bsa btn-bsa-ghost" href="/demos/brightsteps/index.html">Back to website</a>
+                </form>
+
+                <div class="login-page__hint" style="margin-top:1.5rem;padding:1rem;background:#f0f7ff;border-radius:12px;font-size:0.9rem;">
+                    <strong>Demo credentials</strong><br />
+                    Student: <code>student_demo</code> / <code>Demo@12345</code><br />
+                    Parent: <code>parent_demo</code> / <code>Demo@12345</code>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+    <script src="/demos/brightsteps/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/demos/brightsteps/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/demos/brightsteps/js/site.js?v=luiJ4SEN_KdAVDB3Pna67snIoueCu41p_1cu6Rh0fuY"></script>
+    <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var login = params.get("login") || params.get("email") || "";
+      var field = document.getElementById("loginId");
+      if (field && login) field.value = login;
+
+      var form = document.getElementById("loginForm");
+      if (!form) return;
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (window.showToast) {
+          window.showToast("This is a static demo site. Connect the live BrightSteps app for real sign-in.", "info");
+        }
+      });
+    })();
+    </script>
+</body>
+</html>
