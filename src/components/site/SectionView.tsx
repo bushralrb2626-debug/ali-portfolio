@@ -707,7 +707,9 @@ export function AboutCard({
 
 function isOpenWebItem(item: SectionItem): boolean {
   const href = (item.articleUrl || item.url || "").trim();
-  if (!/^https?:\/\//i.test(href)) return false;
+  const isHttp = /^https?:\/\//i.test(href);
+  const isDemoPath = href.startsWith("/demos/");
+  if (!href || (!isHttp && !isDemoPath)) return false;
   if (item.videoUrl?.trim()) return false;
   const cue = `${item.timeRange ?? ""} ${item.whyArticle ?? ""}`.toLowerCase();
   return (

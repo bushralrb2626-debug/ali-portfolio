@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vienici a trovare · Scuola Materna</title>
+    <title data-i18n="title.contact">Vienici a trovare · Scuola Materna</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -13,11 +13,12 @@
     <link rel="stylesheet" href="/demos/brightsteps/css/vibrant.css?v=_MlOwKhNsDIIyZrj__65eFxm0nqMbGR8UMI4j8NWuoA" />
     <link rel="stylesheet" href="/demos/brightsteps/css/fancy.css?v=bOP9eHgb89n0I_cKxXSxDNCgKsnhNRWykcSpIgOqgGQ" />
     
+    <link rel="stylesheet" href="/demos/brightsteps/css/campus-bot.css" />
 </head>
 <body class="site-body">
     <header class="site-nav">
     <div class="site-nav__inner">
-        <a class="brand-logo " aria-label="Home Scuola Materna" href="/demos/brightsteps/index.html">
+        <a class="brand-logo " aria-label="Home Scuola Materna" data-i18n-aria="nav.homeAria" href="/demos/brightsteps/index.html">
         <span class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 48 48" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="4" y="10" width="28" height="30" rx="6" fill="#5B8DEF"/>
@@ -28,26 +29,26 @@
         </span>
     <span class="brand-text">
         <strong>Scuola Materna</strong>
-            <small>Impara. Esplora. Cresci.</small>
+            <small data-i18n="brand.tagline">Impara. Esplora. Cresci.</small>
     </span>
 </a>
 
-        <button class="site-nav__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#publicNav" aria-controls="publicNav" aria-expanded="false" aria-label="Apri menu">
+        <button class="site-nav__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#publicNav" aria-controls="publicNav" aria-expanded="false" aria-label="Apri menu" data-i18n-aria="nav.toggle">
             <span></span><span></span><span></span>
         </button>
         <nav class="collapse site-nav__menu" id="publicNav">
-            <a class="site-nav__link " href="/demos/brightsteps/index.html">Home</a>
-            <a class="site-nav__link " href="/demos/brightsteps/about.html">Chi siamo</a>
-            <a class="site-nav__link " href="/demos/brightsteps/programs.html">Programmi</a>
-            <a class="site-nav__link " href="/demos/brightsteps/facilities.html">Strutture</a>
-            <a class="site-nav__link " href="/demos/brightsteps/teachers.html">Insegnanti</a>
-            <a class="site-nav__link " href="/demos/brightsteps/activities.html">Attività</a>
-            <a class="site-nav__link " href="/demos/brightsteps/events.html">Eventi</a>
-            <a class="site-nav__link " href="/demos/brightsteps/gallery.html">Galleria</a>
-            <a class="site-nav__link is-active" href="/demos/brightsteps/contact.html">Contatti</a>
-            <a class="btn-bsa btn-bsa-primary site-nav__cta" href="/demos/brightsteps/portal.html">🔐 Accedi <span class="cta-arrow" aria-hidden="true">→</span></a>
+            <a class="site-nav__link " href="/demos/brightsteps/index.html" data-i18n="nav.home">Home</a>
+            <a class="site-nav__link " href="/demos/brightsteps/about.html" data-i18n="nav.about">Chi siamo</a>
+            <a class="site-nav__link " href="/demos/brightsteps/programs.html" data-i18n="nav.programs">Programmi</a>
+            <a class="site-nav__link " href="/demos/brightsteps/facilities.html" data-i18n="nav.facilities">Strutture</a>
+            <a class="site-nav__link " href="/demos/brightsteps/teachers.html" data-i18n="about.teachers">Insegnanti</a>
+            <a class="site-nav__link " href="/demos/brightsteps/activities.html" data-i18n="nav.activities">Attività</a>
+            <a class="site-nav__link " href="/demos/brightsteps/events.html" data-i18n="nav.events">Eventi</a>
+            <a class="site-nav__link " href="/demos/brightsteps/gallery.html" data-i18n="nav.gallery">Galleria</a>
+            <a class="site-nav__link is-active" href="/demos/brightsteps/contact.html" data-i18n="nav.contact">Contatti</a>
+            <a class="btn-bsa btn-bsa-primary site-nav__cta" href="/demos/brightsteps/portal.html" data-i18n="nav.loginCta">🔐 Accedi <span class="cta-arrow" aria-hidden="true">→</span></a>
         </nav>
-        <div class="lang-switch" id="langSwitch" role="group" aria-label="Language">
+        <div class="lang-switch" id="langSwitch" role="group" aria-label="Language" data-i18n-aria="lang.group">
             <button type="button" class="lang-switch__btn" data-set-lang="en" aria-pressed="false">EN</button>
             <button type="button" class="lang-switch__btn" data-set-lang="it" aria-pressed="true">IT</button>
         </div>
@@ -58,9 +59,9 @@
         <section class="page-hero section">
     <div class="blob accent-grass"></div>
     <div class="section-head reveal">
-        <p class="eyebrow">Contatti</p>
-        <h1>Visita us</h1>
-        <p>Ci piacerebbe conoscere la vostra famiglia.</p>
+        <p class="eyebrow" data-i18n="nav.contact">Contatti</p>
+        <h1 data-i18n="sec.visitUs">Visita us</h1>
+        <p data-i18n="contact.meet">Ci piacerebbe conoscere la vostra famiglia.</p>
     </div>
 </section>
 
@@ -69,7 +70,7 @@
         <form id="contactForm" class="form-bsa card-lift reveal" method="post" action="#">
             <label>
                 Nome completo
-                <input type="text" name="name" required placeholder="Il tuo nome" />
+                <input type="text" name="name" required placeholder="Il tuo nome" data-i18n-placeholder="contact.yourName" />
             </label>
             <label>
                 Email
@@ -81,9 +82,9 @@
             </label>
             <label>
                 Message
-                <textarea name="message" rows="5" required placeholder="Raccontaci un po&#x27; di tuo figlio o della richiesta di visita"></textarea>
+                <textarea name="message" rows="5" required placeholder="Raccontaci un po&#x27; di tuo figlio o della richiesta di visita" data-i18n-placeholder="contact.placeholderMsg"></textarea>
             </label>
-            <button type="submit" class="btn-bsa btn-bsa-primary">Invia messaggio</button>
+            <button type="submit" class="btn-bsa btn-bsa-primary" data-i18n="contact.send">Invia messaggio</button>
         </form>
         <div class="contact-side reveal">
             <div class="contact-card">
@@ -91,10 +92,10 @@
                 <p>42 Maple Grove, Riverside</p>
                 <p>&#x2B;1 (555) 214-8800</p>
                 <p>hello@brightsteps.academy</p>
-                <a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/portal.html">Accedi</a>
+                <a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/portal.html" data-i18n="portal.loginBtn">Accedi</a>
             </div>
-            <div class="map-placeholder" role="img" aria-label="Segnaposto mappa">
-                <span>📍 Mappa in arrivo</span>
+            <div class="map-placeholder" role="img" aria-label="Segnaposto mappa" data-i18n-aria="contact.mapPh">
+                <span data-i18n="contact.mapSoon">📍 Mappa in arrivo</span>
                 <small>42 Maple Grove, Riverside</small>
             </div>
         </div>
@@ -112,7 +113,7 @@
     </svg>
     <div class="footer-bsa__inner">
         <div class="footer-bsa__brand">
-            <a class="brand-logo " aria-label="Home Scuola Materna" href="/demos/brightsteps/index.html">
+            <a class="brand-logo " aria-label="Home Scuola Materna" data-i18n-aria="nav.homeAria" href="/demos/brightsteps/index.html">
         <span class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 48 48" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="4" y="10" width="28" height="30" rx="6" fill="#5B8DEF"/>
@@ -123,42 +124,42 @@
         </span>
     <span class="brand-text">
         <strong>Scuola Materna</strong>
-            <small>Impara. Esplora. Cresci.</small>
+            <small data-i18n="brand.tagline">Impara. Esplora. Cresci.</small>
     </span>
 </a>
 
-            <p>Un luogo gioioso dove i bambini imparano, esplorano e crescono — ogni giorno.</p>
-            <div class="footer-social" aria-label="Link social">
+            <p data-i18n="footer.joy">Un luogo gioioso dove i bambini imparano, esplorano e crescono — ogni giorno.</p>
+            <div class="footer-social" aria-label="Link social" data-i18n-aria="contact.social">
                 <a href="#" aria-label="Facebook">f</a>
                 <a href="#" aria-label="Instagram">ig</a>
                 <a href="#" aria-label="YouTube">▶</a>
             </div>
         </div>
         <div class="footer-bsa__col">
-            <h4>Esplora</h4>
-            <a href="/demos/brightsteps/about.html">Chi siamo</a>
-            <a href="/demos/brightsteps/programs.html">Programmi</a>
-            <a href="/demos/brightsteps/facilities.html">Strutture</a>
-            <a href="/demos/brightsteps/teachers.html">Insegnanti</a>
+            <h4 data-i18n="sec.explore">Esplora</h4>
+            <a href="/demos/brightsteps/about.html" data-i18n="nav.about">Chi siamo</a>
+            <a href="/demos/brightsteps/programs.html" data-i18n="nav.programs">Programmi</a>
+            <a href="/demos/brightsteps/facilities.html" data-i18n="nav.facilities">Strutture</a>
+            <a href="/demos/brightsteps/teachers.html" data-i18n="about.teachers">Insegnanti</a>
         </div>
         <div class="footer-bsa__col">
-            <h4>Vita scolastica</h4>
-            <a href="/demos/brightsteps/activities.html">Attività</a>
-            <a href="/demos/brightsteps/events.html">Eventi</a>
-            <a href="/demos/brightsteps/gallery.html">Galleria</a>
-            <a href="/demos/brightsteps/contact.html">Contatti</a>
+            <h4 data-i18n="sec.schoolLife">Vita scolastica</h4>
+            <a href="/demos/brightsteps/activities.html" data-i18n="nav.activities">Attività</a>
+            <a href="/demos/brightsteps/events.html" data-i18n="nav.events">Eventi</a>
+            <a href="/demos/brightsteps/gallery.html" data-i18n="nav.gallery">Galleria</a>
+            <a href="/demos/brightsteps/contact.html" data-i18n="nav.contact">Contatti</a>
         </div>
         <div class="footer-bsa__col">
-            <h4>Visita</h4>
+            <h4 data-i18n="sec.visit">Visita</h4>
             <p>42 Maple Grove, Riverside</p>
             <p>&#x2B;1 (555) 214-8800</p>
             <p>hello@brightsteps.academy</p>
-            <a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/portal.html">🔐 Accedi</a>
+            <a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/portal.html" data-i18n="nav.loginCta">🔐 Accedi</a>
         </div>
     </div>
     <div class="footer-bsa__bar">
-        <span>&copy; 2026 Scuola Materna · Impara. Esplora. Cresci.</span>
-        <a href="/demos/brightsteps/contact.html">Scrivici</a>
+        <span data-i18n="footer.copy">&copy; 2026 Scuola Materna · Impara. Esplora. Cresci.</span>
+        <a href="/demos/brightsteps/contact.html" data-i18n="sec.getInTouch">Scrivici</a>
     </div>
 </footer>
 
@@ -169,11 +170,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="bsaModalTitle">BrightSteps</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi" data-i18n-aria="close"></button>
             </div>
             <div class="modal-body" id="bsaModalBody"></div>
             <div class="modal-footer" id="bsaModalFooter">
-                <button type="button" class="btn-bsa btn-bsa-ghost" data-bs-dismiss="modal">Chiudi</button>
+                <button type="button" class="btn-bsa btn-bsa-ghost" data-bs-dismiss="modal" data-i18n="close">Chiudi</button>
             </div>
         </div>
     </div>
@@ -184,6 +185,7 @@
     <script src="/demos/brightsteps/js/site.js?v=luiJ4SEN_KdAVDB3Pna67snIoueCu41p_1cu6Rh0fuY"></script>
     <script src="/demos/brightsteps/js/i18n.js"></script>
     
+    <script src="/demos/brightsteps/js/campus-bot.js"></script>
 </body>
 </html>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Galleria della scuola · Scuola Materna</title>
+    <title data-i18n="title.gallery">Galleria della scuola · Scuola Materna</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -13,11 +13,12 @@
     <link rel="stylesheet" href="/demos/brightsteps/css/vibrant.css?v=_MlOwKhNsDIIyZrj__65eFxm0nqMbGR8UMI4j8NWuoA" />
     <link rel="stylesheet" href="/demos/brightsteps/css/fancy.css?v=bOP9eHgb89n0I_cKxXSxDNCgKsnhNRWykcSpIgOqgGQ" />
     
+    <link rel="stylesheet" href="/demos/brightsteps/css/campus-bot.css" />
 </head>
 <body class="site-body">
     <header class="site-nav">
     <div class="site-nav__inner">
-        <a class="brand-logo " aria-label="Home Scuola Materna" href="/demos/brightsteps/index.html">
+        <a class="brand-logo " aria-label="Home Scuola Materna" data-i18n-aria="nav.homeAria" href="/demos/brightsteps/index.html">
         <span class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 48 48" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="4" y="10" width="28" height="30" rx="6" fill="#5B8DEF"/>
@@ -28,26 +29,26 @@
         </span>
     <span class="brand-text">
         <strong>Scuola Materna</strong>
-            <small>Impara. Esplora. Cresci.</small>
+            <small data-i18n="brand.tagline">Impara. Esplora. Cresci.</small>
     </span>
 </a>
 
-        <button class="site-nav__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#publicNav" aria-controls="publicNav" aria-expanded="false" aria-label="Apri menu">
+        <button class="site-nav__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#publicNav" aria-controls="publicNav" aria-expanded="false" aria-label="Apri menu" data-i18n-aria="nav.toggle">
             <span></span><span></span><span></span>
         </button>
         <nav class="collapse site-nav__menu" id="publicNav">
-            <a class="site-nav__link " href="/demos/brightsteps/index.html">Home</a>
-            <a class="site-nav__link " href="/demos/brightsteps/about.html">Chi siamo</a>
-            <a class="site-nav__link " href="/demos/brightsteps/programs.html">Programmi</a>
-            <a class="site-nav__link " href="/demos/brightsteps/facilities.html">Strutture</a>
-            <a class="site-nav__link " href="/demos/brightsteps/teachers.html">Insegnanti</a>
-            <a class="site-nav__link " href="/demos/brightsteps/activities.html">Attività</a>
-            <a class="site-nav__link " href="/demos/brightsteps/events.html">Eventi</a>
-            <a class="site-nav__link is-active" href="/demos/brightsteps/gallery.html">Galleria</a>
-            <a class="site-nav__link " href="/demos/brightsteps/contact.html">Contatti</a>
-            <a class="btn-bsa btn-bsa-primary site-nav__cta" href="/demos/brightsteps/portal.html">🔐 Accedi <span class="cta-arrow" aria-hidden="true">→</span></a>
+            <a class="site-nav__link " href="/demos/brightsteps/index.html" data-i18n="nav.home">Home</a>
+            <a class="site-nav__link " href="/demos/brightsteps/about.html" data-i18n="nav.about">Chi siamo</a>
+            <a class="site-nav__link " href="/demos/brightsteps/programs.html" data-i18n="nav.programs">Programmi</a>
+            <a class="site-nav__link " href="/demos/brightsteps/facilities.html" data-i18n="nav.facilities">Strutture</a>
+            <a class="site-nav__link " href="/demos/brightsteps/teachers.html" data-i18n="about.teachers">Insegnanti</a>
+            <a class="site-nav__link " href="/demos/brightsteps/activities.html" data-i18n="nav.activities">Attività</a>
+            <a class="site-nav__link " href="/demos/brightsteps/events.html" data-i18n="nav.events">Eventi</a>
+            <a class="site-nav__link is-active" href="/demos/brightsteps/gallery.html" data-i18n="nav.gallery">Galleria</a>
+            <a class="site-nav__link " href="/demos/brightsteps/contact.html" data-i18n="nav.contact">Contatti</a>
+            <a class="btn-bsa btn-bsa-primary site-nav__cta" href="/demos/brightsteps/portal.html" data-i18n="nav.loginCta">🔐 Accedi <span class="cta-arrow" aria-hidden="true">→</span></a>
         </nav>
-        <div class="lang-switch" id="langSwitch" role="group" aria-label="Language">
+        <div class="lang-switch" id="langSwitch" role="group" aria-label="Language" data-i18n-aria="lang.group">
             <button type="button" class="lang-switch__btn" data-set-lang="en" aria-pressed="false">EN</button>
             <button type="button" class="lang-switch__btn" data-set-lang="it" aria-pressed="true">IT</button>
         </div>
@@ -58,61 +59,61 @@
         <section class="page-hero section">
     <div class="blob accent-purple"></div>
     <div class="section-head reveal">
-        <p class="eyebrow">Galleria</p>
-        <h1>Galleria scolastica</h1>
-        <p>Momenti dalle aule, dai campi, dagli studi e dalle celebrazioni.</p>
+        <p class="eyebrow" data-i18n="nav.gallery">Galleria</p>
+        <h1 data-i18n="sec.schoolGallery">Galleria scolastica</h1>
+        <p data-i18n="gal.moments">Momenti dalle aule, dai campi, dagli studi e dalle celebrazioni.</p>
     </div>
 </section>
 
 <section class="section">
     <div class="gallery-grid">
-            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Mattina in un&#x27;aula luminosa" aria-label="Mattina in un&#x27;aula luminosa">
-                <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Mattina in un&#x27;aula luminosa" loading="lazy" />
-                <span>Aule</span>
+            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Mattina in un&#x27;aula luminosa" aria-label="Mattina in un&#x27;aula luminosa" data-i18n-aria="img.morning">
+                <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Mattina in un&#x27;aula luminosa" data-i18n-alt="img.morning" loading="lazy" />
+                <span data-i18n="about.classes">Aule</span>
             </button>
-            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&amp;fit=crop&amp;w=800&amp;q=80" data-caption="Studenti immersi in una nuova storia" aria-label="Studenti immersi in una nuova storia">
-                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&amp;fit=crop&amp;w=800&amp;q=80" alt="Studenti immersi in una nuova storia" loading="lazy" />
-                <span>Studenti</span>
+            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&amp;fit=crop&amp;w=800&amp;q=80" data-caption="Studenti immersi in una nuova storia" aria-label="Studenti immersi in una nuova storia" data-i18n-aria="img.newStory">
+                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&amp;fit=crop&amp;w=800&amp;q=80" alt="Studenti immersi in una nuova storia" data-i18n-alt="img.newStory" loading="lazy" />
+                <span data-i18n="about.students">Studenti</span>
             </button>
-            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&amp;fit=crop&amp;w=400&amp;q=80" data-caption="La sig.ra Wilson con la classe 5" aria-label="La sig.ra Wilson con la classe 5">
-                <img src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&amp;fit=crop&amp;w=400&amp;q=80" alt="La sig.ra Wilson con la classe 5" loading="lazy" />
-                <span>Insegnanti</span>
+            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&amp;fit=crop&amp;w=400&amp;q=80" data-caption="La sig.ra Wilson con la classe 5" aria-label="La sig.ra Wilson con la classe 5" data-i18n-aria="img.wilson">
+                <img src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&amp;fit=crop&amp;w=400&amp;q=80" alt="La sig.ra Wilson con la classe 5" data-i18n-alt="img.wilson" loading="lazy" />
+                <span data-i18n="about.teachers">Insegnanti</span>
             </button>
-            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&amp;fit=crop&amp;w=1000&amp;q=80" data-caption="House races on Giornata dello sport" aria-label="House races on Giornata dello sport">
-                <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&amp;fit=crop&amp;w=1000&amp;q=80" alt="House races on Giornata dello sport" loading="lazy" />
-                <span>Sport</span>
+            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&amp;fit=crop&amp;w=1000&amp;q=80" data-caption="House races on Giornata dello sport" aria-label="House races on Giornata dello sport" data-i18n-aria="img.houseRaces">
+                <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&amp;fit=crop&amp;w=1000&amp;q=80" alt="House races on Giornata dello sport" data-i18n-alt="img.houseRaces" loading="lazy" />
+                <span data-i18n="prog.sports">Sport</span>
             </button>
-            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Colori e argilla nello studio" aria-label="Colori e argilla nello studio">
-                <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Colori e argilla nello studio" loading="lazy" />
-                <span>Arte</span>
+            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Colori e argilla nello studio" aria-label="Colori e argilla nello studio" data-i18n-aria="img.clay">
+                <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Colori e argilla nello studio" data-i18n-alt="img.clay" loading="lazy" />
+                <span data-i18n="subj.art">Arte</span>
             </button>
-            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1567427013422-6b76b26f2254?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Camici da laboratorio e grandi domande" aria-label="Camici da laboratorio e grandi domande">
-                <img src="https://images.unsplash.com/photo-1567427013422-6b76b26f2254?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Camici da laboratorio e grandi domande" loading="lazy" />
-                <span>Scienze</span>
+            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1567427013422-6b76b26f2254?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Camici da laboratorio e grandi domande" aria-label="Camici da laboratorio e grandi domande" data-i18n-aria="img.labCoats">
+                <img src="https://images.unsplash.com/photo-1567427013422-6b76b26f2254?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Camici da laboratorio e grandi domande" data-i18n-alt="img.labCoats" loading="lazy" />
+                <span data-i18n="subj.sci">Scienze</span>
             </button>
-            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Il saggio annuale si illumina" aria-label="Il saggio annuale si illumina">
-                <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Il saggio annuale si illumina" loading="lazy" />
-                <span>Eventi</span>
+            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Il saggio annuale si illumina" aria-label="Il saggio annuale si illumina" data-i18n-aria="img.annualLights">
+                <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Il saggio annuale si illumina" data-i18n-alt="img.annualLights" loading="lazy" />
+                <span data-i18n="nav.events">Eventi</span>
             </button>
-            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&amp;fit=crop&amp;w=1100&amp;q=80" data-caption="Campus BrightSteps all&#x27;alba" aria-label="Campus BrightSteps all&#x27;alba">
-                <img src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&amp;fit=crop&amp;w=1100&amp;q=80" alt="Campus BrightSteps all&#x27;alba" loading="lazy" />
-                <span>Edificio scolastico</span>
+            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&amp;fit=crop&amp;w=1100&amp;q=80" data-caption="Campus BrightSteps all&#x27;alba" aria-label="Campus BrightSteps all&#x27;alba" data-i18n-aria="img.dawn">
+                <img src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&amp;fit=crop&amp;w=1100&amp;q=80" alt="Campus BrightSteps all&#x27;alba" data-i18n-alt="img.dawn" loading="lazy" />
+                <span data-i18n="gal.building">Edificio scolastico</span>
             </button>
-            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&amp;fit=crop&amp;w=1000&amp;q=80" data-caption="Angoli silenziosi della biblioteca" aria-label="Angoli silenziosi della biblioteca">
-                <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&amp;fit=crop&amp;w=1000&amp;q=80" alt="Angoli silenziosi della biblioteca" loading="lazy" />
-                <span>Biblioteca</span>
+            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&amp;fit=crop&amp;w=1000&amp;q=80" data-caption="Angoli silenziosi della biblioteca" aria-label="Angoli silenziosi della biblioteca" data-i18n-aria="img.quietCorners">
+                <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&amp;fit=crop&amp;w=1000&amp;q=80" alt="Angoli silenziosi della biblioteca" data-i18n-alt="img.quietCorners" loading="lazy" />
+                <span data-i18n="fac.libraryShort">Biblioteca</span>
             </button>
-            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Risate nel cortile" aria-label="Risate nel cortile">
-                <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Risate nel cortile" loading="lazy" />
-                <span>Cortile</span>
+            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Risate nel cortile" aria-label="Risate nel cortile" data-i18n-aria="img.laughs">
+                <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Risate nel cortile" data-i18n-alt="img.laughs" loading="lazy" />
+                <span data-i18n="fac.yard">Cortile</span>
             </button>
-            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Prove del coro dopo pranzo" aria-label="Prove del coro dopo pranzo">
-                <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Prove del coro dopo pranzo" loading="lazy" />
-                <span>Eventi</span>
+            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Prove del coro dopo pranzo" aria-label="Prove del coro dopo pranzo" data-i18n-aria="img.choir">
+                <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Prove del coro dopo pranzo" data-i18n-alt="img.choir" loading="lazy" />
+                <span data-i18n="nav.events">Eventi</span>
             </button>
-            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Una giornata di scoperta all&#x27;aperto" aria-label="Una giornata di scoperta all&#x27;aperto">
-                <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Una giornata di scoperta all&#x27;aperto" loading="lazy" />
-                <span>Eventi</span>
+            <button type="button" class="gallery-item card-lift reveal" data-gallery data-src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&amp;fit=crop&amp;w=900&amp;q=80" data-caption="Una giornata di scoperta all&#x27;aperto" aria-label="Una giornata di scoperta all&#x27;aperto" data-i18n-aria="img.outdoor">
+                <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Una giornata di scoperta all&#x27;aperto" data-i18n-alt="img.outdoor" loading="lazy" />
+                <span data-i18n="nav.events">Eventi</span>
             </button>
     </div>
 </section>
@@ -128,7 +129,7 @@
     </svg>
     <div class="footer-bsa__inner">
         <div class="footer-bsa__brand">
-            <a class="brand-logo " aria-label="Home Scuola Materna" href="/demos/brightsteps/index.html">
+            <a class="brand-logo " aria-label="Home Scuola Materna" data-i18n-aria="nav.homeAria" href="/demos/brightsteps/index.html">
         <span class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 48 48" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="4" y="10" width="28" height="30" rx="6" fill="#5B8DEF"/>
@@ -139,42 +140,42 @@
         </span>
     <span class="brand-text">
         <strong>Scuola Materna</strong>
-            <small>Impara. Esplora. Cresci.</small>
+            <small data-i18n="brand.tagline">Impara. Esplora. Cresci.</small>
     </span>
 </a>
 
-            <p>Un luogo gioioso dove i bambini imparano, esplorano e crescono — ogni giorno.</p>
-            <div class="footer-social" aria-label="Link social">
+            <p data-i18n="footer.joy">Un luogo gioioso dove i bambini imparano, esplorano e crescono — ogni giorno.</p>
+            <div class="footer-social" aria-label="Link social" data-i18n-aria="contact.social">
                 <a href="#" aria-label="Facebook">f</a>
                 <a href="#" aria-label="Instagram">ig</a>
                 <a href="#" aria-label="YouTube">▶</a>
             </div>
         </div>
         <div class="footer-bsa__col">
-            <h4>Esplora</h4>
-            <a href="/demos/brightsteps/about.html">Chi siamo</a>
-            <a href="/demos/brightsteps/programs.html">Programmi</a>
-            <a href="/demos/brightsteps/facilities.html">Strutture</a>
-            <a href="/demos/brightsteps/teachers.html">Insegnanti</a>
+            <h4 data-i18n="sec.explore">Esplora</h4>
+            <a href="/demos/brightsteps/about.html" data-i18n="nav.about">Chi siamo</a>
+            <a href="/demos/brightsteps/programs.html" data-i18n="nav.programs">Programmi</a>
+            <a href="/demos/brightsteps/facilities.html" data-i18n="nav.facilities">Strutture</a>
+            <a href="/demos/brightsteps/teachers.html" data-i18n="about.teachers">Insegnanti</a>
         </div>
         <div class="footer-bsa__col">
-            <h4>Vita scolastica</h4>
-            <a href="/demos/brightsteps/activities.html">Attività</a>
-            <a href="/demos/brightsteps/events.html">Eventi</a>
-            <a href="/demos/brightsteps/gallery.html">Galleria</a>
-            <a href="/demos/brightsteps/contact.html">Contatti</a>
+            <h4 data-i18n="sec.schoolLife">Vita scolastica</h4>
+            <a href="/demos/brightsteps/activities.html" data-i18n="nav.activities">Attività</a>
+            <a href="/demos/brightsteps/events.html" data-i18n="nav.events">Eventi</a>
+            <a href="/demos/brightsteps/gallery.html" data-i18n="nav.gallery">Galleria</a>
+            <a href="/demos/brightsteps/contact.html" data-i18n="nav.contact">Contatti</a>
         </div>
         <div class="footer-bsa__col">
-            <h4>Visita</h4>
+            <h4 data-i18n="sec.visit">Visita</h4>
             <p>42 Maple Grove, Riverside</p>
             <p>&#x2B;1 (555) 214-8800</p>
             <p>hello@brightsteps.academy</p>
-            <a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/portal.html">🔐 Accedi</a>
+            <a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/portal.html" data-i18n="nav.loginCta">🔐 Accedi</a>
         </div>
     </div>
     <div class="footer-bsa__bar">
-        <span>&copy; 2026 Scuola Materna · Impara. Esplora. Cresci.</span>
-        <a href="/demos/brightsteps/contact.html">Scrivici</a>
+        <span data-i18n="footer.copy">&copy; 2026 Scuola Materna · Impara. Esplora. Cresci.</span>
+        <a href="/demos/brightsteps/contact.html" data-i18n="sec.getInTouch">Scrivici</a>
     </div>
 </footer>
 
@@ -185,11 +186,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="bsaModalTitle">BrightSteps</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi" data-i18n-aria="close"></button>
             </div>
             <div class="modal-body" id="bsaModalBody"></div>
             <div class="modal-footer" id="bsaModalFooter">
-                <button type="button" class="btn-bsa btn-bsa-ghost" data-bs-dismiss="modal">Chiudi</button>
+                <button type="button" class="btn-bsa btn-bsa-ghost" data-bs-dismiss="modal" data-i18n="close">Chiudi</button>
             </div>
         </div>
     </div>
@@ -200,6 +201,7 @@
     <script src="/demos/brightsteps/js/site.js?v=luiJ4SEN_KdAVDB3Pna67snIoueCu41p_1cu6Rh0fuY"></script>
     <script src="/demos/brightsteps/js/i18n.js"></script>
     
+    <script src="/demos/brightsteps/js/campus-bot.js"></script>
 </body>
 </html>
 

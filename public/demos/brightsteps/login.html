@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>School Login · BrightSteps Academy</title>
+    <title data-i18n="title.login">School Login · BrightSteps Academy</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -12,10 +12,11 @@
     <link rel="stylesheet" href="/demos/brightsteps/css/bridge.css?v=7eZ7z0-isDSPkIrEmY5kX2w3anNvmJBqC8XONQyJlhc" />
     <link rel="stylesheet" href="/demos/brightsteps/css/vibrant.css?v=_MlOwKhNsDIIyZrj__65eFxm0nqMbGR8UMI4j8NWuoA" />
     <link rel="stylesheet" href="/demos/brightsteps/css/fancy.css?v=bOP9eHgb89n0I_cKxXSxDNCgKsnhNRWykcSpIgOqgGQ" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/campus-bot.css" />
 </head>
 <body class="site-body">
     <main>
-        <section class="login-page" data-no-translate>
+        <section class="login-page">
             <div class="login-page__visual">
                 <div class="blob accent-yellow"></div>
                 <div class="blob accent-mint"></div>
@@ -23,22 +24,22 @@
                     <a class="brand-logo" href="/demos/brightsteps/index.html" style="margin-bottom:1rem;display:inline-flex">
                         <span class="brand-text">
                             <strong>BrightSteps Academy</strong>
-                            <small>Learn. Explore. Grow.</small>
+                            <small data-i18n="brand.tagline">Learn. Explore. Grow.</small>
                         </span>
                     </a>
-                    <h1>Welcome back</h1>
-                    <p>Authorized school staff and users only. Your dashboard opens based on your account.</p>
+                    <h1 data-i18n="portal.welcomeBack">Welcome back</h1>
+                    <p data-i18n="portal.authorized">Authorized school staff and users only. Your dashboard opens based on your account.</p>
                 </div>
             </div>
             <div class="login-page__form reveal">
-                <p class="eyebrow">Sign in</p>
-                <h2>School Login</h2>
-                <p class="login-page__hint">Enter your login ID and password. Your role is determined from your account.</p>
+                <p class="eyebrow" data-i18n="portal.signIn">Sign in</p>
+                <h2 data-i18n="portal.schoolLogin">School Login</h2>
+                <p class="login-page__hint" data-i18n="portal.enterHint">Enter your login ID and password. Your role is determined from your account.</p>
 
                 <form class="form-bsa" id="loginForm" method="get" action="#" novalidate>
                     <label>
                         Email or Login ID
-                        <input type="text" name="login" id="loginId" required placeholder="e.g. student_demo" autocomplete="username" />
+                        <input type="text" name="login" id="loginId" required placeholder="e.g. student_demo" data-i18n-placeholder="portal.demoLoginPh" autocomplete="username" />
                     </label>
                     <label>
                         Password
@@ -46,15 +47,15 @@
                     </label>
                     <label class="form-bsa__check">
                         <input type="checkbox" name="remember" value="true" />
-                        <span>Remember me</span>
+                        <span data-i18n="portal.remember">Remember me</span>
                     </label>
-                    <button type="submit" class="btn-bsa btn-bsa-primary">Login</button>
-                    <a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/portal.html">School portals</a>
-                    <a class="btn-bsa btn-bsa-ghost" href="/demos/brightsteps/index.html">Back to website</a>
+                    <button type="submit" class="btn-bsa btn-bsa-primary" data-i18n="portal.loginBtn">Login</button>
+                    <a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/portal.html" data-i18n="portal.portals">School portals</a>
+                    <a class="btn-bsa btn-bsa-ghost" href="/demos/brightsteps/index.html" data-i18n="portal.backWeb">Back to website</a>
                 </form>
 
                 <div class="login-page__hint" style="margin-top:1.5rem;padding:1rem;background:#f0f7ff;border-radius:12px;font-size:0.9rem;">
-                    <strong>Demo credentials</strong> (works on this site — no external login)<br />
+                    <strong data-i18n="portal.demoCreds">Demo credentials</strong> (works on this site — no external login)<br />
                     Student: <code>student_demo</code> / <code>Demo@12345</code><br />
                     Parent: <code>parent_demo</code> / <code>Demo@12345</code><br />
                     Teacher: <code>teacher_demo</code> / <code>Demo@12345</code>
@@ -100,5 +101,7 @@
       });
     })();
     </script>
+    <script src="/demos/brightsteps/js/i18n.js"></script>
+    <script src="/demos/brightsteps/js/campus-bot.js"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>I nostri programmi · Scuola Materna</title>
+    <title data-i18n="title.programs">I nostri programmi · Scuola Materna</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -13,11 +13,12 @@
     <link rel="stylesheet" href="/demos/brightsteps/css/vibrant.css?v=_MlOwKhNsDIIyZrj__65eFxm0nqMbGR8UMI4j8NWuoA" />
     <link rel="stylesheet" href="/demos/brightsteps/css/fancy.css?v=bOP9eHgb89n0I_cKxXSxDNCgKsnhNRWykcSpIgOqgGQ" />
     
+    <link rel="stylesheet" href="/demos/brightsteps/css/campus-bot.css" />
 </head>
 <body class="site-body">
     <header class="site-nav">
     <div class="site-nav__inner">
-        <a class="brand-logo " aria-label="Home Scuola Materna" href="/demos/brightsteps/index.html">
+        <a class="brand-logo " aria-label="Home Scuola Materna" data-i18n-aria="nav.homeAria" href="/demos/brightsteps/index.html">
         <span class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 48 48" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="4" y="10" width="28" height="30" rx="6" fill="#5B8DEF"/>
@@ -28,26 +29,26 @@
         </span>
     <span class="brand-text">
         <strong>Scuola Materna</strong>
-            <small>Impara. Esplora. Cresci.</small>
+            <small data-i18n="brand.tagline">Impara. Esplora. Cresci.</small>
     </span>
 </a>
 
-        <button class="site-nav__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#publicNav" aria-controls="publicNav" aria-expanded="false" aria-label="Apri menu">
+        <button class="site-nav__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#publicNav" aria-controls="publicNav" aria-expanded="false" aria-label="Apri menu" data-i18n-aria="nav.toggle">
             <span></span><span></span><span></span>
         </button>
         <nav class="collapse site-nav__menu" id="publicNav">
-            <a class="site-nav__link " href="/demos/brightsteps/index.html">Home</a>
-            <a class="site-nav__link " href="/demos/brightsteps/about.html">Chi siamo</a>
-            <a class="site-nav__link is-active" href="/demos/brightsteps/programs.html">Programmi</a>
-            <a class="site-nav__link " href="/demos/brightsteps/facilities.html">Strutture</a>
-            <a class="site-nav__link " href="/demos/brightsteps/teachers.html">Insegnanti</a>
-            <a class="site-nav__link " href="/demos/brightsteps/activities.html">Attività</a>
-            <a class="site-nav__link " href="/demos/brightsteps/events.html">Eventi</a>
-            <a class="site-nav__link " href="/demos/brightsteps/gallery.html">Galleria</a>
-            <a class="site-nav__link " href="/demos/brightsteps/contact.html">Contatti</a>
-            <a class="btn-bsa btn-bsa-primary site-nav__cta" href="/demos/brightsteps/portal.html">🔐 Accedi <span class="cta-arrow" aria-hidden="true">→</span></a>
+            <a class="site-nav__link " href="/demos/brightsteps/index.html" data-i18n="nav.home">Home</a>
+            <a class="site-nav__link " href="/demos/brightsteps/about.html" data-i18n="nav.about">Chi siamo</a>
+            <a class="site-nav__link is-active" href="/demos/brightsteps/programs.html" data-i18n="nav.programs">Programmi</a>
+            <a class="site-nav__link " href="/demos/brightsteps/facilities.html" data-i18n="nav.facilities">Strutture</a>
+            <a class="site-nav__link " href="/demos/brightsteps/teachers.html" data-i18n="about.teachers">Insegnanti</a>
+            <a class="site-nav__link " href="/demos/brightsteps/activities.html" data-i18n="nav.activities">Attività</a>
+            <a class="site-nav__link " href="/demos/brightsteps/events.html" data-i18n="nav.events">Eventi</a>
+            <a class="site-nav__link " href="/demos/brightsteps/gallery.html" data-i18n="nav.gallery">Galleria</a>
+            <a class="site-nav__link " href="/demos/brightsteps/contact.html" data-i18n="nav.contact">Contatti</a>
+            <a class="btn-bsa btn-bsa-primary site-nav__cta" href="/demos/brightsteps/portal.html" data-i18n="nav.loginCta">🔐 Accedi <span class="cta-arrow" aria-hidden="true">→</span></a>
         </nav>
-        <div class="lang-switch" id="langSwitch" role="group" aria-label="Language">
+        <div class="lang-switch" id="langSwitch" role="group" aria-label="Language" data-i18n-aria="lang.group">
             <button type="button" class="lang-switch__btn" data-set-lang="en" aria-pressed="false">EN</button>
             <button type="button" class="lang-switch__btn" data-set-lang="it" aria-pressed="true">IT</button>
         </div>
@@ -58,9 +59,9 @@
         <section class="page-hero section">
     <div class="blob accent-sky"></div>
     <div class="section-head reveal">
-        <p class="eyebrow">Programmi</p>
-        <h1>Percorsi per ogni allievo</h1>
-        <p>Trova il giusto mix di studio, arte, sport e scoperta.</p>
+        <p class="eyebrow" data-i18n="nav.programs">Programmi</p>
+        <h1 data-i18n="prog.pathways">Percorsi per ogni allievo</h1>
+        <p data-i18n="prog.findMix">Trova il giusto mix di studio, arte, sport e scoperta.</p>
     </div>
 </section>
 
@@ -68,86 +69,86 @@
     <div class="card-grid programs-grid">
             <a class="program-card card-lift reveal accent-yellow" href="/demos/brightsteps/Home/Program?name=Early%20Apprendimento">
                 <div class="program-card__media">
-                    <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Prima infanzia" />
+                    <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Prima infanzia" data-i18n-alt="prog.early" />
                 </div>
                 <div class="program-card__body">
                     <span class="ico ico-blocks" aria-hidden="true">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="8" y="3" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>
 </span>
 
-                    <h3>Prima infanzia</h3>
-                    <p>Coltivare la curiosità attraverso il gioco e la scoperta.</p>
-                    <span class="btn-bsa btn-bsa-soft">Scopri di più</span>
+                    <h3 data-i18n="prog.early">Prima infanzia</h3>
+                    <p data-i18n="prog.earlyDesc">Coltivare la curiosità attraverso il gioco e la scoperta.</p>
+                    <span class="btn-bsa btn-bsa-soft" data-i18n="prog.learnMore">Scopri di più</span>
                 </div>
             </a>
             <a class="program-card card-lift reveal accent-sky" href="/demos/brightsteps/Home/Program?name=Primary%20School">
                 <div class="program-card__media">
-                    <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Scuola primaria" />
+                    <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Scuola primaria" data-i18n-alt="prog.primary" />
                 </div>
                 <div class="program-card__body">
                     <span class="ico ico-book" aria-hidden="true">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 5.5A2.5 2.5 0 017.5 3H19v15H7.5A2.5 2.5 0 005 20.5V5.5z" stroke="currentColor" stroke-width="1.8"/><path d="M5 18.5h12" stroke="currentColor" stroke-width="1.8"/></svg>
 </span>
 
-                    <h3>Scuola primaria</h3>
-                    <p>Basi solide per un apprendimento che dura tutta la vita.</p>
-                    <span class="btn-bsa btn-bsa-soft">Scopri di più</span>
+                    <h3 data-i18n="prog.primary">Scuola primaria</h3>
+                    <p data-i18n="prog.primaryDesc">Basi solide per un apprendimento che dura tutta la vita.</p>
+                    <span class="btn-bsa btn-bsa-soft" data-i18n="prog.learnMore">Scopri di più</span>
                 </div>
             </a>
             <a class="program-card card-lift reveal accent-royal" href="/demos/brightsteps/Home/Program?name=Middle%20School">
                 <div class="program-card__media">
-                    <img src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&amp;fit=crop&amp;w=1000&amp;q=80" alt="Scuola media" />
+                    <img src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&amp;fit=crop&amp;w=1000&amp;q=80" alt="Scuola media" data-i18n-alt="prog.middle" />
                 </div>
                 <div class="program-card__body">
                     <span class="ico ico-cap" aria-hidden="true">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10l9-5 9 5-9 5-9-5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 12.5v4.2c0 .8 2.2 2.3 5 2.3s5-1.5 5-2.3v-4.2" stroke="currentColor" stroke-width="1.8"/><path d="M21 10v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
 </span>
 
-                    <h3>Scuola media</h3>
-                    <p>Sviluppare conoscenze, fiducia e indipendenza.</p>
-                    <span class="btn-bsa btn-bsa-soft">Scopri di più</span>
+                    <h3 data-i18n="prog.middle">Scuola media</h3>
+                    <p data-i18n="prog.middleDesc">Sviluppare conoscenze, fiducia e indipendenza.</p>
+                    <span class="btn-bsa btn-bsa-soft" data-i18n="prog.learnMore">Scopri di più</span>
                 </div>
             </a>
             <a class="program-card card-lift reveal accent-pink" href="/demos/brightsteps/Home/Program?name=Creativo%20Arts">
                 <div class="program-card__media">
-                    <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Arti creative" />
+                    <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Arti creative" data-i18n-alt="prog.arts" />
                 </div>
                 <div class="program-card__body">
                     <span class="ico ico-palette" aria-hidden="true">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 4a8 8 0 100 16h1.5a2.5 2.5 0 002.5-2.5c0-1-.6-1.5-1-2-.5-.6-.7-1.2-.4-1.9.4-.8 1.3-1.1 2.1-1.3A8 8 0 0012 4z" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="10" r="1" fill="currentColor"/><circle cx="11.5" cy="7.5" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/></svg>
 </span>
 
-                    <h3>Arti creative</h3>
-                    <p>Aiutare gli studenti a esprimere la loro immaginazione.</p>
-                    <span class="btn-bsa btn-bsa-soft">Scopri di più</span>
+                    <h3 data-i18n="prog.arts">Arti creative</h3>
+                    <p data-i18n="prog.artsDesc">Aiutare gli studenti a esprimere la loro immaginazione.</p>
+                    <span class="btn-bsa btn-bsa-soft" data-i18n="prog.learnMore">Scopri di più</span>
                 </div>
             </a>
             <a class="program-card card-lift reveal accent-orange" href="/demos/brightsteps/Home/Program?name=Sport">
                 <div class="program-card__media">
-                    <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&amp;fit=crop&amp;w=1000&amp;q=80" alt="Sport" />
+                    <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba6851?auto=format&amp;fit=crop&amp;w=1000&amp;q=80" alt="Sport" data-i18n-alt="prog.sports" />
                 </div>
                 <div class="program-card__body">
                     <span class="ico ico-ball" aria-hidden="true">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M4.8 9.5c2.4 1 5 1.5 7.2 1.5s4.8-.5 7.2-1.5M4.8 14.5c2.4-1 5-1.5 7.2-1.5s4.8.5 7.2 1.5M12 4c1.2 2.5 1.8 5 1.8 8s-.6 5.5-1.8 8c-1.2-2.5-1.8-5-1.8-8s.6-5.5 1.8-8z" stroke="currentColor" stroke-width="1.4"/></svg>
 </span>
 
-                    <h3>Sport</h3>
-                    <p>Costruire collaborazione, fiducia e abitudini sane.</p>
-                    <span class="btn-bsa btn-bsa-soft">Scopri di più</span>
+                    <h3 data-i18n="prog.sports">Sport</h3>
+                    <p data-i18n="prog.sportsDesc">Costruire collaborazione, fiducia e abitudini sane.</p>
+                    <span class="btn-bsa btn-bsa-soft" data-i18n="prog.learnMore">Scopri di più</span>
                 </div>
             </a>
             <a class="program-card card-lift reveal accent-mint" href="/demos/brightsteps/Home/Program?name=Science%20%26%20Technology">
                 <div class="program-card__media">
-                    <img src="https://images.unsplash.com/photo-1567427013422-6b76b26f2254?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Scienza e tecnologia" />
+                    <img src="https://images.unsplash.com/photo-1567427013422-6b76b26f2254?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Scienza e tecnologia" data-i18n-alt="prog.stem" />
                 </div>
                 <div class="program-card__body">
                     <span class="ico ico-flask" aria-hidden="true">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 3h6M10 3v5.5L5.5 18A2.5 2.5 0 007.7 21.5h8.6A2.5 2.5 0 0018.5 18L14 8.5V3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
 </span>
 
-                    <h3>Scienza e tecnologia</h3>
-                    <p>Esplorare il mondo attraverso innovazione e scoperta.</p>
-                    <span class="btn-bsa btn-bsa-soft">Scopri di più</span>
+                    <h3 data-i18n="prog.stem">Scienza e tecnologia</h3>
+                    <p data-i18n="prog.stemDesc">Esplorare il mondo attraverso innovazione e scoperta.</p>
+                    <span class="btn-bsa btn-bsa-soft" data-i18n="prog.learnMore">Scopri di più</span>
                 </div>
             </a>
     </div>
@@ -164,7 +165,7 @@
     </svg>
     <div class="footer-bsa__inner">
         <div class="footer-bsa__brand">
-            <a class="brand-logo " aria-label="Home Scuola Materna" href="/demos/brightsteps/index.html">
+            <a class="brand-logo " aria-label="Home Scuola Materna" data-i18n-aria="nav.homeAria" href="/demos/brightsteps/index.html">
         <span class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 48 48" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="4" y="10" width="28" height="30" rx="6" fill="#5B8DEF"/>
@@ -175,42 +176,42 @@
         </span>
     <span class="brand-text">
         <strong>Scuola Materna</strong>
-            <small>Impara. Esplora. Cresci.</small>
+            <small data-i18n="brand.tagline">Impara. Esplora. Cresci.</small>
     </span>
 </a>
 
-            <p>Un luogo gioioso dove i bambini imparano, esplorano e crescono — ogni giorno.</p>
-            <div class="footer-social" aria-label="Link social">
+            <p data-i18n="footer.joy">Un luogo gioioso dove i bambini imparano, esplorano e crescono — ogni giorno.</p>
+            <div class="footer-social" aria-label="Link social" data-i18n-aria="contact.social">
                 <a href="#" aria-label="Facebook">f</a>
                 <a href="#" aria-label="Instagram">ig</a>
                 <a href="#" aria-label="YouTube">▶</a>
             </div>
         </div>
         <div class="footer-bsa__col">
-            <h4>Esplora</h4>
-            <a href="/demos/brightsteps/about.html">Chi siamo</a>
-            <a href="/demos/brightsteps/programs.html">Programmi</a>
-            <a href="/demos/brightsteps/facilities.html">Strutture</a>
-            <a href="/demos/brightsteps/teachers.html">Insegnanti</a>
+            <h4 data-i18n="sec.explore">Esplora</h4>
+            <a href="/demos/brightsteps/about.html" data-i18n="nav.about">Chi siamo</a>
+            <a href="/demos/brightsteps/programs.html" data-i18n="nav.programs">Programmi</a>
+            <a href="/demos/brightsteps/facilities.html" data-i18n="nav.facilities">Strutture</a>
+            <a href="/demos/brightsteps/teachers.html" data-i18n="about.teachers">Insegnanti</a>
         </div>
         <div class="footer-bsa__col">
-            <h4>Vita scolastica</h4>
-            <a href="/demos/brightsteps/activities.html">Attività</a>
-            <a href="/demos/brightsteps/events.html">Eventi</a>
-            <a href="/demos/brightsteps/gallery.html">Galleria</a>
-            <a href="/demos/brightsteps/contact.html">Contatti</a>
+            <h4 data-i18n="sec.schoolLife">Vita scolastica</h4>
+            <a href="/demos/brightsteps/activities.html" data-i18n="nav.activities">Attività</a>
+            <a href="/demos/brightsteps/events.html" data-i18n="nav.events">Eventi</a>
+            <a href="/demos/brightsteps/gallery.html" data-i18n="nav.gallery">Galleria</a>
+            <a href="/demos/brightsteps/contact.html" data-i18n="nav.contact">Contatti</a>
         </div>
         <div class="footer-bsa__col">
-            <h4>Visita</h4>
+            <h4 data-i18n="sec.visit">Visita</h4>
             <p>42 Maple Grove, Riverside</p>
             <p>&#x2B;1 (555) 214-8800</p>
             <p>hello@brightsteps.academy</p>
-            <a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/portal.html">🔐 Accedi</a>
+            <a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/portal.html" data-i18n="nav.loginCta">🔐 Accedi</a>
         </div>
     </div>
     <div class="footer-bsa__bar">
-        <span>&copy; 2026 Scuola Materna · Impara. Esplora. Cresci.</span>
-        <a href="/demos/brightsteps/contact.html">Scrivici</a>
+        <span data-i18n="footer.copy">&copy; 2026 Scuola Materna · Impara. Esplora. Cresci.</span>
+        <a href="/demos/brightsteps/contact.html" data-i18n="sec.getInTouch">Scrivici</a>
     </div>
 </footer>
 
@@ -221,11 +222,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="bsaModalTitle">BrightSteps</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi" data-i18n-aria="close"></button>
             </div>
             <div class="modal-body" id="bsaModalBody"></div>
             <div class="modal-footer" id="bsaModalFooter">
-                <button type="button" class="btn-bsa btn-bsa-ghost" data-bs-dismiss="modal">Chiudi</button>
+                <button type="button" class="btn-bsa btn-bsa-ghost" data-bs-dismiss="modal" data-i18n="close">Chiudi</button>
             </div>
         </div>
     </div>
@@ -236,6 +237,7 @@
     <script src="/demos/brightsteps/js/site.js?v=luiJ4SEN_KdAVDB3Pna67snIoueCu41p_1cu6Rh0fuY"></script>
     <script src="/demos/brightsteps/js/i18n.js"></script>
     
+    <script src="/demos/brightsteps/js/campus-bot.js"></script>
 </body>
 </html>
 
