@@ -43,15 +43,15 @@
       roleLabel: "Headmaster",
       className: "BrightSteps Academy",
     },
-    "admin@brightfuture.academy": {
-      password: DEMO_PASSWORD,
+    "admin@gmail.com": {
+      password: "123456",
       role: "admin",
       name: "School Administrator",
       roleLabel: "School Admin",
       className: "BrightFuture Academy",
     },
-    "superadmin@platform.com": {
-      password: DEMO_PASSWORD,
+    "superadmin@gmail.com": {
+      password: "12345",
       role: "superadmin",
       name: "Platform Super Admin",
       roleLabel: "Super Admin",
@@ -62,6 +62,8 @@
   BUILTIN["alex.rivera@student.brightsteps.academy"] = BUILTIN.student_demo;
   BUILTIN["amelia.johnson@email.com"] = BUILTIN.parent_demo;
   BUILTIN["sarah.wilson@brightsteps.academy"] = BUILTIN.teacher_demo;
+  BUILTIN["admin@brightfuture.academy"] = BUILTIN["admin@gmail.com"];
+  BUILTIN["superadmin@platform.com"] = BUILTIN["superadmin@gmail.com"];
 
   function normalizeLogin(value) {
     return String(value || "").trim().toLowerCase();

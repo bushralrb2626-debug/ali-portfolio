@@ -397,7 +397,7 @@
       return panel(
         "School admins",
         table(["Name", "School", "Email"], [
-          ["School Administrator", "BrightFuture Academy", "admin@brightfuture.academy"],
+          ["School Administrator", "BrightFuture Academy", "admin@gmail.com"],
           ["Grace Okonkwo", "Scuola Materna", "grace.okonkwo@brightsteps.academy"],
         ])
       );

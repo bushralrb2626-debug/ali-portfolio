@@ -226,11 +226,20 @@
     return t().fallback;
   }
 
-  var booking = { step: "", name: "", email: "", when: "", age: "", voice: false };
+  var booking = { step: "", name: "", email: "", when: "", age: "" };
   var rec = null;
+  var voiceTurn = false;
+
+  function hushVoice() {
+    if (window.speechSynthesis) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) {}
+    }
+  }
 
   function speak(text) {
-    if (!window.speechSynthesis) return;
+    if (!voiceTurn || !window.speechSynthesis) return;
     try {
       window.speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(text);
@@ -328,15 +337,18 @@
     document.getElementById("campusBot").setAttribute("data-open", "true");
     var log = document.getElementById("campusBotLog");
     if (log && !log.childElementCount) {
-      botSay(t().greet, false);
+      voiceTurn = false;
+      hushVoice();
+      botSay(t().greet);
     }
     document.getElementById("campusBotInput").focus();
   }
 
   function closePanel() {
     document.getElementById("campusBot").setAttribute("data-open", "false");
+    voiceTurn = false;
     stopMic();
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    hushVoice();
   }
 
   function addBubble(who, text) {
@@ -348,68 +360,72 @@
     log.scrollTop = log.scrollHeight;
   }
 
-  function botSay(text, voice) {
+  function botSay(text) {
     addBubble("bot", text);
-    if (voice) speak(text);
+    if (voiceTurn) speak(text);
+  }
+
+  function beginTurn(fromVoice) {
+    voiceTurn = !!fromVoice;
+    if (!voiceTurn) hushVoice();
   }
 
   function handleUser(text, fromVoice, forced) {
+    beginTurn(fromVoice);
     addBubble("user", text);
-    booking.voice = !!fromVoice;
     if (forced === "__book__" || (forced == null && wantsBook(norm(text)) && !booking.step)) {
-      startBooking(fromVoice);
+      startBooking();
       return;
     }
     if (booking.step) {
-      stepBooking(text, fromVoice);
+      stepBooking(text);
       return;
     }
     if (forced && forced !== "__book__") {
-      botSay(forced, !!fromVoice);
+      botSay(forced);
       return;
     }
     var reply = intentReply(text);
     if (reply == null) {
-      startBooking(fromVoice);
+      startBooking();
       return;
     }
-    botSay(reply, !!fromVoice);
+    botSay(reply);
   }
 
-  function startBooking(fromVoice) {
-    booking = { step: "name", name: "", email: "", when: "", age: "", voice: !!fromVoice };
-    botSay(t().askName, !!fromVoice);
+  function startBooking() {
+    booking = { step: "name", name: "", email: "", when: "", age: "" };
+    botSay(t().askName);
   }
 
-  function stepBooking(raw, fromVoice) {
-    var speakBack = fromVoice || booking.voice;
+  function stepBooking(raw) {
     var s = raw.trim();
     var n = norm(s);
     if (booking.step !== "name" && isNo(n)) {
       booking.step = "";
-      botSay(t().cancel, speakBack);
+      botSay(t().cancel);
       return;
     }
     if (booking.step === "name") {
       booking.name = s;
       booking.step = "email";
-      botSay(fill(t().askEmail, { name: booking.name }), speakBack);
+      botSay(fill(t().askEmail, { name: booking.name }));
       return;
     }
     if (booking.step === "email") {
       if (!isEmail(s)) {
-        botSay(t().badEmail, speakBack);
+        botSay(t().badEmail);
         return;
       }
       booking.email = s;
       booking.step = "when";
-      botSay(t().askWhen, speakBack);
+      botSay(t().askWhen);
       return;
     }
     if (booking.step === "when") {
       booking.when = s;
       booking.step = "age";
-      botSay(t().askAge, speakBack);
+      botSay(t().askAge);
       return;
     }
     if (booking.step === "age") {
@@ -421,26 +437,25 @@
           email: booking.email,
           when: booking.when,
           age: booking.age,
-        }),
-        speakBack
+        })
       );
       return;
     }
     if (booking.step === "confirm") {
       if (isYes(n)) {
-        submitVisit(speakBack);
+        submitVisit();
         return;
       }
       if (isNo(n)) {
         booking.step = "";
-        botSay(t().cancel, speakBack);
+        botSay(t().cancel);
         return;
       }
-      botSay(t().yesNeed, speakBack);
+      botSay(t().yesNeed);
     }
   }
 
-  function submitVisit(speakBack) {
+  function submitVisit() {
     var message =
       "[School visit]\nWhen: " +
       booking.when +
@@ -460,11 +475,11 @@
       .then(function (res) {
         booking.step = "";
         if (!res.ok) throw new Error("fail");
-        botSay(t().booked, speakBack);
+        botSay(t().booked);
       })
       .catch(function () {
         booking.step = "";
-        botSay(t().bookFail, speakBack);
+        botSay(t().bookFail);
       });
   }
 
