@@ -35,6 +35,7 @@
     ],
     admin: [
       { icon: "🏠", label: "Dashboard", id: "home" },
+      { icon: "📅", label: "Meetings", id: "meetings" },
       { icon: "👩‍🏫", label: "Teachers", id: "staff" },
       { icon: "🧒", label: "Students", id: "students" },
       { icon: "📊", label: "Results", id: "results" },
@@ -42,6 +43,7 @@
     ],
     superadmin: [
       { icon: "🏠", label: "Platform", id: "home" },
+      { icon: "📅", label: "Meetings", id: "meetings" },
       { icon: "🏫", label: "Schools", id: "schools" },
       { icon: "👩‍🏫", label: "Teachers", id: "teachers" },
       { icon: "🧒", label: "Students", id: "students" },
@@ -69,6 +71,56 @@
     { name: "Sofia Rossi", school: "BrightFuture Academy", year: "Grade 3", avg: "90%" },
     { name: "Leo Mensah", school: "Maple Grove Primary", year: "Grade 2", avg: "87%" },
   ];
+  var KIDS_KEY = "brightsteps-demo-kids";
+
+  function loadKids() {
+    try {
+      var raw = localStorage.getItem(KIDS_KEY);
+      var list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveKids(list) {
+    localStorage.setItem(KIDS_KEY, JSON.stringify(list.slice(0, 200)));
+  }
+
+  function allStudents() {
+    return STUDENTS.concat(loadKids());
+  }
+
+  function addKidForm(schoolDefault) {
+    var school = escapeHtml(schoolDefault || "BrightFuture Academy");
+    return (
+      '<form class="form-bsa" id="addKidForm" style="margin-bottom:1.25rem">' +
+      "<p><strong>Add a child</strong> — they get a student login and appear on this list.</p>" +
+      '<div class="form-row">' +
+      '<label>Full name<input name="name" required maxlength="80" placeholder="e.g. Ayaan Khan" /></label>' +
+      '<label>Year / class<input name="year" required maxlength="40" placeholder="e.g. Grade 1" value="Grade 1" /></label>' +
+      "</div>" +
+      '<div class="form-row">' +
+      '<label>School<input name="school" required maxlength="80" value="' +
+      school +
+      '" /></label>' +
+      '<label>Student email (login)<input name="email" type="email" required placeholder="child@email.com" /></label>' +
+      "</div>" +
+      '<label>Temporary password<input name="password" value="Demo@12345" minlength="6" /></label>' +
+      '<button type="submit" class="btn-bsa btn-bsa-primary">Add child</button>' +
+      "</form>"
+    );
+  }
+
+  function studentsPanel(session) {
+    var rows = allStudents().map(function (s) {
+      return [escapeHtml(s.name), escapeHtml(s.school), escapeHtml(s.year), escapeHtml(s.avg || "—")];
+    });
+    return (
+      addKidForm(session && session.className ? session.className : "BrightFuture Academy") +
+      panel("Students", table(["Name", "School", "Year", "Average"], rows))
+    );
+  }
   var RESULTS = [
     { student: "Alex Rivera", school: "Scuola Materna", subject: "Math", mark: "88%" },
     { student: "Alex Rivera", school: "Scuola Materna", subject: "Science", mark: "92%" },
@@ -76,6 +128,49 @@
     { student: "Sofia Rossi", school: "BrightFuture Academy", subject: "Art", mark: "94%" },
     { student: "Leo Mensah", school: "Maple Grove Primary", subject: "PE", mark: "87%" },
   ];
+
+  function loadVisits() {
+    try {
+      var raw = localStorage.getItem("brightsteps-demo-visits");
+      var list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function meetingsPanel() {
+    var visits = loadVisits();
+    if (!visits.length) {
+      return panel(
+        "Campus visit meetings",
+        "<p>No visit bookings yet. When a signed-in parent books a visit in the campus chat, it appears here.</p>"
+      );
+    }
+    return panel(
+      "Campus visit meetings",
+      table(
+        ["When requested", "Name", "Email", "Visit time", "Child / year"],
+        visits.map(function (v) {
+          return [
+            escapeHtml(v.createdAt ? String(v.createdAt).replace("T", " ").slice(0, 16) : ""),
+            escapeHtml(v.name),
+            escapeHtml(v.email),
+            escapeHtml(v.when),
+            escapeHtml(v.age),
+          ];
+        })
+      )
+    );
+  }
 
   function greeting() {
     var hour = new Date().getHours();
@@ -341,15 +436,14 @@
     }
 
     if (role === "admin") {
+      if (section === "meetings") return meetingsPanel();
       if (section === "staff") {
         return panel("Teachers", table(["Name", "School", "Subject", "Class"], TEACHERS.map(function (t) {
           return [t.name, t.school, t.subject, t.className];
         })));
       }
       if (section === "students") {
-        return panel("Students", table(["Name", "School", "Year", "Average"], STUDENTS.map(function (s) {
-          return [s.name, s.school, s.year, s.avg];
-        })));
+        return studentsPanel(session);
       }
       if (section === "results") {
         return panel("Results", table(["Student", "School", "Subject", "Mark"], RESULTS.map(function (r) {
@@ -365,14 +459,16 @@
         "</p></div>" +
         kpis([
           { label: "Active staff", value: "38", accent: "accent-sky" },
-          { label: "Students", value: "412", accent: "accent-mint" },
-          { label: "Classes", value: "18", accent: "accent-royal" },
+          { label: "Students", value: String(allStudents().length), accent: "accent-mint" },
+          { label: "Visit requests", value: String(loadVisits().length), accent: "accent-royal" },
           { label: "Pending invites", value: "2", accent: "accent-coral" },
         ]) +
-        panel("Recent activity", "<p>New teacher account created</p><p>Website banner updated</p><p>3 admissions visits booked</p>")
+        meetingsPanel() +
+        panel("Recent activity", "<p>New teacher account created</p><p>Website banner updated</p><p>Admissions visits appear under Meetings</p>")
       );
     }
 
+    if (section === "meetings") return meetingsPanel();
     if (section === "schools") {
       return panel("All schools", table(["School", "City", "Students", "Teachers", "Attendance"], SCHOOLS.map(function (s) {
         return [s.name, s.city, String(s.students), String(s.teachers), s.attendance];
@@ -384,9 +480,7 @@
       })));
     }
     if (section === "students") {
-      return panel("Students across schools", table(["Name", "School", "Year", "Average"], STUDENTS.map(function (s) {
-        return [s.name, s.school, s.year, s.avg];
-      })));
+      return studentsPanel(session);
     }
     if (section === "results") {
       return panel("Results across schools", table(["Student", "School", "Subject", "Mark"], RESULTS.map(function (r) {
@@ -407,9 +501,10 @@
       kpis([
         { label: "Schools", value: String(SCHOOLS.length), accent: "accent-royal" },
         { label: "Teachers", value: String(TEACHERS.length), accent: "accent-sky" },
-        { label: "Students", value: String(STUDENTS.length), accent: "accent-mint" },
+        { label: "Students", value: String(allStudents().length), accent: "accent-mint" },
         { label: "Results on file", value: String(RESULTS.length), accent: "accent-coral" },
       ]) +
+      meetingsPanel() +
       panel("Schools", table(["School", "Students", "Teachers"], SCHOOLS.map(function (s) {
         return [s.name, String(s.students), String(s.teachers)];
       })))
@@ -474,6 +569,38 @@
       if (demoBtn && window.showToast) {
         window.showToast("Saved (demo) — no server connected.", "success");
       }
+    });
+
+    document.addEventListener("submit", function (e) {
+      var form = e.target.closest("#addKidForm");
+      if (!form) return;
+      e.preventDefault();
+      if (session.role !== "admin" && session.role !== "superadmin") return;
+      var name = (form.querySelector('[name="name"]') || {}).value || "";
+      var year = (form.querySelector('[name="year"]') || {}).value || "";
+      var school = (form.querySelector('[name="school"]') || {}).value || session.className || "School";
+      var email = (form.querySelector('[name="email"]') || {}).value || "";
+      var password = (form.querySelector('[name="password"]') || {}).value || "Demo@12345";
+      var created = auth.addStudentAccount
+        ? auth.addStudentAccount({ name: name, year: year, email: email, password: password })
+        : { ok: false, message: "Cannot add students." };
+      if (!created.ok) {
+        if (window.showToast) window.showToast(created.message, "error");
+        return;
+      }
+      var kids = loadKids();
+      kids.unshift({
+        name: name.trim(),
+        school: String(school).trim(),
+        year: String(year).trim(),
+        avg: "—",
+        email: created.email,
+      });
+      saveKids(kids);
+      if (window.showToast) {
+        window.showToast("Added " + name.trim() + ". Login: " + created.email + " / " + created.password, "success");
+      }
+      render(session, "students");
     });
   }
 

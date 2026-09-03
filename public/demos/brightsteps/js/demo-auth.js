@@ -91,9 +91,10 @@
     return null;
   }
 
-  function isDemoAccount(loginId) {
+  function isPublicDemoAccount(loginId) {
     var found = lookup(loginId);
-    return Boolean(found && found.user && found.user.password === DEMO_PASSWORD);
+    if (!found || !found.user) return false;
+    return found.user.role === "student" || found.user.role === "parent" || found.user.role === "teacher";
   }
 
   function readSession() {
@@ -170,6 +171,26 @@
     return { ok: true, session: session };
   }
 
+  function addStudentAccount(fields) {
+    var email = normalizeLogin(fields.email);
+    var name = String(fields.name || "").trim();
+    var year = String(fields.year || "Grade 1").trim();
+    var password = String(fields.password || DEMO_PASSWORD);
+    if (!name || name.length > 80) return { ok: false, message: "Enter the child's name." };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, message: "Enter a valid email for the student login." };
+    if (lookup(email)) return { ok: false, message: "That email is already registered." };
+    var extra = extraUsers();
+    extra[email] = {
+      password: password.length >= 6 ? password : DEMO_PASSWORD,
+      role: "student",
+      name: name,
+      roleLabel: "Student",
+      className: year,
+    };
+    saveExtra(extra);
+    return { ok: true, email: email, password: extra[email].password };
+  }
+
   function logout() {
     clearSession();
     window.location.href = LOGIN_PATH;
@@ -191,10 +212,12 @@
   window.BrightStepsDemoAuth = {
     login: login,
     register: register,
+    addStudentAccount: addStudentAccount,
     logout: logout,
     getSession: readSession,
     requireAuth: requireAuth,
-    isDemoAccount: isDemoAccount,
+    isDemoAccount: isPublicDemoAccount,
+    isPublicDemoAccount: isPublicDemoAccount,
     demoPassword: DEMO_PASSWORD,
     paths: { login: LOGIN_PATH, register: REGISTER_PATH, dashboard: DASHBOARD_PATH },
   };
