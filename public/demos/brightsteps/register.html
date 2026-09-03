@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create account · BrightSteps Academy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/demos/brightsteps/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/site.css?v=dash4" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/bridge.css?v=7eZ7z0-isDSPkIrEmY5kX2w3anNvmJBqC8XONQyJlhc" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/vibrant.css?v=_MlOwKhNsDIIyZrj__65eFxm0nqMbGR8UMI4j8NWuoA" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/fancy.css?v=bOP9eHgb89n0I_cKxXSxDNCgKsnhNRWykcSpIgOqgGQ" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/campus-bot.css?v=4" />
+</head>
+<body class="site-body">
+    <main>
+        <section class="login-page">
+            <div class="login-page__visual">
+                <div class="blob accent-yellow"></div>
+                <div class="blob accent-mint"></div>
+                <div class="login-page__quote reveal">
+                    <a class="brand-logo" href="/demos/brightsteps/index.html" style="margin-bottom:1rem;display:inline-flex">
+                        <span class="brand-text">
+                            <strong>Scuola Materna</strong>
+                            <small>Learn. Explore. Grow.</small>
+                        </span>
+                    </a>
+                    <h1>Join the school</h1>
+                    <p>Create a parent, student or teacher demo account. It stays in this browser.</p>
+                </div>
+            </div>
+            <div class="login-page__form reveal">
+                <p class="eyebrow">Register</p>
+                <h2>Create an account</h2>
+                <form class="form-bsa" id="registerForm" method="post" action="#" novalidate>
+                    <label>
+                        Full name
+                        <input type="text" name="name" id="regName" required placeholder="Your name" autocomplete="name" />
+                    </label>
+                    <label>
+                        Email
+                        <input type="email" name="email" id="regEmail" required placeholder="you@email.com" autocomplete="email" />
+                    </label>
+                    <label>
+                        I am a
+                        <select name="role" id="regRole" required>
+                            <option value="parent">Parent / Guardian</option>
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                        </select>
+                    </label>
+                    <label>
+                        Password
+                        <input type="password" name="password" id="regPassword" required minlength="6" placeholder="At least 6 characters" autocomplete="new-password" />
+                    </label>
+                    <button type="submit" class="btn-bsa btn-bsa-primary">Create account</button>
+                    <a class="btn-bsa btn-bsa-ghost" href="/demos/brightsteps/login.html">Already have an account? Sign in</a>
+                </form>
+            </div>
+        </section>
+    </main>
+    <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+    <script src="/demos/brightsteps/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/demos/brightsteps/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/demos/brightsteps/js/site.js?v=luiJ4SEN_KdAVDB3Pna67snIoueCu41p_1cu6Rh0fuY"></script>
+    <script src="/demos/brightsteps/js/demo-auth.js?v=5"></script>
+    <script>
+    (function () {
+      var auth = window.BrightStepsDemoAuth;
+      if (auth && auth.getSession()) {
+        window.location.replace(auth.paths.dashboard);
+        return;
+      }
+      var form = document.getElementById("registerForm");
+      if (!form || !auth) return;
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var result = auth.register({
+          name: (document.getElementById("regName") || {}).value || "",
+          email: (document.getElementById("regEmail") || {}).value || "",
+          password: (document.getElementById("regPassword") || {}).value || "",
+          role: (document.getElementById("regRole") || {}).value || "parent",
+        });
+        if (!result.ok) {
+          if (window.showToast) window.showToast(result.message, "error");
+          return;
+        }
+        if (window.showToast) window.showToast("Welcome, " + result.session.name + "!", "success");
+        window.setTimeout(function () {
+          window.location.href = auth.paths.dashboard;
+        }, 350);
+      });
+    })();
+    </script>
+    <script src="/demos/brightsteps/js/i18n.js?v=keyed4"></script>
+    <script src="/demos/brightsteps/js/campus-bot.js?v=4"></script>
+</body>
+</html>

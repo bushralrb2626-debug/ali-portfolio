@@ -1,51 +1,57 @@
 /**
- * BrightSteps static demo — client-side login (no external backend).
+ * BrightSteps static demo — client-side login / registration (no backend).
  */
 (function () {
   "use strict";
 
   var STORAGE_KEY = "brightsteps-demo-session";
+  var USERS_KEY = "brightsteps-demo-users";
   var LOGIN_PATH = "/demos/brightsteps/login.html";
+  var REGISTER_PATH = "/demos/brightsteps/register.html";
   var DASHBOARD_PATH = "/demos/brightsteps/dashboard.html";
+  var DEMO_PASSWORD = "Demo@12345";
 
-  var USERS = {
+  var BUILTIN = {
     student_demo: {
-      password: "Demo@12345",
+      password: DEMO_PASSWORD,
       role: "student",
       name: "Alex Rivera",
       roleLabel: "Student",
       className: "Grade 4 · Maple Class",
     },
+    "alex.rivera@student.brightsteps.academy": null,
     parent_demo: {
-      password: "Demo@12345",
+      password: DEMO_PASSWORD,
       role: "parent",
       name: "Amelia Johnson",
       roleLabel: "Parent / Guardian",
       className: "Linked child: Alex Rivera",
     },
+    "amelia.johnson@email.com": null,
     teacher_demo: {
-      password: "Demo@12345",
+      password: DEMO_PASSWORD,
       role: "teacher",
       name: "Sarah Wilson",
       roleLabel: "Teacher",
       className: "Maple Class · Homeroom",
     },
+    "sarah.wilson@brightsteps.academy": null,
     "grace.okonkwo@brightsteps.academy": {
-      password: "Demo@12345",
+      password: DEMO_PASSWORD,
       role: "headmaster",
       name: "Grace Okonkwo",
       roleLabel: "Headmaster",
       className: "BrightSteps Academy",
     },
     "admin@brightfuture.academy": {
-      password: "Demo@12345",
+      password: DEMO_PASSWORD,
       role: "admin",
       name: "School Administrator",
       roleLabel: "School Admin",
       className: "BrightFuture Academy",
     },
     "superadmin@platform.com": {
-      password: "Demo@12345",
+      password: DEMO_PASSWORD,
       role: "superadmin",
       name: "Platform Super Admin",
       roleLabel: "Super Admin",
@@ -53,17 +59,44 @@
     },
   };
 
+  BUILTIN["alex.rivera@student.brightsteps.academy"] = BUILTIN.student_demo;
+  BUILTIN["amelia.johnson@email.com"] = BUILTIN.parent_demo;
+  BUILTIN["sarah.wilson@brightsteps.academy"] = BUILTIN.teacher_demo;
+
   function normalizeLogin(value) {
     return String(value || "").trim().toLowerCase();
   }
 
+  function extraUsers() {
+    try {
+      var raw = localStorage.getItem(USERS_KEY);
+      var parsed = raw ? JSON.parse(raw) : {};
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveExtra(map) {
+    localStorage.setItem(USERS_KEY, JSON.stringify(map));
+  }
+
+  function lookup(loginId) {
+    var key = normalizeLogin(loginId);
+    if (BUILTIN[key]) return { key: key, user: BUILTIN[key] };
+    var extra = extraUsers();
+    if (extra[key]) return { key: key, user: extra[key] };
+    return null;
+  }
+
+  function isDemoAccount(loginId) {
+    var found = lookup(loginId);
+    return Boolean(found && found.user && found.user.password === DEMO_PASSWORD);
+  }
+
   function readSession() {
     try {
-      var raw = sessionStorage.getItem(STORAGE_KEY);
-      if (!raw) {
-        var remembered = localStorage.getItem(STORAGE_KEY);
-        raw = remembered;
-      }
+      var raw = sessionStorage.getItem(STORAGE_KEY) || localStorage.getItem(STORAGE_KEY);
       return raw ? JSON.parse(raw) : null;
     } catch (e) {
       return null;
@@ -82,14 +115,8 @@
     localStorage.removeItem(STORAGE_KEY);
   }
 
-  function login(loginId, password, remember) {
-    var key = normalizeLogin(loginId);
-    var user = USERS[key];
-    if (!user || user.password !== password) {
-      return { ok: false, message: "Invalid login ID or password." };
-    }
-
-    var session = {
+  function toSession(key, user) {
+    return {
       login: key,
       role: user.role,
       name: user.name,
@@ -97,7 +124,47 @@
       className: user.className,
       loggedInAt: Date.now(),
     };
+  }
+
+  function login(loginId, password, remember) {
+    var found = lookup(loginId);
+    if (!found || found.user.password !== password) {
+      return { ok: false, message: "Invalid login ID or password." };
+    }
+    var session = toSession(found.key, found.user);
     writeSession(session, !!remember);
+    return { ok: true, session: session };
+  }
+
+  function register(fields) {
+    var email = normalizeLogin(fields.email);
+    var name = String(fields.name || "").trim();
+    var password = String(fields.password || "");
+    var role = String(fields.role || "parent");
+    var allowed = { student: 1, parent: 1, teacher: 1 };
+    if (!allowed[role]) role = "parent";
+    if (!name || name.length > 80) return { ok: false, message: "Please enter your name." };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, message: "Please enter a valid email." };
+    if (password.length < 6) return { ok: false, message: "Password must be at least 6 characters." };
+    if (lookup(email)) return { ok: false, message: "That email is already registered. Sign in instead." };
+
+    var labels = { student: "Student", parent: "Parent / Guardian", teacher: "Teacher" };
+    var classes = {
+      student: "Grade 4 · Maple Class",
+      parent: "Linked child pending",
+      teacher: "Maple Class · Homeroom",
+    };
+    var extra = extraUsers();
+    extra[email] = {
+      password: password,
+      role: role,
+      name: name,
+      roleLabel: labels[role],
+      className: classes[role],
+    };
+    saveExtra(extra);
+    var session = toSession(email, extra[email]);
+    writeSession(session, true);
     return { ok: true, session: session };
   }
 
@@ -121,9 +188,12 @@
 
   window.BrightStepsDemoAuth = {
     login: login,
+    register: register,
     logout: logout,
     getSession: readSession,
     requireAuth: requireAuth,
-    paths: { login: LOGIN_PATH, dashboard: DASHBOARD_PATH },
+    isDemoAccount: isDemoAccount,
+    demoPassword: DEMO_PASSWORD,
+    paths: { login: LOGIN_PATH, register: REGISTER_PATH, dashboard: DASHBOARD_PATH },
   };
 })();

@@ -2094,6 +2094,32 @@ body.modal-open { overflow: hidden; }
     radial-gradient(circle at 5% 40%, color-mix(in srgb, var(--pink) 14%, transparent), transparent 22%),
     var(--cream);
 }
+.playful .dash-content .reveal,
+.dash-content .reveal,
+.dash-content .stagger > *,
+.dash-content > * {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+.dash-table th,
+.dash-table td {
+  padding: 0.55rem 0.7rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.dash-table th {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
 
 .playful .welcome-banner {
   background: linear-gradient(120deg,

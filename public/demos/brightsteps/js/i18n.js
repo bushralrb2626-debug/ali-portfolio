@@ -132,8 +132,8 @@
   add("sec.chooseAdventure", "Choose your adventure", "Scegli la tua avventura");
   add(
     "sec.chooseDoor",
-    "Choose your door — Teacher, Parent, Student, Headmaster, School Admin or Super Admin.",
-    "Scegli la tua porta — Insegnante, Genitore, Studente, Preside, Amministratore scolastico o Super Admin."
+    "Choose your door — Teacher, Parent, Student or Headmaster.",
+    "Scegli la tua porta — Insegnante, Genitore, Studente o Preside."
   );
   add(
     "footer.joy",
@@ -595,6 +595,7 @@
       var parent = node.parentElement;
       if (!parent) return;
       if (parent.closest("[data-no-translate]")) return;
+      if (parent.closest("[data-i18n]")) return;
       var tag = parent.tagName;
       if (tag === "SCRIPT" || tag === "STYLE" || tag === "NOSCRIPT") return;
       var text = node.nodeValue;
@@ -674,6 +675,10 @@
   } else {
     boot();
   }
+
+  window.addEventListener("pageshow", function () {
+    setLang(currentLang());
+  });
 
   window.ScuolaLang = { set: setLang, get: currentLang, strings: STRINGS };
 })();
