@@ -2121,6 +2121,20 @@ body.modal-open { overflow: hidden; }
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+.dash-money {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+.dash-money input {
+  width: 7.5rem;
+  min-width: 0;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
+}
 
 .playful .welcome-banner {
   background: linear-gradient(120deg,

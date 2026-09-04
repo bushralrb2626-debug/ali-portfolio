@@ -38,6 +38,7 @@
       { icon: "📅", label: "Meetings", id: "meetings" },
       { icon: "👩‍🏫", label: "Teachers", id: "staff" },
       { icon: "🧒", label: "Students", id: "students" },
+      { icon: "💵", label: "Fees", id: "fees" },
       { icon: "📊", label: "Results", id: "results" },
       { icon: "⚙️", label: "Settings", id: "settings" },
     ],
@@ -47,6 +48,7 @@
       { icon: "🏫", label: "Schools", id: "schools" },
       { icon: "👩‍🏫", label: "Teachers", id: "teachers" },
       { icon: "🧒", label: "Students", id: "students" },
+      { icon: "💵", label: "Fees", id: "fees" },
       { icon: "📊", label: "Results", id: "results" },
       { icon: "🛡️", label: "Admins", id: "admins" },
     ],
@@ -58,24 +60,26 @@
     { name: "Maple Grove Primary", city: "Riverside", students: 198, teachers: 16, attendance: "96%" },
   ];
   var TEACHERS = [
-    { name: "Sarah Wilson", school: "Scuola Materna", subject: "Mathematics", className: "Maple · 4A" },
-    { name: "David Chen", school: "Scuola Materna", subject: "Science", className: "Lab · 4B" },
-    { name: "Amina Rahman", school: "Scuola Materna", subject: "English", className: "4A / 5A" },
-    { name: "Priya Sharma", school: "BrightFuture Academy", subject: "Art", className: "Studio" },
-    { name: "James Okonkwo", school: "Maple Grove Primary", subject: "PE", className: "All years" },
+    { id: "seed-sarah", name: "Sarah Wilson", school: "Scuola Materna", subject: "Mathematics", className: "Maple · 4A", salary: 85000 },
+    { id: "seed-david", name: "David Chen", school: "Scuola Materna", subject: "Science", className: "Lab · 4B", salary: 82000 },
+    { id: "seed-amina", name: "Amina Rahman", school: "Scuola Materna", subject: "English", className: "4A / 5A", salary: 80000 },
+    { id: "seed-priya", name: "Priya Sharma", school: "BrightFuture Academy", subject: "Art", className: "Studio", salary: 78000 },
+    { id: "seed-james", name: "James Okonkwo", school: "Maple Grove Primary", subject: "PE", className: "All years", salary: 76000 },
   ];
   var STUDENTS = [
-    { name: "Alex Rivera", school: "Scuola Materna", year: "Grade 4", avg: "88%" },
-    { name: "Mia Chen", school: "Scuola Materna", year: "Grade 4", avg: "91%" },
-    { name: "Noah Patel", school: "Scuola Materna", year: "Grade 5", avg: "84%" },
-    { name: "Sofia Rossi", school: "BrightFuture Academy", year: "Grade 3", avg: "90%" },
-    { name: "Leo Mensah", school: "Maple Grove Primary", year: "Grade 2", avg: "87%" },
+    { id: "seed-alex", name: "Alex Rivera", school: "Scuola Materna", year: "Grade 4", avg: "88%", fee: 12000 },
+    { id: "seed-mia", name: "Mia Chen", school: "Scuola Materna", year: "Grade 4", avg: "91%", fee: 12000 },
+    { id: "seed-noah", name: "Noah Patel", school: "Scuola Materna", year: "Grade 5", avg: "84%", fee: 13000 },
+    { id: "seed-sofia", name: "Sofia Rossi", school: "BrightFuture Academy", year: "Grade 3", avg: "90%", fee: 11000 },
+    { id: "seed-leo", name: "Leo Mensah", school: "Maple Grove Primary", year: "Grade 2", avg: "87%", fee: 10000 },
   ];
   var KIDS_KEY = "brightsteps-demo-kids";
+  var STAFF_KEY = "brightsteps-demo-staff";
+  var MONEY_KEY = "brightsteps-demo-money";
 
-  function loadKids() {
+  function loadList(key) {
     try {
-      var raw = localStorage.getItem(KIDS_KEY);
+      var raw = localStorage.getItem(key);
       var list = raw ? JSON.parse(raw) : [];
       return Array.isArray(list) ? list : [];
     } catch (e) {
@@ -83,19 +87,135 @@
     }
   }
 
+  function saveList(key, list) {
+    localStorage.setItem(key, JSON.stringify(list.slice(0, 200)));
+  }
+
+  function loadKids() {
+    return loadList(KIDS_KEY);
+  }
+
   function saveKids(list) {
-    localStorage.setItem(KIDS_KEY, JSON.stringify(list.slice(0, 200)));
+    saveList(KIDS_KEY, list);
+  }
+
+  function loadStaff() {
+    return loadList(STAFF_KEY);
+  }
+
+  function saveStaff(list) {
+    saveList(STAFF_KEY, list);
+  }
+
+  function loadMoney() {
+    try {
+      var raw = localStorage.getItem(MONEY_KEY);
+      var parsed = raw ? JSON.parse(raw) : {};
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveMoney(map) {
+    localStorage.setItem(MONEY_KEY, JSON.stringify(map));
+  }
+
+  function parseAmount(value) {
+    var n = Number(String(value == null ? "" : value).replace(/[^\d.]/g, ""));
+    if (!isFinite(n) || n < 0) return 0;
+    return Math.round(n);
+  }
+
+  function money(value) {
+    return "Rs " + parseAmount(value).toLocaleString();
+  }
+
+  function amountFor(id, field, fallback) {
+    var map = loadMoney();
+    if (map[id] && map[id][field] != null && map[id][field] !== "") return parseAmount(map[id][field]);
+    return parseAmount(fallback);
+  }
+
+  function setAmount(id, field, value) {
+    var map = loadMoney();
+    if (!map[id]) map[id] = {};
+    map[id][field] = parseAmount(value);
+    saveMoney(map);
+  }
+
+  function canManageRoster(session) {
+    return session && (session.role === "admin" || session.role === "superadmin");
+  }
+
+  function saveFeeFor(id, value) {
+    setAmount(id, "fee", value);
+    var kids = loadKids();
+    var changed = false;
+    kids.forEach(function (k) {
+      if ((k.id || k.name) === id) {
+        k.fee = parseAmount(value);
+        changed = true;
+      }
+    });
+    if (changed) saveKids(kids);
+  }
+
+  function saveSalaryFor(id, value) {
+    setAmount(id, "salary", value);
+    var staff = loadStaff();
+    var changed = false;
+    staff.forEach(function (t) {
+      if ((t.id || t.name) === id) {
+        t.salary = parseAmount(value);
+        changed = true;
+      }
+    });
+    if (changed) saveStaff(staff);
+  }
+
+  function allTeachers() {
+    return TEACHERS.concat(loadStaff()).map(function (t) {
+      var copy = {};
+      Object.keys(t).forEach(function (k) { copy[k] = t[k]; });
+      copy.salary = amountFor(t.id || t.name, "salary", t.salary || 0);
+      return copy;
+    });
   }
 
   function allStudents() {
-    return STUDENTS.concat(loadKids());
+    return STUDENTS.concat(loadKids()).map(function (s) {
+      var copy = {};
+      Object.keys(s).forEach(function (k) { copy[k] = s[k]; });
+      copy.fee = amountFor(s.id || s.name, "fee", s.fee || 0);
+      return copy;
+    });
+  }
+
+  function moneyInput(kind, id, value) {
+    return (
+      '<div class="dash-money">' +
+      '<input type="number" min="0" step="500" data-' +
+      kind +
+      '="' +
+      escapeHtml(id) +
+      '" value="' +
+      parseAmount(value) +
+      '" />' +
+      '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-save-' +
+      kind +
+      '="' +
+      escapeHtml(id) +
+      '">Save</button>' +
+      "</div>"
+    );
   }
 
   function addKidForm(schoolDefault) {
     var school = escapeHtml(schoolDefault || "BrightFuture Academy");
     return (
       '<form class="form-bsa" id="addKidForm" style="margin-bottom:1.25rem">' +
-      "<p><strong>Add a child</strong> — they get a student login and appear on this list.</p>" +
+      "<p><strong>Add a child</strong> — set their monthly fee and they get a student login.</p>" +
       '<div class="form-row">' +
       '<label>Full name<input name="name" required maxlength="80" placeholder="e.g. Ayaan Khan" /></label>' +
       '<label>Year / class<input name="year" required maxlength="40" placeholder="e.g. Grade 1" value="Grade 1" /></label>' +
@@ -104,21 +224,84 @@
       '<label>School<input name="school" required maxlength="80" value="' +
       school +
       '" /></label>' +
+      '<label>Monthly fee (Rs)<input name="fee" type="number" min="0" step="500" value="10000" required /></label>' +
+      "</div>" +
+      '<div class="form-row">' +
       '<label>Student email (login)<input name="email" type="email" required placeholder="child@email.com" /></label>' +
+      '<label>Temporary password<input name="password" value="Demo@12345" minlength="6" /></label>' +
+      "</div>" +
+      '<button type="submit" class="btn-bsa btn-bsa-primary">Add child</button>' +
+      "</form>"
+    );
+  }
+
+  function addTeacherForm(schoolDefault) {
+    var school = escapeHtml(schoolDefault || "BrightFuture Academy");
+    return (
+      '<form class="form-bsa" id="addTeacherForm" style="margin-bottom:1.25rem">' +
+      "<p><strong>Add a teacher</strong> — set their monthly salary and they get a teacher login.</p>" +
+      '<div class="form-row">' +
+      '<label>Full name<input name="name" required maxlength="80" placeholder="e.g. Sara Malik" /></label>' +
+      '<label>Subject<input name="subject" required maxlength="40" placeholder="e.g. Mathematics" /></label>' +
+      "</div>" +
+      '<div class="form-row">' +
+      '<label>School<input name="school" required maxlength="80" value="' +
+      school +
+      '" /></label>' +
+      '<label>Class / role<input name="className" maxlength="40" placeholder="e.g. Grade 3 homeroom" /></label>' +
+      "</div>" +
+      '<div class="form-row">' +
+      '<label>Monthly salary (Rs)<input name="salary" type="number" min="0" step="1000" value="75000" required /></label>' +
+      '<label>Teacher email (login)<input name="email" type="email" required placeholder="teacher@email.com" /></label>' +
       "</div>" +
       '<label>Temporary password<input name="password" value="Demo@12345" minlength="6" /></label>' +
-      '<button type="submit" class="btn-bsa btn-bsa-primary">Add child</button>' +
+      '<button type="submit" class="btn-bsa btn-bsa-primary">Add teacher</button>' +
       "</form>"
     );
   }
 
   function studentsPanel(session) {
     var rows = allStudents().map(function (s) {
-      return [escapeHtml(s.name), escapeHtml(s.school), escapeHtml(s.year), escapeHtml(s.avg || "—")];
+      var id = s.id || s.name;
+      return [
+        escapeHtml(s.name),
+        escapeHtml(s.school),
+        escapeHtml(s.year),
+        moneyInput("fee", id, s.fee),
+      ];
     });
     return (
       addKidForm(session && session.className ? session.className : "BrightFuture Academy") +
-      panel("Students", table(["Name", "School", "Year", "Average"], rows))
+      panel("Students and monthly fees", table(["Name", "School", "Year", "Monthly fee"], rows))
+    );
+  }
+
+  function teachersPanel(session) {
+    var rows = allTeachers().map(function (t) {
+      var id = t.id || t.name;
+      return [
+        escapeHtml(t.name),
+        escapeHtml(t.school),
+        escapeHtml(t.subject),
+        escapeHtml(t.className),
+        moneyInput("salary", id, t.salary),
+      ];
+    });
+    return (
+      addTeacherForm(session && session.className ? session.className : "BrightFuture Academy") +
+      panel("Teachers and monthly salary", table(["Name", "School", "Subject", "Class", "Monthly salary"], rows))
+    );
+  }
+
+  function feesPanel() {
+    var rows = allStudents().map(function (s) {
+      var id = s.id || s.name;
+      return [escapeHtml(s.name), escapeHtml(s.year), escapeHtml(s.school), moneyInput("fee", id, s.fee)];
+    });
+    var total = allStudents().reduce(function (sum, s) { return sum + parseAmount(s.fee); }, 0);
+    return (
+      kpis([{ label: "Students", value: String(allStudents().length), accent: "accent-mint" }, { label: "Monthly fee total", value: money(total), accent: "accent-royal" }, { label: "Teacher payroll", value: money(allTeachers().reduce(function (sum, t) { return sum + parseAmount(t.salary); }, 0)), accent: "accent-sky" }, { label: "Open visits", value: String(loadVisits().length), accent: "accent-coral" }]) +
+      panel("Fee of each student", table(["Student", "Year", "School", "Monthly fee"], rows))
     );
   }
   var RESULTS = [
@@ -437,14 +620,9 @@
 
     if (role === "admin") {
       if (section === "meetings") return meetingsPanel();
-      if (section === "staff") {
-        return panel("Teachers", table(["Name", "School", "Subject", "Class"], TEACHERS.map(function (t) {
-          return [t.name, t.school, t.subject, t.className];
-        })));
-      }
-      if (section === "students") {
-        return studentsPanel(session);
-      }
+      if (section === "staff") return teachersPanel(session);
+      if (section === "students") return studentsPanel(session);
+      if (section === "fees") return feesPanel();
       if (section === "results") {
         return panel("Results", table(["Student", "School", "Subject", "Mark"], RESULTS.map(function (r) {
           return [r.student, r.school, r.subject, r.mark];
@@ -458,7 +636,7 @@
         session.className +
         "</p></div>" +
         kpis([
-          { label: "Active staff", value: "38", accent: "accent-sky" },
+          { label: "Active staff", value: String(allTeachers().length), accent: "accent-sky" },
           { label: "Students", value: String(allStudents().length), accent: "accent-mint" },
           { label: "Visit requests", value: String(loadVisits().length), accent: "accent-royal" },
           { label: "Pending invites", value: "2", accent: "accent-coral" },
@@ -474,14 +652,9 @@
         return [s.name, s.city, String(s.students), String(s.teachers), s.attendance];
       })));
     }
-    if (section === "teachers") {
-      return panel("Teachers across schools", table(["Name", "School", "Subject", "Class"], TEACHERS.map(function (t) {
-        return [t.name, t.school, t.subject, t.className];
-      })));
-    }
-    if (section === "students") {
-      return studentsPanel(session);
-    }
+    if (section === "teachers") return teachersPanel(session);
+    if (section === "students") return studentsPanel(session);
+    if (section === "fees") return feesPanel();
     if (section === "results") {
       return panel("Results across schools", table(["Student", "School", "Subject", "Mark"], RESULTS.map(function (r) {
         return [r.student, r.school, r.subject, r.mark];
@@ -500,7 +673,7 @@
       '<div class="welcome-banner"><h2>Platform control</h2><p>All schools, teachers, students and results on one desk.</p></div>' +
       kpis([
         { label: "Schools", value: String(SCHOOLS.length), accent: "accent-royal" },
-        { label: "Teachers", value: String(TEACHERS.length), accent: "accent-sky" },
+        { label: "Teachers", value: String(allTeachers().length), accent: "accent-sky" },
         { label: "Students", value: String(allStudents().length), accent: "accent-mint" },
         { label: "Results on file", value: String(RESULTS.length), accent: "accent-coral" },
       ]) +
@@ -565,6 +738,30 @@
         render(session, section);
         return;
       }
+      var saveFeeBtn = e.target.closest("[data-save-fee]");
+      if (saveFeeBtn) {
+        e.preventDefault();
+        if (!canManageRoster(session)) return;
+        var feeRow = saveFeeBtn.closest("tr");
+        var feeInput = feeRow && feeRow.querySelector("[data-fee]");
+        var feeId = saveFeeBtn.getAttribute("data-save-fee");
+        saveFeeFor(feeId, feeInput ? feeInput.value : 0);
+        if (window.showToast) window.showToast("Monthly fee saved: " + money(feeInput && feeInput.value), "success");
+        render(session, section);
+        return;
+      }
+      var saveSalaryBtn = e.target.closest("[data-save-salary]");
+      if (saveSalaryBtn) {
+        e.preventDefault();
+        if (!canManageRoster(session)) return;
+        var salaryRow = saveSalaryBtn.closest("tr");
+        var salaryInput = salaryRow && salaryRow.querySelector("[data-salary]");
+        var salaryId = saveSalaryBtn.getAttribute("data-save-salary");
+        saveSalaryFor(salaryId, salaryInput ? salaryInput.value : 0);
+        if (window.showToast) window.showToast("Monthly salary saved: " + money(salaryInput && salaryInput.value), "success");
+        render(session, section);
+        return;
+      }
       var demoBtn = e.target.closest("[data-demo-action]");
       if (demoBtn && window.showToast) {
         window.showToast("Saved (demo) — no server connected.", "success");
@@ -572,13 +769,52 @@
     });
 
     document.addEventListener("submit", function (e) {
+      var teacherForm = e.target.closest("#addTeacherForm");
+      if (teacherForm) {
+        e.preventDefault();
+        if (!canManageRoster(session)) return;
+        var tName = (teacherForm.querySelector('[name="name"]') || {}).value || "";
+        var tSubject = (teacherForm.querySelector('[name="subject"]') || {}).value || "";
+        var tSchool = (teacherForm.querySelector('[name="school"]') || {}).value || session.className || "School";
+        var tClass = (teacherForm.querySelector('[name="className"]') || {}).value || tSubject;
+        var tSalary = parseAmount((teacherForm.querySelector('[name="salary"]') || {}).value);
+        var tEmail = (teacherForm.querySelector('[name="email"]') || {}).value || "";
+        var tPassword = (teacherForm.querySelector('[name="password"]') || {}).value || "Demo@12345";
+        var tCreated = auth.addTeacherAccount
+          ? auth.addTeacherAccount({ name: tName, subject: tSubject, className: tClass, email: tEmail, password: tPassword })
+          : { ok: false, message: "Cannot add teachers." };
+        if (!tCreated.ok) {
+          if (window.showToast) window.showToast(tCreated.message, "error");
+          return;
+        }
+        var staff = loadStaff();
+        var teacherId = "t-" + Date.now();
+        staff.unshift({
+          id: teacherId,
+          name: tName.trim(),
+          school: String(tSchool).trim(),
+          subject: String(tSubject).trim(),
+          className: String(tClass).trim() || String(tSubject).trim(),
+          salary: tSalary,
+          email: tCreated.email,
+        });
+        saveStaff(staff);
+        saveSalaryFor(teacherId, tSalary);
+        if (window.showToast) {
+          window.showToast("Added " + tName.trim() + ". Login: " + tCreated.email + " / " + tCreated.password, "success");
+        }
+        render(session, session.role === "superadmin" ? "teachers" : "staff");
+        return;
+      }
+
       var form = e.target.closest("#addKidForm");
       if (!form) return;
       e.preventDefault();
-      if (session.role !== "admin" && session.role !== "superadmin") return;
+      if (!canManageRoster(session)) return;
       var name = (form.querySelector('[name="name"]') || {}).value || "";
       var year = (form.querySelector('[name="year"]') || {}).value || "";
       var school = (form.querySelector('[name="school"]') || {}).value || session.className || "School";
+      var fee = parseAmount((form.querySelector('[name="fee"]') || {}).value);
       var email = (form.querySelector('[name="email"]') || {}).value || "";
       var password = (form.querySelector('[name="password"]') || {}).value || "Demo@12345";
       var created = auth.addStudentAccount
@@ -589,14 +825,18 @@
         return;
       }
       var kids = loadKids();
+      var kidId = "s-" + Date.now();
       kids.unshift({
+        id: kidId,
         name: name.trim(),
         school: String(school).trim(),
         year: String(year).trim(),
         avg: "—",
+        fee: fee,
         email: created.email,
       });
       saveKids(kids);
+      saveFeeFor(kidId, fee);
       if (window.showToast) {
         window.showToast("Added " + name.trim() + ". Login: " + created.email + " / " + created.password, "success");
       }

@@ -191,6 +191,26 @@
     return { ok: true, email: email, password: extra[email].password };
   }
 
+  function addTeacherAccount(fields) {
+    var email = normalizeLogin(fields.email);
+    var name = String(fields.name || "").trim();
+    var subject = String(fields.subject || "General").trim();
+    var password = String(fields.password || DEMO_PASSWORD);
+    if (!name || name.length > 80) return { ok: false, message: "Enter the teacher's name." };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, message: "Enter a valid email for the teacher login." };
+    if (lookup(email)) return { ok: false, message: "That email is already registered." };
+    var extra = extraUsers();
+    extra[email] = {
+      password: password.length >= 6 ? password : DEMO_PASSWORD,
+      role: "teacher",
+      name: name,
+      roleLabel: "Teacher",
+      className: String(fields.className || subject).trim() || subject,
+    };
+    saveExtra(extra);
+    return { ok: true, email: email, password: extra[email].password };
+  }
+
   function logout() {
     clearSession();
     window.location.href = LOGIN_PATH;
@@ -213,6 +233,7 @@
     login: login,
     register: register,
     addStudentAccount: addStudentAccount,
+    addTeacherAccount: addTeacherAccount,
     logout: logout,
     getSession: readSession,
     requireAuth: requireAuth,
