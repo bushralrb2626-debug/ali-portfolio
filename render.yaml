@@ -24,7 +24,5 @@ services:
         value: "12345"
       - key: ADMIN_PASSWORD
         value: "12345"
-      - key: CURSOR_API_KEY
-        sync: false
       - key: CURSOR_BOT_MODEL
         value: "composer-2.5"
