@@ -7,7 +7,7 @@
 
   var T = {
     en: {
-      fab: "Ask the school",
+      fab: "Ask about school",
       title: "Campus desk",
       sub: "Chat, speak, or book a visit",
       close: "Close chat",
@@ -58,7 +58,7 @@
       yesNeed: "Reply yes to send the request, or no to cancel.",
     },
     it: {
-      fab: "Chiedi alla scuola",
+      fab: "Info sulla scuola",
       title: "Sportello campus",
       sub: "Scrivi, parla o prenota una visita",
       close: "Chiudi chat",
@@ -109,7 +109,7 @@
       yesNeed: "Rispondi sì per inviare, o no per annullare.",
     },
     ur: {
-      fab: "اسکول سے پوچھیں",
+      fab: "اسکول کے بارے میں پوچھیں",
       title: "کیمپس ڈیسک",
       sub: "لکھو یا بولو — اسی زبان میں جواب",
       close: "چیٹ بند کریں",
@@ -147,7 +147,7 @@
       yesNeed: "بھیجنے کے لیے ہاں لکھیں، یا منسوخ کے لیے نہیں۔",
     },
     pa: {
-      fab: "سکول توں پُچھو",
+      fab: "سکول بارے پُچھو",
       title: "کیمپس ڈیسک",
       sub: "لکھو یا بولو — اوسے زبان وچ جواب",
       close: "چیٹ بند کرو",
