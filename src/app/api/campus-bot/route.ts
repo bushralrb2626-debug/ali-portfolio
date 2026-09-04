@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 120;
 
 const CURSOR_KEY_FILE = "/app/.runtime/cursor_api_key";
+const DEFAULT_UPSTREAM = "https://ali-portfolio-y2z4.onrender.com/api/campus-bot";
 
 /** Runtime-only env access (avoids any build-time static replacement). */
 function envVar(name: string): string {
@@ -26,6 +27,14 @@ function cursorApiKey(): string {
     /* ignore */
   }
   return "";
+}
+
+/** When this host has no key, forward to the Render service that does. */
+function upstreamUrl(): string | null {
+  const configured = envVar("CAMPUS_BOT_UPSTREAM") || DEFAULT_UPSTREAM;
+  const host = envVar("RENDER_EXTERNAL_HOSTNAME");
+  if (host && configured.includes(host)) return null;
+  return configured;
 }
 
 const SCHOOL_PROMPT = `You are the Scuola Materna (BrightSteps) campus desk chatbot on a school demo website.
@@ -63,8 +72,47 @@ function cleanReply(text: string): string {
     .slice(0, 1800);
 }
 
+async function proxyJson(
+  method: "GET" | "POST",
+  body?: string
+): Promise<NextResponse | null> {
+  const upstream = upstreamUrl();
+  if (!upstream) return null;
+  try {
+    const res = await fetch(upstream, {
+      method,
+      headers: body ? { "Content-Type": "application/json" } : undefined,
+      body: method === "POST" ? body : undefined,
+      cache: "no-store",
+    });
+    const text = await res.text();
+    return new NextResponse(text, {
+      status: res.status,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch {
+    return null;
+  }
+}
+
 export async function GET() {
   const apiKey = cursorApiKey();
+  if (!apiKey) {
+    const proxied = await proxyJson("GET");
+    if (proxied) {
+      try {
+        const data = (await proxied.clone().json()) as Record<string, unknown>;
+        return NextResponse.json({
+          ...data,
+          proxied: true,
+          localKey: false,
+        });
+      } catch {
+        return proxied;
+      }
+    }
+  }
+
   const fromEnv = envVar("CURSOR_API_KEY");
   const fromFile = existsSync(CURSOR_KEY_FILE);
   const relatedKeys = Object.keys(env).filter((k) =>
@@ -87,8 +135,11 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const rawBody = await request.text();
   const apiKey = cursorApiKey();
   if (!apiKey) {
+    const proxied = await proxyJson("POST", rawBody);
+    if (proxied) return proxied;
     return NextResponse.json(
       { ok: false, error: "missing_key", reply: null },
       { status: 503 }
@@ -97,7 +148,7 @@ export async function POST(request: NextRequest) {
 
   let body: Body;
   try {
-    body = (await request.json()) as Body;
+    body = JSON.parse(rawBody || "{}") as Body;
   } catch {
     return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 });
   }
@@ -117,8 +168,10 @@ export async function POST(request: NextRequest) {
     .filter(Boolean)
     .join("\n");
 
+  // systemPrompt is gated on many API keys (throws --system-prompt); put role in the user prompt.
   const prompt = [
-    historyBlock ? `Recent chat:\n${historyBlock}\n` : "",
+    SCHOOL_PROMPT,
+    historyBlock ? `Recent chat:\n${historyBlock}` : "",
     `Visitor language hint: ${lang}`,
     `Visitor message: ${message}`,
   ]
@@ -131,7 +184,6 @@ export async function POST(request: NextRequest) {
     const result = await Agent.prompt(prompt, {
       apiKey,
       model: { id: envVar("CURSOR_BOT_MODEL") || "composer-2.5" },
-      systemPrompt: SCHOOL_PROMPT,
       tools: [],
       local: { cwd },
     });
