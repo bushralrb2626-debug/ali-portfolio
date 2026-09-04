@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Scuola Materna campus assistant — chat, voice, visit booking.
  * Bookings POST to /api/contact as [School visit] messages.
  */
@@ -25,11 +25,11 @@
       chipLogin: "Login",
       chipRegister: "Register",
       powered: "Powered by Slorsh",
-      calling: "Opening your phone dialer for +1 (555) 214-8800…",
+      calling: "Opening your phone dialer for 03066638854…",
       callOffer: "You can call the school office now:",
-      callBtn: "Call +1 (555) 214-8800",
+      callBtn: "Call 03066638854",
       hours:
-        "The office is open Monday–Friday, 8:00 AM – 4:00 PM. Classes run on the same campus at 42 Maple Grove, Riverside. Phone +1 (555) 214-8800.",
+        "The office is open Monday–Friday, 8:00 AM – 4:00 PM. Classes run on the same campus at 42 Maple Grove, Riverside. Phone 03066638854.",
       programs:
         "Pathways: Early Learning, Primary, Middle School, Creative Arts, Sports, and Science & Technology. Each mixes curiosity, play and solid teaching.",
       admissions:
@@ -37,7 +37,7 @@
       portal:
         "Parents, teachers and students sign in from the Student Portal / Accedi button. Demo logins work on this site (student_demo, parent_demo, teacher_demo — password Demo@12345).",
       address:
-        "We’re at 42 Maple Grove, Riverside. Email hello@brightsteps.academy or call +1 (555) 214-8800.",
+        "We’re at 42 Maple Grove, Riverside. Email hello@brightsteps.academy or call 03066638854.",
       teachers:
         "Warm, qualified teachers who know every child by name — mathematics, science, English, art, music, PE, computing and more.",
       facilities:
@@ -90,11 +90,11 @@
       chipLogin: "Accedi",
       chipRegister: "Registrati",
       powered: "Powered by Slorsh",
-      calling: "Apro il dialer per +1 (555) 214-8800…",
+      calling: "Apro il dialer per 03066638854…",
       callOffer: "Puoi chiamare la segreteria ora:",
-      callBtn: "Chiama +1 (555) 214-8800",
+      callBtn: "Chiama 03066638854",
       hours:
-        "La segreteria è aperta lunedì–venerdì, 8:00–16:00. Siamo in 42 Maple Grove, Riverside. Tel. +1 (555) 214-8800.",
+        "La segreteria è aperta lunedì–venerdì, 8:00–16:00. Siamo in 42 Maple Grove, Riverside. Tel. 03066638854.",
       programs:
         "Percorsi: Prima infanzia, Scuola primaria, Scuola media, Arti creative, Sport, Scienza e tecnologia. Ogni percorso unisce curiosità, gioco e solida didattica.",
       admissions:
@@ -102,7 +102,7 @@
       portal:
         "Genitori, insegnanti e studenti accedono dal pulsante Accedi / Portale studenti. Su questo sito funzionano gli accessi demo (student_demo, parent_demo, teacher_demo — password Demo@12345).",
       address:
-        "Siamo in 42 Maple Grove, Riverside. Email hello@brightsteps.academy oppure tel. +1 (555) 214-8800.",
+        "Siamo in 42 Maple Grove, Riverside. Email hello@brightsteps.academy oppure tel. 03066638854.",
       teachers:
         "Insegnanti preparati e calorosi che conoscono ogni bambino per nome — matematica, scienze, inglese, arte, musica, educazione fisica, informatica e altro.",
       facilities:
@@ -154,14 +154,14 @@
       chipLogin: "لاگ اِن",
       chipRegister: "رجسٹر",
       powered: "Powered by Slorsh",
-      calling: "فون ڈائلر کھل رہا ہے: +1 (555) 214-8800…",
+      calling: "فون ڈائلر کھل رہا ہے: 03066638854…",
       callOffer: "اب اسکول آفس کو کال کر سکتے ہیں:",
-      callBtn: "کال کریں +1 (555) 214-8800",
-      hours: "دفتر پیر تا جمعہ صبح 8:00 سے شام 4:00 تک کھلا ہے۔ پتہ: 42 Maple Grove, Riverside۔ فون +1 (555) 214-8800۔",
+      callBtn: "کال کریں 03066638854",
+      hours: "دفتر پیر تا جمعہ صبح 8:00 سے شام 4:00 تک کھلا ہے۔ پتہ: 42 Maple Grove, Riverside۔ فون 03066638854۔",
       programs: "راستے: Early Learning، پرائمری، مڈل اسکول، آرٹس، اسپورٹس، اور سائنس و ٹیکنالوجی۔ ہر راستے میں کھیل، تجسس اور مضبوط تعلیم ہے۔",
       admissions: "داخلہ کیمپس وزٹ سے شروع ہوتا ہے۔ کہیں کہ وزٹ بک کرنی ہے — نام، ای میل، دن/وقت اور بچے کی عمر پوچھوں گا۔",
       portal: "والدین، اساتذہ اور طلبہ Student Portal / Accedi سے لاگ اِن کریں۔ ڈیمو: student_demo، parent_demo، teacher_demo — پاس ورڈ Demo@12345۔",
-      address: "پتہ: 42 Maple Grove, Riverside۔ ای میل hello@brightsteps.academy یا فون +1 (555) 214-8800۔",
+      address: "پتہ: 42 Maple Grove, Riverside۔ ای میل hello@brightsteps.academy یا فون 03066638854۔",
       teachers: "محبت کرنے والے، اہل اساتذہ جو ہر بچے کا نام جانتے ہیں — ریاضی، سائنس، انگریزی، آرٹ، موسیقی، کھیلیں اور کمپیوٹر۔",
       facilities: "لائبریری، سائنس و کمپیوٹر لیبز، کھیلوں کا میدان، آرٹ و موسیقی کے کمرے، سمارٹ کلاسز، کیفے اور محفوظ کھیل کا علاقہ۔",
       fallback: "میں اوقات، پروگرامز، داخلہ، اساتذہ، سہولیات، پورٹل — یا وزٹ بکنگ میں مدد کر سکتا ہوں۔ کیا پوچھنا ہے؟",
@@ -203,14 +203,14 @@
       chipLogin: "لاگ اِن",
       chipRegister: "رجسٹر",
       powered: "Powered by Slorsh",
-      calling: "فون ڈائلر کھل رہا اے: +1 (555) 214-8800…",
+      calling: "فون ڈائلر کھل رہا اے: 03066638854…",
       callOffer: "ہن سکول آفس نوں کال کر سکدے او:",
-      callBtn: "کال کرو +1 (555) 214-8800",
-      hours: "دفتر پیر توں جمعہ صبح 8:00 توں شام 4:00 کھلا۔ پتہ: 42 Maple Grove, Riverside۔ فون +1 (555) 214-8800۔",
+      callBtn: "کال کرو 03066638854",
+      hours: "دفتر پیر توں جمعہ صبح 8:00 توں شام 4:00 کھلا۔ پتہ: 42 Maple Grove, Riverside۔ فون 03066638854۔",
       programs: "راستے: Early Learning، پرائمری، مڈل سکول، آرٹس، کھیڈاں، سائنس تے ٹیکنالوجی۔ ہر پاسے کھیل، تجسس تے مضبوط سکھیا۔",
       admissions: "داخلہ کیمپس وزٹ نال شروع ہوندا اے۔ کہو وزٹ بک کرنی اے — ناں، ای میل، دن/وقت تے بچے دی عمر پُچھاں گا۔",
       portal: "ماپے، استاد تے طالب علم Accedi / Student Portal توں لاگ اِن کرن۔ ڈیمو: student_demo، parent_demo، teacher_demo — پاس ورڈ Demo@12345۔",
-      address: "پتہ: 42 Maple Grove, Riverside۔ ای میل hello@brightsteps.academy یا فون +1 (555) 214-8800۔",
+      address: "پتہ: 42 Maple Grove, Riverside۔ ای میل hello@brightsteps.academy یا فون 03066638854۔",
       teachers: "پیار والے استاد جو ہر بچے دا ناں جاندے نے — ریاضی، سائنس، انگریزی، آرٹ، موسیقی، کھیڈاں تے کمپیوٹر۔",
       facilities: "لائبریری، سائنس تے کمپیوٹر لیبز، کھیڈاں دا میدان، آرٹ تے موسیقی دے کمرے، سمارٹ کلاس، کیفے تے محفوظ کھیڈ دا تھاں۔",
       fallback: "میں اواریں، پروگرام، داخلہ، استاد، سہولیات، پورٹل — یا وزٹ بکنگ وچ مدد کر سکدا واں۔ کی پُچھنا اے؟",
@@ -423,10 +423,11 @@
     { keys: ["who are you","your name","chi sei","آپ کون","تسی کون","تون کون","aap kaun","tusi kaun","تم کون ہو","آپ کون ہو","یہ بوٹ"], en: "I’m the Scuola Materna campus assistant. I answer school questions and can book a visit.", it: "Sono l’assistente della Scuola Materna. Rispondo alle domande e posso prenotare una visita.", ur: "میں Scuola Materna کا اسسٹنٹ ہوں۔ اسکول کے سوالات کے جواب دیتا ہوں اور وزٹ بک کروا سکتا ہوں۔", pa: "میں Scuola Materna دا اسسٹنٹ واں۔ سکول دے سوالاں دے جواب دیندا واں تے وزٹ بک کروا سکدا واں۔" },
     { keys: ["help","aiuto","what can you","مدد","کیا کر سکتے","کی کر سکدے","madad","help urdu","کیا مدد","madad chahiye","help chahiye"], en: "Ask me about hours, programs, admissions, fees, uniform, lunch, buses, teachers, class size, holidays, the parent portal, or booking a visit.", it: "Chiedimi orari, programmi, iscrizioni, rette, divisa, mensa, pullman, insegnanti, numero in classe, vacanze, portale genitori o una visita.", ur: "اوقات، پروگرامز، داخلہ، فیس، یونیفارم، لنچ، بس، اساتذہ، کلاس سائز، چھٹیاں، والدین پورٹل، یا وزٹ بکنگ پوچھیں۔", pa: "اواریں، پروگرام، داخلہ، فیس، یونیفارم، لنچ، بس، استاد، کلاس سائز، چھٹیاں، والدین پورٹل، یا وزٹ بکنگ پُچھو۔" },
     { keys: ["weekend","saturday","sunday","sabato","domenica","ہفتہ","اتوار","weekend urdu","hafta","itwar","ہفتے کو","اتوار کو","weekend band"], en: "The office is closed Saturday and Sunday. We open again Monday at 8:00 AM.", it: "La segreteria è chiusa sabato e domenica. Riapriamo lunedì alle 8:00.", ur: "دفتر ہفتہ اور اتوار بند رہتا ہے۔ پیر صبح 8:00 بجے کھلتا ہے۔", pa: "دفتر ہفتہ تے اتوار بند رہندا اے۔ پیر صبح 8:00 کھلدا اے۔" },
-    { keys: ["hour","open","orari","apert","closing","اوقات","کھلا","کب کھلتا","اواریں","kitne baje","timing","timings","kab khulta","اوقات کیا","وقت کیا","کب کھلتی","کب کھلتے","کھلتا ہے","کھلتی ہے","ٹائمنگ","ٹائمنگز","وقت بتاؤ","اوقات بتاؤ","اوقات بتائیں","school timing","school timings","timing batao","timings batao","kab khulti","kab khulte","khulta hai","khulti hai","office hours","school hours","kya time","kitnay baje"], en: "Office hours: Monday–Friday, 8:00 AM – 4:00 PM at 42 Maple Grove, Riverside. Phone +1 (555) 214-8800.", it: "Orari: lunedì–venerdì 8:00–16:00, 42 Maple Grove, Riverside. Tel. +1 (555) 214-8800.", ur: "دفتر کے اوقات: پیر تا جمعہ، 8:00 صبح – 4:00 شام، 42 Maple Grove, Riverside۔ فون +1 (555) 214-8800۔", pa: "دفتر دیاں اواریں: پیر توں جمعہ، 8:00 صبح – 4:00 شام، 42 Maple Grove, Riverside۔ فون +1 (555) 214-8800۔" },
+    { keys: ["hour","open","orari","apert","closing","اوقات","کھلا","کب کھلتا","اواریں","kitne baje","timing","timings","kab khulta","اوقات کیا","وقت کیا","کب کھلتی","کب کھلتے","کھلتا ہے","کھلتی ہے","ٹائمنگ","ٹائمنگز","وقت بتاؤ","اوقات بتاؤ","اوقات بتائیں","school timing","school timings","timing batao","timings batao","kab khulti","kab khulte","khulta hai","khulti hai","office hours","school hours","kya time","kitnay baje"], en: "Office hours: Monday–Friday, 8:00 AM – 4:00 PM at 42 Maple Grove, Riverside. Phone 03066638854.", it: "Orari: lunedì–venerdì 8:00–16:00, 42 Maple Grove, Riverside. Tel. 03066638854.", ur: "دفتر کے اوقات: پیر تا جمعہ، 8:00 صبح – 4:00 شام، 42 Maple Grove, Riverside۔ فون 03066638854۔", pa: "دفتر دیاں اواریں: پیر توں جمعہ، 8:00 صبح – 4:00 شام، 42 Maple Grove, Riverside۔ فون 03066638854۔" },
     { keys: ["early learning","nursery","infanzia","preschool","kindergarten","نرسری","پری اسکول","ابتدائی","preschool urdu","ابتدائی تعلیم","nursery class"], en: "Early Learning is play-based discovery for our youngest children — curiosity, stories and gentle routines.", it: "Prima infanzia è un percorso per i più piccoli: gioco, storie e routine delicate.", ur: "Early Learning چھوٹے بچوں کے لیے کھیل پر مبنی سیکھنا ہے — کہانیاں اور نرم روٹین۔", pa: "Early Learning ننھے بچیاں لئی کھیڈ نال سکھنا اے — کہانیاں تے نرم روٹین۔" },
     { keys: ["primary","elementar","primaria","پرائمری","پرائمری اسکول","primary urdu","پرائمری کلاس","primary class"], en: "Primary School builds strong reading, maths and kindness — the foundations for lifelong learning.", it: "La scuola primaria costruisce lettura, matematica e gentilezza — basi per tutta la vita.", ur: "پرائمری میں مضبوط پڑھائی، ریاضی اور مہربانی سکھائی جاتی ہے — زندگی بھر کی بنیاد۔", pa: "پرائمری وچ مضبوط پڑھائی، ریاضی تے مہربانی سکھائی جاندی اے — زندگی بھر دی بنیاد۔" },
     { keys: ["middle school","scuola media","مڈل","مڈل اسکول","middle urdu","مڈل کلاس"], en: "Middle School grows independence, confidence and deeper subject knowledge.", it: "La scuola media sviluppa indipendenza, fiducia e materie più approfondite.", ur: "مڈل اسکول میں آزادی، اعتماد اور گہری مضامین کی سمجھ بڑھتی ہے۔", pa: "مڈل سکول وچ آزادی، اعتماد تے مضامین دی گہری سمجھ ودھدی اے۔" },
+    { keys: ["facilit","facility","facilities","campus facilit","سہولت","سہولیات","سہولتاں","facility urdu","tell about facilit","facilities batao","سہولیات بتائیں","سہولیات بتاؤ","کیا سہولیات","what facilities"], en: "Library, science and computer labs, sports ground, art and music rooms, smart classrooms, cafeteria and a safe play area.", it: "Biblioteca, laboratori di scienze e informatica, campo sportivo, sale arte e musica, aule smart, mensa e un’area giochi sicura.", ur: "لائبریری، سائنس و کمپیوٹر لیبز، کھیلوں کا میدان، آرٹ و موسیقی کے کمرے، سمارٹ کلاسز، کیفے اور محفوظ کھیل کا علاقہ۔", pa: "لائبریری، سائنس تے کمپیوٹر لیبز، کھیڈاں دا میدان، آرٹ تے موسیقی دے کمرے، سمارٹ کلاس، کیفے تے محفوظ کھیڈ دا تھاں۔" },
     { keys: ["program","curric","pathway","percors","materie","پروگرام","نصاب","راستہ","program urdu","nisab","کون سے پروگرام","کیا پڑھاتے","subjects","کورس"], en: "Pathways: Early Learning, Primary, Middle School, Creative Arts, Sports, and Science & Technology.", it: "Percorsi: Prima infanzia, Scuola primaria, Scuola media, Arti creative, Sport, Scienza e tecnologia.", ur: "راستے: Early Learning، پرائمری، مڈل اسکول، آرٹس، اسپورٹس، سائنس و ٹیکنالوجی۔", pa: "راستے: Early Learning، پرائمری، مڈل سکول، آرٹس، کھیڈاں، سائنس تے ٹیکنالوجی۔" },
     { keys: ["art","arte","music","musica","آرٹ","موسیقی","فنون","آرٹ کلاس","ڈرائنگ"], en: "Art and music studios run all week. Children paint, sing, and perform at the annual show.", it: "Sale arte e musica tutta la settimana. I bambini dipingono, cantano e si esibiscono al saggio.", ur: "آرٹ اور موسیقی پورے ہفتے چلتے ہیں۔ بچے پینٹ کرتے، گاتے اور سالانہ شو میں پرفارم کرتے ہیں۔", pa: "آرٹ تے موسیقی سارے ہفتے چلدے نے۔ بچے پینٹ کردے، گاندے تے سالانہ شو وچ پرفارم کردے نے۔" },
     { keys: ["sport","pe","educazione fisica","football","soccer","کھیل","کھیڈ","اسپورٹ","football urdu","کھیلیں","sports day"], en: "Sports include PE, house races and Sports Day on the field. We mix teamwork with lots of orange slices.", it: "Sport: educazione fisica, gare delle case e Giornata dello sport. Tanto gioco di squadra.", ur: "کھیل: پی ای، ہاؤس ریسز اور اسپورٹس ڈے میدان پر۔ ٹیم ورک اور مزہ۔", pa: "کھیڈاں: پی ای، ہاؤس ریس تے اسپورٹس ڈے میدان تے۔ ٹیم ورک تے مزہ۔" },
@@ -437,8 +438,8 @@
     { keys: ["uniform","divisa","یونیفارم","ڈریس","یونفورم","uniform urdu","یونیفارم ہے","ڈریس کوڈ","uniform hai","dress code"], en: "Yes — a simple school uniform. The office shares the list at your visit.", it: "Sì, c’è una divisa semplice. La lista si riceve in visita.", ur: "جی ہاں — سادہ اسکول یونیفارم۔ فہرست وزٹ پر ملتی ہے۔", pa: "ہاں — سادہ سکول یونیفارم۔ لسٹ وزٹ تے ملدی اے۔" },
     { keys: ["lunch","canteen","mensa","food","cafeteria","لنچ","کھانا","کیفے","khana","کھانا ملتا","لنچ ہوتا","tiffin"], en: "The cafeteria is a comfortable dining space. Packed lunches are welcome too.", it: "La mensa è un spazio comodo. Si può portare anche il pranzo da casa.", ur: "کیفے آرام دہ ہے۔ گھر سے لنچ بھی لا سکتے ہیں۔", pa: "کیفے آرام دہ اے۔ گھر توں لنچ وی لیا جا سکدا اے۔" },
     { keys: ["bus","transport","pullman","scuolabus","بس","ٹرانسپورٹ","سکول بس","bus urdu","بس ملتی","pick and drop","school van"], en: "Safe school transport is available. Ask the office during your visit for routes.", it: "C’è un trasporto scolastico sicuro. I percorsi si vedono in segreteria.", ur: "محفوظ اسکول ٹرانسپورٹ دستیاب ہے۔ راستے وزٹ پر دفتر سے پوچھیں۔", pa: "محفوظ سکول ٹرانسپورٹ دستیاب اے۔ رستے وزٹ تے دفتر توں پُچھو۔" },
-    { keys: ["address","where","map","indirizzo","location","dove siete","پتہ","کہاں","لوکیشن","address urdu","kahan","kidhar","پتہ کیا","کہاں واقع","لوکیشن کیا","اسکول کہاں","address kya","school kahan","kahan hai","location kya"], en: "42 Maple Grove, Riverside. Email hello@brightsteps.academy or call +1 (555) 214-8800.", it: "42 Maple Grove, Riverside. Email hello@brightsteps.academy — tel. +1 (555) 214-8800.", ur: "42 Maple Grove, Riverside۔ ای میل hello@brightsteps.academy یا فون +1 (555) 214-8800۔", pa: "42 Maple Grove, Riverside۔ ای میل hello@brightsteps.academy یا فون +1 (555) 214-8800۔" },
-    { keys: ["phone","call","telefon","number","فون","نمبر","کال","phone urdu","فون نمبر","رابطہ نمبر","contact number","phone number","call karo"], en: "Call the office on +1 (555) 214-8800, Monday–Friday 8:00 AM – 4:00 PM.", it: "Tel. +1 (555) 214-8800, lunedì–venerdì 8:00–16:00.", ur: "دفتر کو کال کریں: +1 (555) 214-8800، پیر تا جمعہ 8:00–4:00۔", pa: "دفتر نوں کال کرو: +1 (555) 214-8800، پیر توں جمعہ 8:00–4:00۔" },
+    { keys: ["address","where","map","indirizzo","location","dove siete","پتہ","کہاں","لوکیشن","address urdu","kahan","kidhar","پتہ کیا","کہاں واقع","لوکیشن کیا","اسکول کہاں","address kya","school kahan","kahan hai","location kya"], en: "42 Maple Grove, Riverside. Email hello@brightsteps.academy or call 03066638854.", it: "42 Maple Grove, Riverside. Email hello@brightsteps.academy — tel. 03066638854.", ur: "42 Maple Grove, Riverside۔ ای میل hello@brightsteps.academy یا فون 03066638854۔", pa: "42 Maple Grove, Riverside۔ ای میل hello@brightsteps.academy یا فون 03066638854۔" },
+    { keys: ["phone","call","telefon","number","فون","نمبر","کال","phone urdu","فون نمبر","رابطہ نمبر","contact number","phone number","call karo"], en: "Call the office on 03066638854, Monday–Friday 8:00 AM – 4:00 PM.", it: "Tel. 03066638854, lunedì–venerdì 8:00–16:00.", ur: "دفتر کو کال کریں: 03066638854، پیر تا جمعہ 8:00–4:00۔", pa: "دفتر نوں کال کرو: 03066638854، پیر توں جمعہ 8:00–4:00۔" },
     { keys: ["email","write","scriv","ای میل","لکھیں","email urdu","ای میل کیا","email kya"], en: "Email hello@brightsteps.academy — or use the contact form on this site.", it: "Email hello@brightsteps.academy — oppure il modulo Contatti sul sito.", ur: "ای میل hello@brightsteps.academy — یا اس سائٹ کا رابطہ فارم۔", pa: "ای میل hello@brightsteps.academy — یا اس سائٹ دا رابطہ فارم۔" },
     { keys: ["teacher","insegn","staff","faculty","استاد","استانی","ٹیچر","ustad","teacher urdu","استاد کون","ٹیچرز","teachers kaise"], en: "Warm, qualified teachers who know every child by name — maths, science, English, art, music, PE and computing.", it: "Insegnanti preparati che conoscono ogni bambino per nome — matematica, scienze, inglese, arte, musica, motoria e informatica.", ur: "محبت کرنے والے، اہل اساتذہ جو ہر بچے کا نام جانتے ہیں — ریاضی، سائنس، انگریزی، آرٹ، موسیقی، کھیلیں، کمپیوٹر۔", pa: "پیار والے استاد جو ہر بچے دا ناں جاندے نے — ریاضی، سائنس، انگریزی، آرٹ، موسیقی، کھیڈاں، کمپیوٹر۔" },
     { keys: ["class size","how many children","quanti bambini","ratio","کلاس سائز","کتنے بچے","kitne bachay","کلاس میں کتنے","کتنے بچے کلاس"], en: "Classes stay small enough that teachers know every child. Ask on your visit for the current year-group sizes.", it: "Classi contenute: gli insegnanti conoscono ogni bambino. I numeri precisi si vedono in visita.", ur: "کلاسز اتنی چھوٹی رہتی ہیں کہ استاد ہر بچے کو جانتے ہیں۔ موجودہ سائز وزٹ پر پوچھیں۔", pa: "کلاسز اتنی چھوٹیاں رہندیاں نے کہ استاد ہر بچے نوں جاندے نے۔ موجودہ سائز وزٹ تے پُچھو۔" },
@@ -604,8 +605,8 @@
     return t().fallback;
   }
 
-  var OFFICE_PHONE_DISPLAY = "+1 (555) 214-8800";
-  var OFFICE_PHONE_TEL = "tel:+15552148800";
+  var OFFICE_PHONE_DISPLAY = "03066638854";
+  var OFFICE_PHONE_TEL = "tel:+923066638854";
   var booking = { step: "", name: "", email: "", when: "", age: "", clock: "" };
   var rec = null;
   var voiceTurn = false;
@@ -1365,7 +1366,7 @@
       startBooking();
       return;
     }
-    var offerCall = /555|phone|tel\.|call |فون|کال|telefon/i.test(String(reply));
+    var offerCall = /03066638854|phone|tel\.|call |فون|کال|telefon/i.test(String(reply));
     botSay(reply, offerCall ? { offerCall: true } : null);
   }
 
