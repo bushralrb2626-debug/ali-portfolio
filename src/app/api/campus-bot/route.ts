@@ -1,14 +1,31 @@
 import { Agent, CursorAgentError } from "@cursor/sdk";
-import { NextRequest, NextResponse } from "next/server";
+import { existsSync, readFileSync } from "node:fs";
+import { env } from "node:process";
 import path from "node:path";
+import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
 
-/** Read at request time — Next/webpack must not inline empty build-time env. */
+const CURSOR_KEY_FILE = "/app/.runtime/cursor_api_key";
+
+/** Runtime-only env access (avoids any build-time static replacement). */
 function envVar(name: string): string {
-  return String(process.env[name] ?? "").trim();
+  return String(Reflect.get(env, name) ?? "").trim();
+}
+
+function cursorApiKey(): string {
+  const fromEnv = envVar("CURSOR_API_KEY");
+  if (fromEnv) return fromEnv;
+  try {
+    if (existsSync(CURSOR_KEY_FILE)) {
+      return readFileSync(CURSOR_KEY_FILE, "utf8").trim();
+    }
+  } catch {
+    /* ignore */
+  }
+  return "";
 }
 
 const SCHOOL_PROMPT = `You are the Scuola Materna (BrightSteps) campus desk chatbot on a school demo website.
@@ -47,17 +64,30 @@ function cleanReply(text: string): string {
 }
 
 export async function GET() {
-  const hasKey = Boolean(envVar("CURSOR_API_KEY"));
+  const apiKey = cursorApiKey();
+  const fromEnv = envVar("CURSOR_API_KEY");
+  const fromFile = existsSync(CURSOR_KEY_FILE);
+  const relatedKeys = Object.keys(env).filter((k) =>
+    /cursor|api_?key|admin_email|render/i.test(k)
+  );
   return NextResponse.json({
     ok: true,
     service: "campus-bot",
-    cursorKeyConfigured: hasKey,
+    cursorKeyConfigured: Boolean(apiKey),
+    cursorKeyLen: apiKey.length,
+    diag: {
+      fromEnv: Boolean(fromEnv),
+      fromFile,
+      relatedKeys,
+      hasAdminEmail: Boolean(envVar("ADMIN_EMAIL")),
+      nodeEnv: envVar("NODE_ENV") || null,
+    },
     node: process.version,
   });
 }
 
 export async function POST(request: NextRequest) {
-  const apiKey = envVar("CURSOR_API_KEY");
+  const apiKey = cursorApiKey();
   if (!apiKey) {
     return NextResponse.json(
       { ok: false, error: "missing_key", reply: null },

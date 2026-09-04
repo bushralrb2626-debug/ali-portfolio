@@ -38,5 +38,7 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 # Cursor SDK (local agent) needs its package + platform binaries at runtime.
 COPY --from=builder /app/node_modules/@cursor ./node_modules/@cursor
+COPY scripts/docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
 EXPOSE 10000
-CMD ["node", "server.js"]
+CMD ["/app/docker-entrypoint.sh"]
