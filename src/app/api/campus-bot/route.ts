@@ -3,7 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 import path from "node:path";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 export const maxDuration = 120;
+
+/** Read at request time — Next/webpack must not inline empty build-time env. */
+function envVar(name: string): string {
+  return String(process.env[name] ?? "").trim();
+}
 
 const SCHOOL_PROMPT = `You are the Scuola Materna (BrightSteps) campus desk chatbot on a school demo website.
 
@@ -41,7 +47,7 @@ function cleanReply(text: string): string {
 }
 
 export async function GET() {
-  const hasKey = Boolean(String(process.env.CURSOR_API_KEY || "").trim());
+  const hasKey = Boolean(envVar("CURSOR_API_KEY"));
   return NextResponse.json({
     ok: true,
     service: "campus-bot",
@@ -51,7 +57,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const apiKey = String(process.env.CURSOR_API_KEY || "").trim();
+  const apiKey = envVar("CURSOR_API_KEY");
   if (!apiKey) {
     return NextResponse.json(
       { ok: false, error: "missing_key", reply: null },
@@ -94,7 +100,7 @@ export async function POST(request: NextRequest) {
   try {
     const result = await Agent.prompt(prompt, {
       apiKey,
-      model: { id: process.env.CURSOR_BOT_MODEL || "composer-2.5" },
+      model: { id: envVar("CURSOR_BOT_MODEL") || "composer-2.5" },
       systemPrompt: SCHOOL_PROMPT,
       tools: [],
       local: { cwd },
