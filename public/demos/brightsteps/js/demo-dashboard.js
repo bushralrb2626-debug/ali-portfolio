@@ -549,6 +549,9 @@
         escapeHtml(room),
         String(countPeopleInRoom(room, students)),
         String(countPeopleInRoom(room, teachers)),
+        '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-remove-room="' +
+          escapeHtml(room) +
+          '">Remove</button>',
       ];
     });
 
@@ -576,13 +579,56 @@
 
     return (
       '<form class="form-bsa" id="addRoomForm" style="margin-bottom:1.25rem">' +
-      "<p><strong>Add a classroom</strong></p>" +
+      "<p><strong>Add or remove classrooms</strong> — new classes appear in assignments, announcements, homework and results.</p>" +
       '<label>New classroom name<input name="name" required maxlength="60" placeholder="e.g. Grade 6" /></label>' +
       '<button type="submit" class="btn-bsa btn-bsa-primary">Add classroom</button>' +
       "</form>" +
-      panel("Classrooms overview", table(["Classroom", "Students", "Teachers"], roomRows)) +
+      panel(
+        "Classrooms",
+        roomRows.length
+          ? table(["Classroom", "Students", "Teachers", "Actions"], roomRows)
+          : "<p class='text-muted'>No classrooms yet. Add one above.</p>"
+      ) +
       panel("Assign people to classrooms", table(["Name", "Role", "Assignment"], assignRows))
     );
+  }
+
+  function removeRoom(roomName) {
+    var room = String(roomName || "").trim();
+    if (!room) return;
+    var rooms = loadRooms().filter(function (r) {
+      return r !== room;
+    });
+    saveRooms(rooms);
+    var map = loadRoomMap();
+    Object.keys(map).forEach(function (id) {
+      if (map[id] === room) delete map[id];
+    });
+    saveRoomMap(map);
+    var kids = loadKids().map(function (k) {
+      if (k.classroom === room || k.year === room) {
+        var copy = {};
+        Object.keys(k).forEach(function (key) {
+          copy[key] = k[key];
+        });
+        copy.classroom = "";
+        return copy;
+      }
+      return k;
+    });
+    saveKids(kids);
+    var staff = loadStaff().map(function (t) {
+      if (t.classroom === room || t.className === room) {
+        var copyT = {};
+        Object.keys(t).forEach(function (key) {
+          copyT[key] = t[key];
+        });
+        copyT.classroom = "";
+        return copyT;
+      }
+      return t;
+    });
+    saveStaff(staff);
   }
 
   function formatDate(iso) {
@@ -1681,6 +1727,18 @@
           if (window.showToast) window.showToast("Assignment saved.", "success");
           render(session, section);
         }
+        return;
+      }
+
+      var removeRoomBtn = e.target.closest("[data-remove-room]");
+      if (removeRoomBtn) {
+        e.preventDefault();
+        if (!canManageRoster(session)) return;
+        var roomToRemove = removeRoomBtn.getAttribute("data-remove-room");
+        if (!window.confirm('Remove classroom "' + roomToRemove + '"? People in it will be unassigned.')) return;
+        removeRoom(roomToRemove);
+        if (window.showToast) window.showToast("Classroom removed.", "success");
+        render(session, "classrooms");
         return;
       }
 
