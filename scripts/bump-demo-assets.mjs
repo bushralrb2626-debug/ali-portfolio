@@ -6,8 +6,8 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".html"))) {
   const p = path.join(dir, file);
   let html = fs.readFileSync(p, "utf8");
   html = html.replace(/js\/i18n\.js(?:\?v=[^"]*)?/g, "js/i18n.js?v=keyed5");
-  html = html.replace(/js\/campus-bot\.js(?:\?v=[^"]*)?/g, "js/campus-bot.js?v=18");
-  html = html.replace(/css\/campus-bot\.css(?:\?v=[^"]*)?/g, "css/campus-bot.css?v=18");
+  html = html.replace(/js\/campus-bot\.js(?:\?v=[^"]*)?/g, "js/campus-bot.js?v=19");
+  html = html.replace(/css\/campus-bot\.css(?:\?v=[^"]*)?/g, "css/campus-bot.css?v=19");
   fs.writeFileSync(p, html);
   console.log("bumped", file);
 }
