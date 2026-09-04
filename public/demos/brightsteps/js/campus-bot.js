@@ -45,6 +45,8 @@
       fallback:
         "I can help with hours, programs, admissions, teachers, facilities, the portal — or booking a visit. What would you like?",
       thinking: "One moment — checking with the campus desk…",
+      aiOffline:
+        "Campus AI is not connected yet (API key / deploy). I can still help with hours, programs, admissions, teachers, facilities, the portal — or booking a visit.",
       askName: "Lovely — let’s book a visit. What’s your name?",
       askEmail: "Thanks, {name}. What’s the best email for the office to reach you?",
       askClock:
@@ -111,6 +113,8 @@
       fallback:
         "Posso aiutarti con orari, programmi, iscrizioni, insegnanti, strutture, il portale — o prenotare una visita. Cosa ti serve?",
       thinking: "Un momento — sto chiedendo allo sportello…",
+      aiOffline:
+        "L’AI del campus non è ancora collegata (chiave API / deploy). Posso comunque aiutarti con orari, programmi, iscrizioni, insegnanti, strutture, il portale — o prenotare una visita.",
       askName: "Perfetto — prenotiamo una visita. Come ti chiami?",
       askEmail: "Grazie, {name}. Qual è l’email migliore per la segreteria?",
       askClock:
@@ -168,6 +172,8 @@
       facilities: "لائبریری، سائنس و کمپیوٹر لیبز، کھیلوں کا میدان، آرٹ و موسیقی کے کمرے، سمارٹ کلاسز، کیفے اور محفوظ کھیل کا علاقہ۔",
       fallback: "میں اوقات، پروگرامز، داخلہ، اساتذہ، سہولیات، پورٹل — یا وزٹ بکنگ میں مدد کر سکتا ہوں۔ کیا پوچھنا ہے؟",
       thinking: "ایک لمحہ — کیمپس ڈیسک سے پوچھ رہا ہوں…",
+      aiOffline:
+        "کیمپس AI ابھی منسلک نہیں (API کلید / ڈیپلائے)۔ اوقات، پروگرامز، داخلہ، اساتذہ، سہولیات، پورٹل — یا وزٹ بکنگ میں پھر بھی مدد کر سکتا ہوں۔",
       askName: "زبردست — وزٹ بک کرتے ہیں۔ آپ کا نام کیا ہے؟",
       askEmail: "شکریہ، {name}۔ دفتر کے لیے بہترین ای میل کیا ہے؟",
       askClock: "دن اور وقت سے پہلے — گھڑی کیسے لکھیں؟ جواب دیں AM/PM (۱۲ گھنٹے) یا ۲۴ گھنٹے۔",
@@ -218,6 +224,8 @@
       facilities: "لائبریری، سائنس تے کمپیوٹر لیبز، کھیڈاں دا میدان، آرٹ تے موسیقی دے کمرے، سمارٹ کلاس، کیفے تے محفوظ کھیڈ دا تھاں۔",
       fallback: "میں اواریں، پروگرام، داخلہ، استاد، سہولیات، پورٹل — یا وزٹ بکنگ وچ مدد کر سکدا واں۔ کی پُچھنا اے؟",
       thinking: "اک پل — کیمپس ڈیسک توں پُچھ رہا واں…",
+      aiOffline:
+        "کیمپس AI ہلے جڑیا نہیں (API کی / ڈیپلائے)۔ اواریں، پروگرام، داخلہ، استاد، سہولیات، پورٹل — یا وزٹ بکنگ وچ فیر وی مدد کر سکدا واں۔",
       askName: "چنگا — وزٹ بک کردے آں۔ تہاڈا ناں کی اے؟",
       askEmail: "شکریہ، {name}۔ دفتر لئی سب توں ودھیا ای میل کیہڑی اے؟",
       askClock: "دن تے وقت توں پہلاں — گھڑی کویں لکھئیے؟ جواب دیو AM/PM (۱۲ گھنٹے) یا ۲۴ گھنٹے۔",
@@ -1288,7 +1296,7 @@
 
   function askCursorAi(text, onDone) {
     if (aiBusy) {
-      onDone(null);
+      onDone(null, "busy");
       return;
     }
     aiBusy = true;
@@ -1306,23 +1314,31 @@
       }),
     })
       .then(function (res) {
-        return res.json().then(function (data) {
-          return { ok: res.ok, data: data };
-        });
+        return res.json().then(
+          function (data) {
+            return { ok: res.ok, status: res.status, data: data };
+          },
+          function () {
+            return { ok: false, status: res.status, data: null };
+          }
+        );
       })
       .then(function (pack) {
         removeThinking(thinking);
         aiBusy = false;
         if (pack.ok && pack.data && pack.data.ok && pack.data.reply) {
-          onDone(String(pack.data.reply));
-        } else {
-          onDone(null);
+          onDone(String(pack.data.reply), null);
+          return;
         }
+        var code =
+          (pack.data && pack.data.error) ||
+          (pack.status === 404 ? "http_404" : pack.status === 503 ? "http_503" : "failed");
+        onDone(null, code);
       })
       .catch(function () {
         removeThinking(thinking);
         aiBusy = false;
-        onDone(null);
+        onDone(null, "network");
       });
   }
 
@@ -1433,10 +1449,14 @@
 
     // Free-text → Cursor agent API; chips stay local. FAQ is offline fallback.
     if (forced == null) {
-      askCursorAi(text, function (aiReply) {
+      askCursorAi(text, function (aiReply, errCode) {
         if (aiReply) {
           var offerCallAi = /03066638854|phone|tel\.|call |فون|کال|telefon/i.test(aiReply);
           botSay(aiReply, offerCallAi ? { offerCall: true } : null);
+          return;
+        }
+        if (errCode === "missing_key" || errCode === "http_404" || errCode === "http_503") {
+          botSay(t().aiOffline || t().fallback);
           return;
         }
         var reply = intentReply(text);

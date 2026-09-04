@@ -40,6 +40,16 @@ function cleanReply(text: string): string {
     .slice(0, 1800);
 }
 
+export async function GET() {
+  const hasKey = Boolean(String(process.env.CURSOR_API_KEY || "").trim());
+  return NextResponse.json({
+    ok: true,
+    service: "campus-bot",
+    cursorKeyConfigured: hasKey,
+    node: process.version,
+  });
+}
+
 export async function POST(request: NextRequest) {
   const apiKey = String(process.env.CURSOR_API_KEY || "").trim();
   if (!apiKey) {

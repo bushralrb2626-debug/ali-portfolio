@@ -50,6 +50,11 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["@prisma/client", "prisma", "@cursor/sdk"],
   outputFileTracingIncludes: {
     "*": ["./prisma/**/*", "./prisma/dev.db"],
+    "/api/campus-bot": [
+      "./node_modules/@cursor/sdk/**/*",
+      "./node_modules/@cursor/sdk-*/**/*",
+      "./public/demos/brightsteps/**/*",
+    ],
   },
 };
 
