@@ -123,7 +123,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       reply,
-      agentId: result.agentId,
       runId: result.id,
     });
   } catch (err) {
