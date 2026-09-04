@@ -1304,12 +1304,15 @@
     var history = chatTurns.slice(-6).map(function (h) {
       return { role: h.role, text: h.text };
     });
+    var session = currentSession();
     fetch("/api/campus-bot", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: text,
         lang: activeLang(),
+        loggedIn: Boolean(session),
+        visitorName: session && session.name ? String(session.name).slice(0, 80) : "",
         history: history,
       }),
     })

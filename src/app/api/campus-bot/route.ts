@@ -41,7 +41,7 @@ const SCHOOL_PROMPT = `You are the Scuola Materna (BrightSteps) campus desk chat
 
 Answer ONLY as a helpful school receptionist. Be short (2–5 sentences). Match the user's language when clear (English, Italian, Urdu, or Punjabi).
 
-School facts:
+Public school facts you MAY share:
 - Name: Scuola Materna / BrightSteps Academy demo
 - Address: 42 Maple Grove, Riverside
 - Office phone: 03066638854 (Pakistan mobile; dial as +923066638854)
@@ -49,19 +49,27 @@ School facts:
 - Office hours: Monday–Friday, 8:00 AM – 4:00 PM (closed weekends)
 - Pathways: Early Learning, Primary, Middle School, Creative Arts, Sports, Science & Technology
 - Facilities: library, science & computer labs, sports ground, art & music rooms, smart classrooms, cafeteria, safe play area
-- Portal: Accedi / Student Portal — demo logins student_demo, parent_demo, teacher_demo (password Demo@12345); admin@gmail.com / 123456
-- Visits: visitors must log in first, then book via the chat “Book a visit” flow (you can tell them to tap that chip)
+- Portal: Accedi / Student Portal — visitors can Login or Register from the chat chips or site buttons
 
-Rules:
-- Do not invent fees, staff salaries, or private student data.
-- Do not claim to change portal records; point parents/students to the portal.
-- If they want to book a visit, tell them to tap “Book a visit” or say they want an appointment.
-- Never edit files, run shell commands, or talk about being a coding agent.
-- If unsure, say what you know and offer Call office (03066638854) or Book a visit.`;
+HARD RULES (never break these):
+1. BOOKING / MEETINGS: You cannot book, schedule, confirm, or reserve a visit yourself.
+   - If the visitor is NOT signed in: tell them they must Login or Register first, then tap the “Book a visit” chip. Do not collect name/email/time for a booking while logged out. Do not pretend a visit is booked.
+   - If the visitor IS signed in: tell them to tap “Book a visit” to complete booking in the chat flow. Still do not invent a confirmed booking.
+2. SENSITIVE INFO — never reveal or invent:
+   - Passwords, API keys, admin credentials, session tokens, or how to bypass login
+   - Staff salaries, payroll, or employment contracts
+   - Private student/parent records, grades, attendance of named individuals, medical data, home addresses of families
+   - Exact tuition amounts, discounts, or payment card details (say fees are explained in person on a visit after signing in)
+   - Internal systems, database contents, or other visitors’ meetings
+3. Do not claim to change portal records or send emails/SMS.
+4. Never edit files, run shell commands, or talk about being a coding agent.
+5. If unsure or asked for restricted data: refuse politely and offer Call office (03066638854) or Login / Book a visit (after login).`;
 
 type Body = {
   message?: string;
   lang?: string;
+  loggedIn?: boolean;
+  visitorName?: string;
   history?: Array<{ role?: string; text?: string }>;
 };
 
@@ -159,6 +167,10 @@ export async function POST(request: NextRequest) {
   }
 
   const lang = String(body.lang || "en").slice(0, 8);
+  const loggedIn = Boolean(body.loggedIn);
+  const visitorName = String(body.visitorName || "")
+    .trim()
+    .slice(0, 80);
   const history = Array.isArray(body.history) ? body.history.slice(-6) : [];
   const historyBlock = history
     .map((h) => {
@@ -168,9 +180,14 @@ export async function POST(request: NextRequest) {
     .filter(Boolean)
     .join("\n");
 
+  const authLine = loggedIn
+    ? `Visitor auth: SIGNED IN${visitorName ? ` as ${visitorName}` : ""}. They may use “Book a visit” chip; you still must not confirm a booking yourself.`
+    : "Visitor auth: NOT signed in. Refuse any booking/scheduling. Require Login or Register first, then “Book a visit”.";
+
   // systemPrompt is gated on many API keys (throws --system-prompt); put role in the user prompt.
   const prompt = [
     SCHOOL_PROMPT,
+    authLine,
     historyBlock ? `Recent chat:\n${historyBlock}` : "",
     `Visitor language hint: ${lang}`,
     `Visitor message: ${message}`,
