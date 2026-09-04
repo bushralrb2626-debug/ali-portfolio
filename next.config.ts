@@ -47,7 +47,7 @@ const nextConfig: NextConfig = {
     "192.168.1.10",
     "192.168.0.10",
   ],
-  serverExternalPackages: ["@prisma/client", "prisma"],
+  serverExternalPackages: ["@prisma/client", "prisma", "@cursor/sdk"],
   outputFileTracingIncludes: {
     "*": ["./prisma/**/*", "./prisma/dev.db"],
   },

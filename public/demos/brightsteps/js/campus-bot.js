@@ -44,6 +44,7 @@
         "Library, science and computer labs, sports ground, art and music rooms, smart classrooms, cafeteria and a safe play area.",
       fallback:
         "I can help with hours, programs, admissions, teachers, facilities, the portal — or booking a visit. What would you like?",
+      thinking: "One moment — checking with the campus desk…",
       askName: "Lovely — let’s book a visit. What’s your name?",
       askEmail: "Thanks, {name}. What’s the best email for the office to reach you?",
       askClock:
@@ -109,6 +110,7 @@
         "Biblioteca, laboratori di scienze e informatica, campo sportivo, sale arte e musica, aule smart, mensa e un’area giochi sicura.",
       fallback:
         "Posso aiutarti con orari, programmi, iscrizioni, insegnanti, strutture, il portale — o prenotare una visita. Cosa ti serve?",
+      thinking: "Un momento — sto chiedendo allo sportello…",
       askName: "Perfetto — prenotiamo una visita. Come ti chiami?",
       askEmail: "Grazie, {name}. Qual è l’email migliore per la segreteria?",
       askClock:
@@ -165,6 +167,7 @@
       teachers: "محبت کرنے والے، اہل اساتذہ جو ہر بچے کا نام جانتے ہیں — ریاضی، سائنس، انگریزی، آرٹ، موسیقی، کھیلیں اور کمپیوٹر۔",
       facilities: "لائبریری، سائنس و کمپیوٹر لیبز، کھیلوں کا میدان، آرٹ و موسیقی کے کمرے، سمارٹ کلاسز، کیفے اور محفوظ کھیل کا علاقہ۔",
       fallback: "میں اوقات، پروگرامز، داخلہ، اساتذہ، سہولیات، پورٹل — یا وزٹ بکنگ میں مدد کر سکتا ہوں۔ کیا پوچھنا ہے؟",
+      thinking: "ایک لمحہ — کیمپس ڈیسک سے پوچھ رہا ہوں…",
       askName: "زبردست — وزٹ بک کرتے ہیں۔ آپ کا نام کیا ہے؟",
       askEmail: "شکریہ، {name}۔ دفتر کے لیے بہترین ای میل کیا ہے؟",
       askClock: "دن اور وقت سے پہلے — گھڑی کیسے لکھیں؟ جواب دیں AM/PM (۱۲ گھنٹے) یا ۲۴ گھنٹے۔",
@@ -214,6 +217,7 @@
       teachers: "پیار والے استاد جو ہر بچے دا ناں جاندے نے — ریاضی، سائنس، انگریزی، آرٹ، موسیقی، کھیڈاں تے کمپیوٹر۔",
       facilities: "لائبریری، سائنس تے کمپیوٹر لیبز، کھیڈاں دا میدان، آرٹ تے موسیقی دے کمرے، سمارٹ کلاس، کیفے تے محفوظ کھیڈ دا تھاں۔",
       fallback: "میں اواریں، پروگرام، داخلہ، استاد، سہولیات، پورٹل — یا وزٹ بکنگ وچ مدد کر سکدا واں۔ کی پُچھنا اے؟",
+      thinking: "اک پل — کیمپس ڈیسک توں پُچھ رہا واں…",
       askName: "چنگا — وزٹ بک کردے آں۔ تہاڈا ناں کی اے؟",
       askEmail: "شکریہ، {name}۔ دفتر لئی سب توں ودھیا ای میل کیہڑی اے؟",
       askClock: "دن تے وقت توں پہلاں — گھڑی کویں لکھئیے؟ جواب دیو AM/PM (۱۲ گھنٹے) یا ۲۴ گھنٹے۔",
@@ -1239,6 +1243,8 @@
 
   function botSay(text, opts) {
     addBubble("bot", text, opts);
+    chatTurns.push({ role: "bot", text: String(text || "") });
+    if (chatTurns.length > 12) chatTurns = chatTurns.slice(-12);
     if (shouldSpeak()) {
       speak(text);
       window.setTimeout(function () {
@@ -1256,6 +1262,68 @@
         }
       }, 900);
     }
+  }
+
+  var chatTurns = [];
+  var aiBusy = false;
+
+  function showThinking() {
+    var log = document.getElementById("campusBotLog");
+    if (!log) return null;
+    var row = document.createElement("div");
+    row.className = "campus-bot__row campus-bot__row--bot";
+    row.setAttribute("data-thinking", "1");
+    var b = document.createElement("div");
+    b.className = "campus-bot__bubble campus-bot__bubble--bot";
+    b.textContent = t().thinking || "…";
+    row.appendChild(b);
+    log.appendChild(row);
+    log.scrollTop = log.scrollHeight;
+    return row;
+  }
+
+  function removeThinking(row) {
+    if (row && row.parentNode) row.parentNode.removeChild(row);
+  }
+
+  function askCursorAi(text, onDone) {
+    if (aiBusy) {
+      onDone(null);
+      return;
+    }
+    aiBusy = true;
+    var thinking = showThinking();
+    var history = chatTurns.slice(-6).map(function (h) {
+      return { role: h.role, text: h.text };
+    });
+    fetch("/api/campus-bot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: text,
+        lang: activeLang(),
+        history: history,
+      }),
+    })
+      .then(function (res) {
+        return res.json().then(function (data) {
+          return { ok: res.ok, data: data };
+        });
+      })
+      .then(function (pack) {
+        removeThinking(thinking);
+        aiBusy = false;
+        if (pack.ok && pack.data && pack.data.ok && pack.data.reply) {
+          onDone(String(pack.data.reply));
+        } else {
+          onDone(null);
+        }
+      })
+      .catch(function () {
+        removeThinking(thinking);
+        aiBusy = false;
+        onDone(null);
+      });
   }
 
   function beginTurn(fromVoice) {
@@ -1313,6 +1381,8 @@
       paintChrome();
     }
     addBubble("user", text);
+    chatTurns.push({ role: "user", text: String(text || "") });
+    if (chatTurns.length > 12) chatTurns = chatTurns.slice(-12);
 
     if (forced === "__login__") {
       window.location.href = authPaths().login;
@@ -1359,6 +1429,25 @@
         stepBooking(text);
         return;
       }
+    }
+
+    // Free-text → Cursor agent API; chips stay local. FAQ is offline fallback.
+    if (forced == null) {
+      askCursorAi(text, function (aiReply) {
+        if (aiReply) {
+          var offerCallAi = /03066638854|phone|tel\.|call |فون|کال|telefon/i.test(aiReply);
+          botSay(aiReply, offerCallAi ? { offerCall: true } : null);
+          return;
+        }
+        var reply = intentReply(text);
+        if (reply == null) {
+          startBooking();
+          return;
+        }
+        var offerCall = /03066638854|phone|tel\.|call |فون|کال|telefon/i.test(String(reply));
+        botSay(reply, offerCall ? { offerCall: true } : null);
+      });
+      return;
     }
 
     var reply = intentReply(text);
