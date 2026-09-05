@@ -1279,19 +1279,115 @@
     var log = document.getElementById("campusBotLog");
     if (!log) return null;
     var row = document.createElement("div");
-    row.className = "campus-bot__row campus-bot__row--bot";
+    row.className = "campus-bot__row campus-bot__row--bot campus-bot__row--enter";
     row.setAttribute("data-thinking", "1");
     var b = document.createElement("div");
-    b.className = "campus-bot__bubble campus-bot__bubble--bot";
-    b.textContent = t().thinking || "…";
+    b.className = "campus-bot__bubble campus-bot__bubble--bot campus-bot__bubble--thinking";
+    b.innerHTML =
+      '<span class="campus-bot__think-label"></span>' +
+      '<span class="campus-bot__dots" aria-hidden="true"><i></i><i></i><i></i></span>';
+    var label = b.querySelector(".campus-bot__think-label");
+    if (label) label.textContent = t().thinking || "…";
     row.appendChild(b);
     log.appendChild(row);
     log.scrollTop = log.scrollHeight;
     return row;
   }
 
+  function setThinkingPhase(row, phase) {
+    if (!row) return;
+    var label = row.querySelector(".campus-bot__think-label");
+    if (!label) return;
+    if (phase === "writing") {
+      label.textContent =
+        {
+          en: "Writing a reply…",
+          it: "Sto scrivendo…",
+          ur: "جواب لکھ رہا ہوں…",
+          pa: "جواب لکھ رہا واں…",
+        }[activeLang()] || "Writing a reply…";
+      row.setAttribute("data-phase", "writing");
+    } else {
+      label.textContent = t().thinking || "…";
+      row.setAttribute("data-phase", "thinking");
+    }
+  }
+
   function removeThinking(row) {
     if (row && row.parentNode) row.parentNode.removeChild(row);
+  }
+
+  function startLiveBotBubble() {
+    var log = document.getElementById("campusBotLog");
+    if (!log) return null;
+    var row = document.createElement("div");
+    row.className = "campus-bot__row campus-bot__row--bot campus-bot__row--enter";
+    row.setAttribute("data-streaming", "1");
+    var b = document.createElement("div");
+    b.className = "campus-bot__bubble campus-bot__bubble--bot campus-bot__bubble--streaming";
+    b.textContent = "";
+    row.appendChild(b);
+    log.appendChild(row);
+    log.scrollTop = log.scrollHeight;
+    return { row: row, bubble: b, text: "" };
+  }
+
+  function appendLiveBotText(live, chunk) {
+    if (!live || !live.bubble) return;
+    live.text = String(live.text || "") + String(chunk || "");
+    live.bubble.textContent = live.text;
+    var log = document.getElementById("campusBotLog");
+    if (log) log.scrollTop = log.scrollHeight;
+  }
+
+  function finalizeLiveBot(live, finalText, opts) {
+    opts = opts || {};
+    if (!live || !live.row) {
+      botSay(finalText, opts);
+      return;
+    }
+    var text = String(finalText || live.text || "").trim();
+    live.row.removeAttribute("data-streaming");
+    if (live.bubble) {
+      live.bubble.classList.remove("campus-bot__bubble--streaming");
+      live.bubble.innerHTML = linkifyPhones(text);
+    }
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "campus-bot__speak";
+    btn.setAttribute("aria-label", "Speak reply");
+    btn.title = "Speak";
+    btn.textContent = "🔊";
+    btn.addEventListener("click", function (ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      speakNow(text);
+    });
+    live.row.appendChild(btn);
+    if (opts.offerCall) appendCallAction(live.row);
+    chatTurns.push({ role: "bot", text: text });
+    if (chatTurns.length > 12) chatTurns = chatTurns.slice(-12);
+    if (shouldSpeak()) speak(text);
+    var log = document.getElementById("campusBotLog");
+    if (log) log.scrollTop = log.scrollHeight;
+  }
+
+  function parseSseChunk(buffer, onEvent) {
+    var parts = buffer.split("\n\n");
+    var rest = parts.pop() || "";
+    for (var i = 0; i < parts.length; i++) {
+      var block = parts[i];
+      var lines = block.split("\n");
+      var dataLines = [];
+      for (var j = 0; j < lines.length; j++) {
+        if (lines[j].indexOf("data:") === 0) dataLines.push(lines[j].slice(5).trim());
+      }
+      if (!dataLines.length) continue;
+      try {
+        onEvent(JSON.parse(dataLines.join("\n")));
+      } catch (e) {}
+    }
+    return rest;
   }
 
   function askCursorAi(text, onDone) {
@@ -1301,47 +1397,105 @@
     }
     aiBusy = true;
     var thinking = showThinking();
-    var history = chatTurns.slice(-6).map(function (h) {
+    var live = null;
+    var history = chatTurns.slice(-3).map(function (h) {
       return { role: h.role, text: h.text };
     });
     var session = currentSession();
+    var finished = false;
+
+    function finish(reply, errCode) {
+      if (finished) return;
+      finished = true;
+      aiBusy = false;
+      if (thinking) removeThinking(thinking);
+      if (reply) {
+        if (live) {
+          finalizeLiveBot(live, reply, {
+            offerCall: /03066638854|phone|tel\.|call |فون|کال|telefon/i.test(reply),
+          });
+          onDone(reply, null, { alreadyRendered: true });
+        } else {
+          onDone(reply, null, null);
+        }
+        return;
+      }
+      if (live && live.row && live.row.parentNode) live.row.parentNode.removeChild(live.row);
+      onDone(null, errCode || "failed", null);
+    }
+
     fetch("/api/campus-bot", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
       body: JSON.stringify({
         message: text,
         lang: activeLang(),
         loggedIn: Boolean(session),
         visitorName: session && session.name ? String(session.name).slice(0, 80) : "",
         history: history,
+        stream: true,
       }),
     })
       .then(function (res) {
+        var ctype = (res.headers.get("content-type") || "").toLowerCase();
+        if (ctype.indexOf("text/event-stream") !== -1 && res.body && res.body.getReader) {
+          var reader = res.body.getReader();
+          var decoder = new TextDecoder();
+          var buf = "";
+          function pump() {
+            return reader.read().then(function (result) {
+              if (result.done) {
+                if (!finished) finish(null, "failed");
+                return;
+              }
+              buf += decoder.decode(result.value, { stream: true });
+              buf = parseSseChunk(buf, function (ev) {
+                if (!ev || !ev.type) return;
+                if (ev.type === "status") {
+                  setThinkingPhase(thinking, ev.phase);
+                  return;
+                }
+                if (ev.type === "delta") {
+                  if (thinking) {
+                    removeThinking(thinking);
+                    thinking = null;
+                  }
+                  if (!live) live = startLiveBotBubble();
+                  appendLiveBotText(live, ev.text || "");
+                  return;
+                }
+                if (ev.type === "done" && ev.reply) {
+                  finish(String(ev.reply), null);
+                  return;
+                }
+                if (ev.type === "error") {
+                  finish(null, ev.error || "failed");
+                }
+              });
+              return pump();
+            });
+          }
+          return pump();
+        }
         return res.json().then(
           function (data) {
-            return { ok: res.ok, status: res.status, data: data };
+            if (res.ok && data && data.ok && data.reply) {
+              finish(String(data.reply), null);
+              return;
+            }
+            finish(
+              null,
+              (data && data.error) ||
+                (res.status === 404 ? "http_404" : res.status === 503 ? "http_503" : "failed")
+            );
           },
           function () {
-            return { ok: false, status: res.status, data: null };
+            finish(null, res.status === 404 ? "http_404" : "failed");
           }
         );
       })
-      .then(function (pack) {
-        removeThinking(thinking);
-        aiBusy = false;
-        if (pack.ok && pack.data && pack.data.ok && pack.data.reply) {
-          onDone(String(pack.data.reply), null);
-          return;
-        }
-        var code =
-          (pack.data && pack.data.error) ||
-          (pack.status === 404 ? "http_404" : pack.status === 503 ? "http_503" : "failed");
-        onDone(null, code);
-      })
       .catch(function () {
-        removeThinking(thinking);
-        aiBusy = false;
-        onDone(null, "network");
+        finish(null, "network");
       });
   }
 
@@ -1452,7 +1606,8 @@
 
     // Free-text → Cursor agent API; chips stay local. FAQ is offline fallback.
     if (forced == null) {
-      askCursorAi(text, function (aiReply, errCode) {
+      askCursorAi(text, function (aiReply, errCode, meta) {
+        if (meta && meta.alreadyRendered) return;
         if (aiReply) {
           var offerCallAi = /03066638854|phone|tel\.|call |فون|کال|telefon/i.test(aiReply);
           botSay(aiReply, offerCallAi ? { offerCall: true } : null);

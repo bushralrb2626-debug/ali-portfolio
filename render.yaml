@@ -25,4 +25,4 @@ services:
       - key: ADMIN_PASSWORD
         value: "12345"
       - key: CURSOR_BOT_MODEL
-        value: "composer-2.5"
+        value: "auto"

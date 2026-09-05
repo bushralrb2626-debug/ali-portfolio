@@ -70,6 +70,7 @@ type Body = {
   lang?: string;
   loggedIn?: boolean;
   visitorName?: string;
+  stream?: boolean;
   history?: Array<{ role?: string; text?: string }>;
 };
 
@@ -78,6 +79,41 @@ function cleanReply(text: string): string {
     .replace(/\r\n/g, "\n")
     .trim()
     .slice(0, 1800);
+}
+
+function buildPrompt(body: Body, message: string): string {
+  const lang = String(body.lang || "en").slice(0, 8);
+  const loggedIn = Boolean(body.loggedIn);
+  const visitorName = String(body.visitorName || "")
+    .trim()
+    .slice(0, 80);
+  const history = Array.isArray(body.history) ? body.history.slice(-3) : [];
+  const historyBlock = history
+    .map((h) => {
+      const role = h.role === "bot" || h.role === "assistant" ? "Desk" : "Visitor";
+      return `${role}: ${String(h.text || "").slice(0, 160)}`;
+    })
+    .filter(Boolean)
+    .join("\n");
+
+  const authLine = loggedIn
+    ? `Auth: SIGNED IN${visitorName ? ` (${visitorName})` : ""}. Point to “Book a visit” chip only — never confirm a booking.`
+    : "Auth: NOT signed in. Refuse booking. Require Login/Register, then “Book a visit”.";
+
+  return [
+    SCHOOL_PROMPT,
+    authLine,
+    historyBlock ? `Recent:\n${historyBlock}` : "",
+    `Lang: ${lang}`,
+    `Visitor: ${message}`,
+    "Reply now in 2–5 short sentences.",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function sseEncode(payload: unknown): Uint8Array {
+  return new TextEncoder().encode(`data: ${JSON.stringify(payload)}\n\n`);
 }
 
 async function proxyJson(
@@ -166,41 +202,103 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "empty" }, { status: 400 });
   }
 
-  const lang = String(body.lang || "en").slice(0, 8);
-  const loggedIn = Boolean(body.loggedIn);
-  const visitorName = String(body.visitorName || "")
-    .trim()
-    .slice(0, 80);
-  const history = Array.isArray(body.history) ? body.history.slice(-6) : [];
-  const historyBlock = history
-    .map((h) => {
-      const role = h.role === "bot" || h.role === "assistant" ? "Desk" : "Visitor";
-      return `${role}: ${String(h.text || "").slice(0, 240)}`;
-    })
-    .filter(Boolean)
-    .join("\n");
-
-  const authLine = loggedIn
-    ? `Visitor auth: SIGNED IN${visitorName ? ` as ${visitorName}` : ""}. They may use “Book a visit” chip; you still must not confirm a booking yourself.`
-    : "Visitor auth: NOT signed in. Refuse any booking/scheduling. Require Login or Register first, then “Book a visit”.";
-
-  // systemPrompt is gated on many API keys (throws --system-prompt); put role in the user prompt.
-  const prompt = [
-    SCHOOL_PROMPT,
-    authLine,
-    historyBlock ? `Recent chat:\n${historyBlock}` : "",
-    `Visitor language hint: ${lang}`,
-    `Visitor message: ${message}`,
-  ]
-    .filter(Boolean)
-    .join("\n\n");
-
+  const prompt = buildPrompt(body, message);
   const cwd = path.join(process.cwd(), "public", "demos", "brightsteps");
+  const modelId = envVar("CURSOR_BOT_MODEL") || "auto";
+  const wantStream = body.stream !== false;
+
+  if (wantStream) {
+    const stream = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        let agent: Awaited<ReturnType<typeof Agent.create>> | null = null;
+        try {
+          controller.enqueue(sseEncode({ type: "status", phase: "thinking" }));
+          agent = await Agent.create({
+            apiKey,
+            model: { id: modelId },
+            tools: [],
+            name: "campus-desk",
+            local: { cwd },
+          });
+          controller.enqueue(sseEncode({ type: "status", phase: "writing" }));
+          const run = await agent.send(prompt);
+          let full = "";
+          for await (const event of run.stream()) {
+            if (event.type !== "assistant") continue;
+            const content = event.message?.content;
+            if (!Array.isArray(content)) continue;
+            for (const block of content) {
+              if (block?.type === "text" && block.text) {
+                full += block.text;
+                controller.enqueue(
+                  sseEncode({ type: "delta", text: String(block.text) })
+                );
+              }
+            }
+          }
+          const waited = await run.wait();
+          if (waited.status === "error") {
+            controller.enqueue(
+              sseEncode({
+                type: "error",
+                error: "run_failed",
+                detail: waited.error?.message || waited.id,
+              })
+            );
+            controller.close();
+            return;
+          }
+          const reply = cleanReply(full || waited.result || "");
+          if (!reply) {
+            controller.enqueue(sseEncode({ type: "error", error: "empty_reply" }));
+          } else {
+            controller.enqueue(
+              sseEncode({ type: "done", ok: true, reply, runId: waited.id })
+            );
+          }
+          controller.close();
+        } catch (err) {
+          const detail =
+            err instanceof CursorAgentError
+              ? err.message
+              : err instanceof Error
+                ? err.message
+                : "unknown";
+          controller.enqueue(
+            sseEncode({
+              type: "error",
+              error:
+                err instanceof CursorAgentError ? "startup_failed" : "unexpected",
+              detail,
+            })
+          );
+          controller.close();
+        } finally {
+          try {
+            if (agent && typeof agent[Symbol.asyncDispose] === "function") {
+              await agent[Symbol.asyncDispose]();
+            }
+          } catch {
+            /* ignore */
+          }
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+        Connection: "keep-alive",
+        "X-Accel-Buffering": "no",
+      },
+    });
+  }
 
   try {
     const result = await Agent.prompt(prompt, {
       apiKey,
-      model: { id: envVar("CURSOR_BOT_MODEL") || "composer-2.5" },
+      model: { id: modelId },
       tools: [],
       local: { cwd },
     });
