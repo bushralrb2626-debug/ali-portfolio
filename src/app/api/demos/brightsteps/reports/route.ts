@@ -60,31 +60,49 @@ function cursorApiKey(): string {
   return "";
 }
 
+const MARKET_TYPES: ReportType[] = [
+  "market_competitor",
+  "product_performance",
+  "pricing_optimization",
+  "customer_satisfaction",
+  "sales_performance",
+  "executive_dashboard",
+];
+
+function isMarketType(type: ReportType): boolean {
+  return MARKET_TYPES.includes(type);
+}
+
 function brief(type: ReportType, topic?: string): string {
   const topicLine = topic
     ? `Niche/topic: ${topic}`
-    : "Context: BrightSteps / Scuola Materna school campus demo admin.";
+    : "Context: BrightSteps / Scuola Materna school campus demo admin (Pakistan / GCC-style private school portal).";
   const map: Record<ReportType, string> = {
     weekly:
       "WEEKLY school usage: Summary, Staff/students/attendance metrics, Meetings & visits, Action Items, Alerts.",
     monthly:
       "MONTHLY school ops: Summary, Enrollment & attendance trends, Fees snapshot, Results on file, Recommendations, Next Steps.",
     weekly_plus:
-      "WEEKLY+ deeper: TL;DR, Funnel (visits→enrollment interest), Risks [URGENT], Priorities, Next Steps. No invented fees.",
+      "WEEKLY+ deeper: TL;DR, Funnel (visits→enrollment interest), Risks [URGENT], Priorities, Next Steps. No invented fees for THIS school.",
     monthly_plus:
-      "MONTHLY+ deeper: TL;DR, Ops health, Positioning vs typical school portals, Action Items, ROI note = Data not found if unknown.",
-    market_competitor:
-      "Market + Competitor for school portal demos: TL;DR, Differentiation, Competitor angles (Data not found for unknown prices), Actions.",
-    product_performance:
-      "Product Performance of the campus portal (attendance, meetings, desk bot): health, gaps, CTA fixes, Actions.",
-    pricing_optimization:
-      "Pricing/fee framing for the school demo (no invented tuition tables): packaging experiments, Actions.",
-    customer_satisfaction:
-      "Parent/visitor satisfaction from visits, inbox feedback, attendance friction: themes, trust fixes, Actions.",
-    sales_performance:
-      "Admissions funnel: visit requests → meetings → interest: conversion leaks, Actions.",
-    executive_dashboard:
-      "Executive one-pager: Snapshot metrics, Top risks, Top opportunities, This week priorities.",
+      "MONTHLY+ deeper: TL;DR, Ops health, Positioning vs typical school portals, Action Items. ROI for THIS school = Data not found if unknown.",
+    market_competitor: `Market + Competitor intel (analyst depth, NOT a pack dump).
+Sections: TL;DR · Market landscape (EdTech / school SIS / parent portals) · Named competitor angles (e.g. PowerSchool, Infinite Campus, ClassDojo, Google Classroom, local private-school portals — pick ones relevant to niche) · How BrightSteps/Slorsh campus desk differentiates · Pricing & packaging ranges as industry ESTIMATES (label clearly) · Actions for this admin.
+Do NOT fill every price cell with "Data not found". Use your knowledge for market norms; reserve "Data not found" only for THIS school's missing pack fields (tuition, vendor fees not in JSON).`,
+    product_performance: `Product Performance of the campus portal — analyst write-up.
+Sections: TL;DR · Feature health vs category norms (attendance windows, parent visits, desk bot, results) · Engagement signals from pack · Gaps vs competitors · CTA / UX fixes · Actions.
+Compare against typical school-portal feature sets; do not refuse analysis just because pack is small.`,
+    pricing_optimization: `Pricing / fee packaging strategy for a private-school portal SaaS + school demo.
+Sections: TL;DR · How category vendors usually price (per-student / campus / seat — as ESTIMATES) · Experiments this admin can run · What NOT to invent from pack · Actions.
+Industry price bands are allowed when labeled as estimates.`,
+    customer_satisfaction: `Parent/visitor satisfaction intel.
+Sections: TL;DR · Themes from pack (visits, feedback, attendance friction) · Typical parent pain points in school portals · Trust fixes · Actions.
+Blend pack signals with category expertise.`,
+    sales_performance: `Admissions / visit funnel performance.
+Sections: TL;DR · Pack funnel (visits → meetings → interest) · Category conversion benchmarks as ESTIMATES · Leak fixes · Actions.`,
+    executive_dashboard: `Executive one-pager for school admin.
+Sections: Snapshot (exact pack metrics) · Top risks · Top opportunities (market + ops) · This week priorities · Open questions.
+Opportunities may include market moves — not only empty pack fields.`,
   };
   return `${map[type]}\n${topicLine}`;
 }
@@ -153,18 +171,29 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const prompt = `You are an internal analyst for BrightSteps school admin (Ali’s portfolio campus demo). Admin seat like Slorsh.
+  const accuracy = isMarketType(type)
+    ? `ACCURACY (market intel):
+- Campus JSON pack = ground truth for THIS school's live tallies (teachers, students, attendance, visits, etc.). Cite those integers exactly.
+- For market landscape, competitor names, category feature norms, and typical industry price bands: use your trained knowledge. Label price bands as estimates (e.g. "~$X–$Y / student / year (industry estimate)").
+- Do NOT write "Data not found" for every competitor cell. That phrase is ONLY for fields missing from THIS school's pack (e.g. this campus's tuition, payroll, vendor invoice amounts).
+- Never invent THIS school's headcount, fees, or attendance beyond the pack.
+- Write like a real market analyst — insight-first, not a re-listing of the JSON.`
+    : `ACCURACY (usage report):
+- Cite EXACT numbers from the JSON pack only.
+- Never invent this school's tuition, salaries, headcount, or fees — write Data not found when the pack lacks them.
+- Do not invent competitor list prices.`;
+
+  const prompt = `You are an internal market & ops analyst for BrightSteps school admin (Ali’s portfolio campus demo). Admin seat like Slorsh. Produce a fresh narrative every run — not a fixed template.
 
 ${brief(type, topic)}
 
-ACCURACY:
-- Cite EXACT numbers from the JSON pack only.
-- Never invent tuition, salaries, headcount, or competitor prices — write Data not found.
+${accuracy}
+
 - Do not mention which AI or tooling generated this report. Do not mention Cursor, vendor models, or API keys.
 - Brand as Slorsh / BrightSteps insight only if needed.
-- Markdown only.
+- Markdown only. Prefer prose + a few sharp tables over endless "Data not found" rows.
 
-JSON pack:
+JSON pack (this school's live demo state):
 ${JSON.stringify({ as_of: asOf, type, topic, pack }, null, 2).slice(0, 14000)}`;
 
   try {

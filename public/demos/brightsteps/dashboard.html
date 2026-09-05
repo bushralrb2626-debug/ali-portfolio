@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/demos/brightsteps/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/demos/brightsteps/css/site.css?v=mobile6" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/site.css?v=reports21" />
     <link rel="stylesheet" href="/demos/brightsteps/css/bridge.css?v=7eZ7z0-isDSPkIrEmY5kX2w3anNvmJBqC8XONQyJlhc" />
     <link rel="stylesheet" href="/demos/brightsteps/css/vibrant.css?v=_MlOwKhNsDIIyZrj__65eFxm0nqMbGR8UMI4j8NWuoA" />
     <link rel="stylesheet" href="/demos/brightsteps/css/campus-bot.css?v=25" />
@@ -16,6 +16,87 @@
       .dash-content .reveal,
       .dash-content .stagger > *,
       .dash-content > * { opacity: 1 !important; transform: none !important; visibility: visible !important; }
+      .dash-content .sr-hero,
+      .dash-content .sr-card,
+      .dash-content .sr-out,
+      .dash-content .sr-spin,
+      .dash-content .sr-skel__bar {
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+      .dash-content .sr-hero { animation: srHeroIn 0.55s var(--ease) both; transform: none; }
+      .dash-content .sr-card { animation: srCardIn 0.5s var(--ease) both; }
+      .dash-content .sr-card:hover { transform: translateY(-3px) !important; }
+      .dash-content .sr-out { animation: srOutIn 0.45s var(--ease) both; transform: none; }
+      .dash-content .sr-spin { animation: srSpin 0.7s linear infinite !important; transform: none !important; }
+      .dash-content .sr-skel__bar { animation: srShimmer 1.15s ease-in-out infinite !important; transform: none !important; }
+      /* Critical report readable styles (survive CSS cache) */
+      .sr-md {
+        font-family: "Nunito", "Segoe UI", sans-serif !important;
+        font-size: 1.08rem !important;
+        line-height: 1.75 !important;
+        white-space: normal !important;
+        background: linear-gradient(180deg, #eef7fc, #fff9f0 40%, #eefaf4) !important;
+        padding: 1.45rem 1.4rem !important;
+        color: #1b1f33 !important;
+      }
+      .sr-md h1 { font-family: "Fredoka", sans-serif; font-size: 1.65rem; color: #0b4fbf; margin: 0.4rem 0 0.7rem; }
+      .sr-md h2 {
+        font-family: "Fredoka", sans-serif;
+        font-size: 1.28rem;
+        color: #fff !important;
+        background: linear-gradient(100deg, #1565d8, #1fa8e0);
+        padding: 0.55rem 0.85rem;
+        border-radius: 0.7rem;
+        margin: 1.25rem 0 0.7rem;
+      }
+      .sr-md h3 {
+        font-size: 1.12rem;
+        color: #0ca678;
+        border-left: 4px solid #12b886;
+        background: #e8faf3;
+        padding: 0.35rem 0.55rem;
+        margin: 1rem 0 0.5rem;
+      }
+      .sr-md p { font-size: 1.05rem; margin: 0.7rem 0; }
+      .sr-md strong { color: #0b4fbf; font-weight: 800; }
+      .sr-md table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 0.9rem 0 1.1rem;
+        font-size: 0.98rem;
+        border-radius: 0.7rem;
+        overflow: hidden;
+        border: 1px solid #c5d8f0;
+        background: #fff;
+      }
+      .sr-md thead th {
+        background: linear-gradient(180deg, #1565d8, #0b4fbf);
+        color: #fff !important;
+        text-align: left;
+        padding: 0.7rem 0.85rem;
+        font-weight: 800;
+      }
+      .sr-md td {
+        padding: 0.65rem 0.85rem;
+        border-bottom: 1px solid #eadfce;
+        vertical-align: top;
+      }
+      .sr-md tbody tr:nth-child(even) td { background: #fff6ea; }
+      .sr-md ul, .sr-md ol { padding-left: 1.35rem; margin: 0.55rem 0 0.9rem; }
+      .sr-md li { margin: 0.4rem 0; }
+      .sr-out { border: 1px solid #e2d8c8; border-radius: 1.1rem; overflow: hidden; background: #fff; }
+      .sr-out__head {
+        display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem;
+        padding: 1rem 1.15rem;
+        background: linear-gradient(100deg, #e8f1fc, #e9f8f1);
+        border-bottom: 1px solid #e2d8c8;
+      }
+      .sr-out__head h3 { margin: 0; font-family: "Fredoka", sans-serif; font-size: 1.2rem; }
+      .sr-pill { display: inline-flex; padding: 0.28rem 0.65rem; border-radius: 999px; font-size: 0.72rem; font-weight: 800; }
+      .sr-pill--live { background: #d8f5e9; color: #0a7a56; border: 1px solid #9fdcc0; }
+      .sr-pill--offline { background: #ffe8d9; color: #b54708; border: 1px solid #f5c2a0; }
       .dash-money { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
       .dash-money input { width: 7.5rem; min-width: 0; padding: 0.35rem 0.5rem; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
     </style>
@@ -49,7 +130,7 @@
     <script src="/demos/brightsteps/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/demos/brightsteps/js/site.js?v=luiJ4SEN_KdAVDB3Pna67snIoueCu41p_1cu6Rh0fuY"></script>
     <script src="/demos/brightsteps/js/demo-auth.js?v=10"></script>
-    <script src="/demos/brightsteps/js/demo-dashboard.js?v=16"></script>
+    <script src="/demos/brightsteps/js/demo-dashboard.js?v=21"></script>
     <script src="/demos/brightsteps/js/campus-bot.js?v=25"></script>
 </body>
 </html>

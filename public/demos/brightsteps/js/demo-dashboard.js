@@ -602,19 +602,184 @@
   }
 
   var SLORSH_REPORT_USAGE = [
-    { type: "weekly", label: "Weekly Report", blurb: "7-day school ops narrative." },
-    { type: "monthly", label: "Monthly Report", blurb: "30-day enrollment, attendance, fees." },
-    { type: "weekly_plus", label: "Weekly Report+", blurb: "Deeper weekly + risks." },
-    { type: "monthly_plus", label: "Monthly Report+", blurb: "Deeper monthly + next steps." },
+    { type: "weekly", label: "Weekly Report", blurb: "7-day school ops narrative.", tone: "usage", eyebrow: "Usage" },
+    { type: "monthly", label: "Monthly Report", blurb: "30-day enrollment, attendance, fees.", tone: "usage", eyebrow: "Usage" },
+    { type: "weekly_plus", label: "Weekly Report+", blurb: "Deeper weekly + risks.", tone: "usage-plus", eyebrow: "Usage +" },
+    { type: "monthly_plus", label: "Monthly Report+", blurb: "Deeper monthly + next steps.", tone: "usage-plus", eyebrow: "Usage +" },
   ];
   var SLORSH_REPORT_MARKET = [
-    { type: "market_competitor", label: "Market + Competitor", blurb: "Portal positioning." },
-    { type: "product_performance", label: "Product Performance", blurb: "Attendance, meetings, desk bot." },
-    { type: "pricing_optimization", label: "Pricing Optimization", blurb: "Fee framing experiments." },
-    { type: "customer_satisfaction", label: "Customer Satisfaction", blurb: "Visits & inbox themes." },
-    { type: "sales_performance", label: "Sales Performance", blurb: "Visits → admissions interest." },
-    { type: "executive_dashboard", label: "Executive Dashboard", blurb: "One-page admin snapshot." },
+    { type: "market_competitor", label: "Market + Competitor", blurb: "Portal positioning vs category.", tone: "market", eyebrow: "Market" },
+    { type: "product_performance", label: "Product Performance", blurb: "Attendance, meetings, desk bot.", tone: "market", eyebrow: "Market" },
+    { type: "pricing_optimization", label: "Pricing Optimization", blurb: "Fee framing experiments.", tone: "market", eyebrow: "Market" },
+    { type: "customer_satisfaction", label: "Customer Satisfaction", blurb: "Visits & inbox themes.", tone: "market", eyebrow: "Market" },
+    { type: "sales_performance", label: "Sales Performance", blurb: "Visits → admissions interest.", tone: "market", eyebrow: "Market" },
+    { type: "executive_dashboard", label: "Executive Dashboard", blurb: "One-page admin snapshot.", tone: "exec", eyebrow: "Exec" },
   ];
+
+  function inlineMd(text) {
+    return escapeHtml(String(text || ""))
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")
+      .replace(/`([^`]+)`/g, "<code>$1</code>");
+  }
+
+  function splitTableRow(line) {
+    var raw = String(line || "").trim();
+    if (raw.charAt(0) === "|") raw = raw.slice(1);
+    if (raw.charAt(raw.length - 1) === "|") raw = raw.slice(0, -1);
+    return raw.split("|").map(function (c) {
+      return c.trim();
+    });
+  }
+
+  function isTableSep(line) {
+    return /^\|?\s*:?-{3,}.*\|/.test(String(line || "").trim());
+  }
+
+  function renderReportMarkdown(md) {
+    var lines = String(md || "").replace(/\r\n/g, "\n").split("\n");
+    var html = [];
+    var i = 0;
+    var inUl = false;
+    var inOl = false;
+
+    function closeLists() {
+      if (inUl) {
+        html.push("</ul>");
+        inUl = false;
+      }
+      if (inOl) {
+        html.push("</ol>");
+        inOl = false;
+      }
+    }
+
+    while (i < lines.length) {
+      var line = lines[i];
+      var trimmed = line.trim();
+
+      if (!trimmed) {
+        closeLists();
+        i += 1;
+        continue;
+      }
+
+      if (trimmed.indexOf("|") !== -1 && i + 1 < lines.length && isTableSep(lines[i + 1])) {
+        closeLists();
+        var heads = splitTableRow(trimmed);
+        i += 2;
+        html.push("<table><thead><tr>");
+        heads.forEach(function (h) {
+          html.push("<th>" + inlineMd(h) + "</th>");
+        });
+        html.push("</tr></thead><tbody>");
+        while (i < lines.length && lines[i].indexOf("|") !== -1 && lines[i].trim()) {
+          if (isTableSep(lines[i])) {
+            i += 1;
+            continue;
+          }
+          var cells = splitTableRow(lines[i]);
+          html.push("<tr>");
+          cells.forEach(function (c) {
+            html.push("<td>" + inlineMd(c) + "</td>");
+          });
+          html.push("</tr>");
+          i += 1;
+        }
+        html.push("</tbody></table>");
+        continue;
+      }
+
+      if (/^---+$/.test(trimmed) || /^\*\*\*+$/.test(trimmed)) {
+        closeLists();
+        html.push("<hr />");
+        i += 1;
+        continue;
+      }
+
+      var heading = trimmed.match(/^(#{1,3})\s+(.+)$/);
+      if (heading) {
+        closeLists();
+        var level = heading[1].length;
+        html.push("<h" + level + ">" + inlineMd(heading[2]) + "</h" + level + ">");
+        i += 1;
+        continue;
+      }
+
+      var ul = trimmed.match(/^[-*]\s+(.+)$/);
+      if (ul) {
+        if (inOl) {
+          html.push("</ol>");
+          inOl = false;
+        }
+        if (!inUl) {
+          html.push("<ul>");
+          inUl = true;
+        }
+        html.push("<li>" + inlineMd(ul[1]) + "</li>");
+        i += 1;
+        continue;
+      }
+
+      var ol = trimmed.match(/^\d+\.\s+(.+)$/);
+      if (ol) {
+        if (inUl) {
+          html.push("</ul>");
+          inUl = false;
+        }
+        if (!inOl) {
+          html.push("<ol>");
+          inOl = true;
+        }
+        html.push("<li>" + inlineMd(ol[1]) + "</li>");
+        i += 1;
+        continue;
+      }
+
+      closeLists();
+      html.push("<p>" + inlineMd(trimmed) + "</p>");
+      i += 1;
+    }
+    closeLists();
+    return html.join("");
+  }
+
+  function schoolReportLoadingHtml() {
+    return (
+      '<div class="sr-out" aria-busy="true">' +
+      '<div class="sr-loading">' +
+      '<div class="sr-loading__row"><span class="sr-spin" aria-hidden="true"></span>' +
+      "<div><strong>Generating report…</strong>" +
+      '<p class="text-muted small" style="margin:0.2rem 0 0">Analyzing campus pack and writing the narrative.</p></div></div>' +
+      '<div class="sr-skel" aria-hidden="true">' +
+      '<div class="sr-skel__bar"></div><div class="sr-skel__bar"></div>' +
+      '<div class="sr-skel__bar"></div><div class="sr-skel__bar"></div>' +
+      "</div></div></div>"
+    );
+  }
+
+  function schoolReportResultHtml(data, rType) {
+    var live = data.via !== "fallback";
+    var pill = live
+      ? '<span class="sr-pill sr-pill--live">Live analysis</span>'
+      : '<span class="sr-pill sr-pill--offline">Pack snapshot</span>';
+    return (
+      '<div class="sr-out">' +
+      '<div class="sr-out__head">' +
+      "<div><h3>" +
+      escapeHtml(data.title || rType) +
+      "</h3>" +
+      (data.summary
+        ? '<p class="sr-out__meta">' + escapeHtml(data.summary) + "</p>"
+        : "") +
+      "</div>" +
+      pill +
+      "</div>" +
+      '<div class="sr-md">' +
+      renderReportMarkdown(data.markdown || "") +
+      "</div></div>"
+    );
+  }
 
   function schoolReportPack(session) {
     var attendMap = loadAttendance();
@@ -654,17 +819,21 @@
   function schoolReportsPanel(session) {
     function cards(list) {
       return (
-        '<div class="grid-2" style="gap:0.75rem">' +
+        '<div class="sr-grid">' +
         list
           .map(function (item) {
             return (
-              '<button type="button" class="btn-bsa btn-bsa-soft" style="display:block;width:100%;text-align:left;padding:1rem" data-school-report="' +
+              '<button type="button" class="sr-card" data-tone="' +
+              escapeHtml(item.tone || "usage") +
+              '" data-school-report="' +
               escapeHtml(item.type) +
-              '"><strong>' +
+              '"><span class="sr-card__eyebrow">' +
+              escapeHtml(item.eyebrow || "Report") +
+              '</span><span class="sr-card__title">' +
               escapeHtml(item.label) +
-              "</strong><br><span class='text-muted small'>" +
+              '</span><span class="sr-card__blurb">' +
               escapeHtml(item.blurb) +
-              "</span></button>"
+              '</span><span class="sr-card__cta">Generate <span aria-hidden="true">→</span></span></button>'
             );
           })
           .join("") +
@@ -672,16 +841,17 @@
       );
     }
     return (
-      '<div class="welcome-banner"><h2>Reports</h2><p>Admin reports · 4 usage + 6 market intel types from live school data.</p></div>' +
-      '<p class="text-muted small" style="margin-bottom:1rem">Signed in as <strong>' +
+      '<div class="sr-hero"><h2>Reports</h2><p>Professional school intel · 4 usage + 6 market types from live campus data.</p>' +
+      '<div class="sr-seat">Signed in as <strong>' +
       escapeHtml(session.name || "Ali") +
-      '</strong> · <span class="badge-soft badge-mint">Admin</span></p>' +
-      '<label class="text-muted small">Niche / topic (optional)<br><input type="text" id="schoolReportTopic" class="form-bsa" maxlength="200" placeholder="e.g. primary school admissions" style="max-width:28rem;width:100%;margin-top:0.35rem" /></label>' +
+      '</strong> · <span class="badge-soft badge-mint">Admin</span></div></div>' +
+      '<div class="sr-topic"><label for="schoolReportTopic">Niche / topic (optional)</label>' +
+      '<input type="text" id="schoolReportTopic" class="form-bsa" maxlength="200" placeholder="e.g. primary school admissions" /></div>' +
       panel("Usage reports", cards(SLORSH_REPORT_USAGE)) +
       panel("Market intel", cards(SLORSH_REPORT_MARKET)) +
       panel(
         "Latest narrative",
-        '<div id="schoolReportOut"><p class="text-muted">Generate a report to see it here.</p></div>'
+        '<div id="schoolReportOut"><div class="sr-out"><p class="sr-empty">Choose a report type to generate a live narrative.</p></div></div>'
       )
     );
   }
@@ -2147,7 +2317,7 @@
         var topic = topicEl ? String(topicEl.value || "").trim() : "";
         var out = document.getElementById("schoolReportOut");
         if (out) {
-          out.innerHTML = "<p class='text-muted'>Generating report…</p>";
+          out.innerHTML = schoolReportLoadingHtml();
         }
         schoolReportBtn.disabled = true;
         fetch("/api/demos/brightsteps/reports", {
@@ -2167,22 +2337,18 @@
           .then(function (result) {
             schoolReportBtn.disabled = false;
             if (!result.ok && result.data && result.data.error) {
-              if (out) out.innerHTML = "<p class='text-muted'>" + escapeHtml(result.data.error) + "</p>";
+              if (out) {
+                out.innerHTML =
+                  '<div class="sr-out"><p class="sr-empty">' +
+                  escapeHtml(result.data.error) +
+                  "</p></div>";
+              }
               if (window.showToast) window.showToast(result.data.error, "error");
               return;
             }
             var data = result.data || {};
             if (out) {
-              out.innerHTML =
-                "<p><strong>" +
-                escapeHtml(data.title || rType) +
-                "</strong></p>" +
-                "<p class='text-muted small'>" +
-                escapeHtml(data.summary || "") +
-                "</p>" +
-                "<pre style='white-space:pre-wrap;max-height:28rem;overflow:auto;font-size:0.85rem;margin-top:0.75rem'>" +
-                escapeHtml(data.markdown || "") +
-                "</pre>";
+              out.innerHTML = schoolReportResultHtml(data, rType);
             }
             if (window.showToast) {
               window.showToast("Report ready.", "success");
@@ -2192,9 +2358,9 @@
             schoolReportBtn.disabled = false;
             if (out) {
               out.innerHTML =
-                "<p class='text-muted'>Could not generate report. " +
+                '<div class="sr-out"><p class="sr-empty">Could not generate report. ' +
                 escapeHtml(err && err.message ? err.message : "") +
-                "</p>";
+                "</p></div>";
             }
             if (window.showToast) window.showToast("Report request failed.", "error");
           });
