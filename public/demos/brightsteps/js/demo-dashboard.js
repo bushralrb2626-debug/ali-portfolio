@@ -602,7 +602,7 @@
   }
 
   var SLORSH_REPORT_USAGE = [
-    { type: "weekly", label: "Weekly Report", blurb: "7-day school ops narrative (Cursor)." },
+    { type: "weekly", label: "Weekly Report", blurb: "7-day school ops narrative." },
     { type: "monthly", label: "Monthly Report", blurb: "30-day enrollment, attendance, fees." },
     { type: "weekly_plus", label: "Weekly Report+", blurb: "Deeper weekly + risks." },
     { type: "monthly_plus", label: "Monthly Report+", blurb: "Deeper monthly + next steps." },
@@ -672,8 +672,8 @@
       );
     }
     return (
-      '<div class="welcome-banner"><h2>Slorsh reports</h2><p>Admin seat · 4 usage + 6 market intel types. Narratives via <strong>Cursor API</strong> from live school demo data.</p></div>' +
-      '<p class="text-muted small" style="margin-bottom:1rem">You are <strong>' +
+      '<div class="welcome-banner"><h2>Reports</h2><p>Admin reports · 4 usage + 6 market intel types from live school data.</p></div>' +
+      '<p class="text-muted small" style="margin-bottom:1rem">Signed in as <strong>' +
       escapeHtml(session.name || "Ali") +
       '</strong> · <span class="badge-soft badge-mint">Admin</span></p>' +
       '<label class="text-muted small">Niche / topic (optional)<br><input type="text" id="schoolReportTopic" class="form-bsa" maxlength="200" placeholder="e.g. primary school admissions" style="max-width:28rem;width:100%;margin-top:0.35rem" /></label>' +
@@ -681,7 +681,7 @@
       panel("Market intel", cards(SLORSH_REPORT_MARKET)) +
       panel(
         "Latest narrative",
-        '<div id="schoolReportOut"><p class="text-muted">Generate a report to see Cursor output here.</p></div>'
+        '<div id="schoolReportOut"><p class="text-muted">Generate a report to see it here.</p></div>'
       )
     );
   }
@@ -2147,7 +2147,7 @@
         var topic = topicEl ? String(topicEl.value || "").trim() : "";
         var out = document.getElementById("schoolReportOut");
         if (out) {
-          out.innerHTML = "<p class='text-muted'>Generating with Cursor…</p>";
+          out.innerHTML = "<p class='text-muted'>Generating report…</p>";
         }
         schoolReportBtn.disabled = true;
         fetch("/api/demos/brightsteps/reports", {
@@ -2176,11 +2176,7 @@
               out.innerHTML =
                 "<p><strong>" +
                 escapeHtml(data.title || rType) +
-                "</strong> · <span class='badge-soft " +
-                (data.via === "cursor" ? "badge-mint" : "badge-coral") +
-                "'>" +
-                escapeHtml(data.via === "cursor" ? "via Cursor" : "fallback") +
-                "</span></p>" +
+                "</strong></p>" +
                 "<p class='text-muted small'>" +
                 escapeHtml(data.summary || "") +
                 "</p>" +
@@ -2189,17 +2185,14 @@
                 "</pre>";
             }
             if (window.showToast) {
-              window.showToast(
-                data.via === "cursor" ? "Report ready (Cursor)." : "Report saved (fallback).",
-                "success"
-              );
+              window.showToast("Report ready.", "success");
             }
           })
           .catch(function (err) {
             schoolReportBtn.disabled = false;
             if (out) {
               out.innerHTML =
-                "<p class='text-muted'>Could not reach report API. " +
+                "<p class='text-muted'>Could not generate report. " +
                 escapeHtml(err && err.message ? err.message : "") +
                 "</p>";
             }

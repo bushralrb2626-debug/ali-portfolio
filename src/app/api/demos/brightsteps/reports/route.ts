@@ -106,7 +106,6 @@ export async function GET() {
       { type: "sales_performance", label: LABELS.sales_performance },
       { type: "executive_dashboard", label: LABELS.executive_dashboard },
     ],
-    cursorConfigured: Boolean(cursorApiKey()),
   });
 }
 
@@ -139,7 +138,7 @@ export async function POST(request: NextRequest) {
     "```",
     "",
     "## Note",
-    "Cursor narrative unavailable — structured pack only. Set CURSOR_API_KEY on the host.",
+    "Structured pack only — AI narrative temporarily unavailable.",
   ].join("\n");
 
   const apiKey = cursorApiKey();
@@ -150,7 +149,7 @@ export async function POST(request: NextRequest) {
       title,
       via: "fallback",
       markdown: fallback,
-      summary: "Structured pack (Cursor key missing).",
+      summary: "Structured pack — AI temporarily unavailable.",
     });
   }
 
@@ -161,7 +160,8 @@ ${brief(type, topic)}
 ACCURACY:
 - Cite EXACT numbers from the JSON pack only.
 - Never invent tuition, salaries, headcount, or competitor prices — write Data not found.
-- Do not mention Cursor, vendor models, or API keys.
+- Do not mention which AI or tooling generated this report. Do not mention Cursor, vendor models, or API keys.
+- Brand as Slorsh / BrightSteps insight only if needed.
 - Markdown only.
 
 JSON pack:
@@ -185,6 +185,10 @@ ${JSON.stringify({ as_of: asOf, type, topic, pack }, null, 2).slice(0, 14000)}`;
         .trim();
     }
     if (text.length < 80) throw new Error("short_reply");
+    // Strip accidental tooling mentions from the narrative.
+    text = text
+      .replace(/\bCursor\b/gi, "Slorsh AI")
+      .replace(/\bCursor API\b/gi, "Slorsh AI");
     const summary =
       text.split("\n").find((l) => l.trim() && !l.startsWith("#"))?.slice(0, 280) ||
       LABELS[type];
@@ -192,7 +196,7 @@ ${JSON.stringify({ as_of: asOf, type, topic, pack }, null, 2).slice(0, 14000)}`;
       ok: true,
       type,
       title,
-      via: "cursor",
+      via: "ai",
       markdown: text.slice(0, 24000),
       summary,
       runId: result.id,
@@ -209,8 +213,8 @@ ${JSON.stringify({ as_of: asOf, type, topic, pack }, null, 2).slice(0, 14000)}`;
       type,
       title,
       via: "fallback",
-      markdown: fallback + `\n\n_(Cursor error: ${detail.slice(0, 160)})_`,
-      summary: "Fallback pack — Cursor failed.",
+      markdown: fallback,
+      summary: "Structured pack — AI temporarily unavailable.",
       detail,
     });
   }
