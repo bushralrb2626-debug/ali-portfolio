@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import { reportSlorshUsageBackground } from "@/lib/slorsh-usage";
 
 export async function POST(request: Request) {
   let body: { slotId?: string; name?: string; email?: string; note?: string };
@@ -38,6 +39,13 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: "That time was just taken." }, { status: 409 });
   }
+
+  reportSlorshUsageBackground({
+    feature: "portfolio_booking",
+    question: `Visit booking: ${name} <${email}>`,
+    answer: note || "Booked",
+    metadata: { slotId },
+  });
 
   revalidatePath("/");
   revalidatePath("/admin/slots");

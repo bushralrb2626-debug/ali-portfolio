@@ -2519,9 +2519,20 @@ body.modal-open { overflow: hidden; }
   color: #b84a3c;
 }
 
-.attendance-toggle button.active[data-status="Late"] {
+.attendance-toggle button.active[data-status="Late"],
+.attendance-toggle button.active[data-attend-status="leave"] {
   background: color-mix(in srgb, var(--orange) 30%, white);
   color: #a85a18;
+}
+
+.attendance-toggle button.active[data-attend-status="present"] {
+  background: color-mix(in srgb, var(--grass) 28%, white);
+  color: #3d7a32;
+}
+
+.attendance-toggle button.active[data-attend-status="absent"] {
+  background: color-mix(in srgb, var(--coral) 28%, white);
+  color: #b84a3c;
 }
 
 .kpi-grid {

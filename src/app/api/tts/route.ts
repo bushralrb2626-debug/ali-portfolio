@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { reportSlorshUsageBackground } from "@/lib/slorsh-usage";
 
 const ALLOWED = new Set(["en", "it", "ur", "pa", "hi"]);
 
@@ -30,6 +31,12 @@ export async function GET(request: NextRequest) {
       const res = await fetch(url, { headers, cache: "no-store" });
       if (!res.ok) continue;
       const buf = await res.arrayBuffer();
+      // Bill after audio is ready — visitor already gets the bytes in this response.
+      reportSlorshUsageBackground({
+        feature: "portfolio_tts",
+        question: q,
+        metadata: { lang: tl, bytes: buf.byteLength },
+      });
       return new NextResponse(buf, {
         status: 200,
         headers: {
@@ -40,6 +47,6 @@ export async function GET(request: NextRequest) {
     }
     return new NextResponse("TTS unavailable", { status: 502 });
   } catch {
-    return new NextResponse("TTS failed", { status: 502 });
+    return new NextResponse("TTS failed", { status: 500 });
   }
 }

@@ -49,6 +49,7 @@
       { icon: "📣", label: "Announce", id: "announce" },
       { icon: "📥", label: "Inbox", id: "feedback" },
       { icon: "📊", label: "Results", id: "results" },
+      { icon: "📑", label: "Reports", id: "slorsh-reports" },
       { icon: "⚙️", label: "Settings", id: "settings" },
     ],
     superadmin: [
@@ -63,6 +64,7 @@
       { icon: "📣", label: "Announce", id: "announce" },
       { icon: "📥", label: "Inbox", id: "feedback" },
       { icon: "📊", label: "Results", id: "results" },
+      { icon: "📑", label: "Reports", id: "slorsh-reports" },
       { icon: "🛡️", label: "Admins", id: "admins" },
     ],
   };
@@ -96,6 +98,8 @@
   var FEEDBACK_KEY = "brightsteps-demo-feedback";
   var RESULTS_KEY = "brightsteps-demo-results";
   var ATTEND_KEY = "brightsteps-demo-attendance";
+  var ATTEND_WINDOW_KEY = "brightsteps-demo-attend-window";
+  var attendTickTimer = null;
 
   var DEFAULT_ROOMS = [
     "Grade 1",
@@ -239,11 +243,87 @@
     saveMap(ATTEND_KEY, map);
   }
 
+  function loadAttendWindow() {
+    try {
+      var raw = localStorage.getItem(ATTEND_WINDOW_KEY);
+      if (!raw) return null;
+      var w = JSON.parse(raw);
+      if (!w || !w.start || !w.end) return null;
+      return w;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveAttendWindow(win) {
+    localStorage.setItem(ATTEND_WINDOW_KEY, JSON.stringify(win));
+  }
+
+  function parseHmToMinutes(hm) {
+    var m = String(hm || "").trim().match(/^(\d{1,2}):(\d{2})$/);
+    if (!m) return null;
+    var h = Number(m[1]);
+    var min = Number(m[2]);
+    if (h < 0 || h > 23 || min < 0 || min > 59) return null;
+    return h * 60 + min;
+  }
+
+  function formatMinutesClock(total) {
+    var h = Math.floor(total / 60);
+    var m = total % 60;
+    return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+  }
+
+  function nowMinutes() {
+    var d = new Date();
+    return d.getHours() * 60 + d.getMinutes();
+  }
+
+  function attendWindowState() {
+    var w = loadAttendWindow();
+    if (!w) {
+      return { configured: false, open: false, locked: false, label: "No window set", remaining: "" };
+    }
+    var start = parseHmToMinutes(w.start);
+    var end = parseHmToMinutes(w.end);
+    if (start == null || end == null || end <= start) {
+      return { configured: false, open: false, locked: !!w.locked, label: "Invalid window", remaining: "" };
+    }
+    var now = nowMinutes();
+    var open = now >= start && now < end;
+    var remaining = "";
+    if (open) {
+      var left = end - now;
+      remaining = left + " min left";
+    } else if (now < start) {
+      remaining = "Opens in " + (start - now) + " min";
+    } else {
+      remaining = "Closed for today";
+    }
+    return {
+      configured: true,
+      open: open,
+      locked: !!w.locked,
+      start: w.start,
+      end: w.end,
+      label: w.start + " – " + w.end,
+      remaining: remaining,
+      win: w,
+    };
+  }
+
   function attendanceStatusLabel(status) {
     if (status === "present") return "Present";
-    if (status === "late") return "Late";
     if (status === "absent") return "Absent";
+    if (status === "leave") return "Leave";
     return "Not marked";
+  }
+
+  function attendanceBadgeHtml(status) {
+    if (status === "present") return '<span class="badge-soft badge-mint">Present</span>';
+    if (status === "absent") return '<span class="badge-soft badge-coral">Absent</span>';
+    if (status === "leave") return '<span class="badge-soft badge-sky">Leave</span>';
+    return '<span class="text-muted">Not marked</span>';
   }
 
   function getAttendance(personId) {
@@ -274,7 +354,6 @@
       if (row.kind === "student" && row.classroom === room) return;
       next[id] = row;
     });
-    // Also clear students currently in that room even if classroom field drifted
     allStudents().forEach(function (s) {
       if (s.classroom === room) delete next[s.id || s.name];
     });
@@ -292,23 +371,78 @@
     return session.personId || (session.login === "student_demo" ? "seed-alex" : session.login || session.name);
   }
 
-  function markButtonsHtml(personId, kind) {
+  function teacherPersonId(session) {
+    if (session.personId) return session.personId;
+    if (session.login === "teacher_demo") return "seed-sarah";
+    var match = allTeachers().find(function (t) {
+      return (
+        (t.email && session.email && t.email.toLowerCase() === String(session.email).toLowerCase()) ||
+        t.name === session.name
+      );
+    });
+    return match ? match.id || match.name : session.login || session.name;
+  }
+
+  function markPresentBtnHtml(personId, kind, already) {
+    if (already) {
+      return attendanceBadgeHtml("present");
+    }
     return (
       '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-primary" data-mark-attend="' +
       escapeHtml(personId) +
       '" data-attend-kind="' +
       escapeHtml(kind) +
-      '" data-attend-status="present">Present</button> ' +
-      '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-mark-attend="' +
-      escapeHtml(personId) +
-      '" data-attend-kind="' +
-      escapeHtml(kind) +
-      '" data-attend-status="late">Late</button> ' +
-      '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-mark-attend="' +
-      escapeHtml(personId) +
-      '" data-attend-kind="' +
-      escapeHtml(kind) +
-      '" data-attend-status="absent">Absent</button>'
+      '" data-attend-status="present">Mark present</button>'
+    );
+  }
+
+  function studentMarkButtonsHtml(personId, currentStatus) {
+    var statuses = [
+      { id: "present", label: "Present", cls: "btn-bsa-primary" },
+      { id: "absent", label: "Absent", cls: "btn-bsa-soft" },
+      { id: "leave", label: "Leave", cls: "btn-bsa-soft" },
+    ];
+    return (
+      '<span class="attendance-toggle" style="display:inline-flex;gap:0.35rem;flex-wrap:wrap">' +
+      statuses
+        .map(function (s) {
+          var active = currentStatus === s.id ? " active" : "";
+          return (
+            '<button type="button" class="btn-bsa btn-bsa-sm ' +
+            s.cls +
+            active +
+            '" data-mark-attend="' +
+            escapeHtml(personId) +
+            '" data-attend-kind="student" data-attend-status="' +
+            s.id +
+            '">' +
+            s.label +
+            "</button>"
+          );
+        })
+        .join("") +
+      "</span>"
+    );
+  }
+
+  function attendWindowBannerHtml(state, forTeacher) {
+    if (!state.configured) {
+      return (
+        "<p class='text-muted'><strong>Attendance window:</strong> Admin has not set a time yet." +
+        (forTeacher ? " You can mark once the office sets today’s window." : "") +
+        "</p>"
+      );
+    }
+    return (
+      "<p><strong>Attendance window:</strong> " +
+      escapeHtml(state.label) +
+      (state.locked ? " · <em>Fixed by admin</em>" : "") +
+      " · " +
+      escapeHtml(state.remaining) +
+      (state.open
+        ? ' · <span class="badge-soft badge-mint">Open now</span>'
+        : ' · <span class="badge-soft badge-coral">Closed</span>') +
+      "</p>"
     );
   }
 
@@ -316,110 +450,130 @@
     var id = studentPersonId(session);
     var room = sessionClassroom(session);
     var row = getAttendance(id);
+    var state = attendWindowState();
     var status = row ? attendanceStatusLabel(row.status) : "Not marked";
     var detail = row
       ? "<p class='text-muted small'>Marked " +
         escapeHtml(row.at ? new Date(row.at).toLocaleString() : "") +
         (row.byName ? " · by " + escapeHtml(row.byName) : "") +
         "</p>"
-      : "<p class='text-muted small'>Mark yourself present when you arrive. Your teacher can reset the class anytime.</p>";
+      : "<p class='text-muted small'>Your class teacher marks attendance during the admin window.</p>";
     return (
       '<div class="welcome-banner"><h2>My attendance</h2><p>' +
       escapeHtml(room || "Your class") +
       "</p></div>" +
       panel(
         "Today",
-        "<p><strong>Status:</strong> " +
+        attendWindowBannerHtml(state, false) +
+          "<p><strong>Status:</strong> " +
           escapeHtml(status) +
           "</p>" +
-          detail +
-          "<p>" +
-          markButtonsHtml(id, "student") +
-          "</p>"
+          detail
       )
     );
   }
 
   function teacherAttendancePanel(session) {
     var room = sessionClassroom(session);
-    var kids = studentsInTeacherClass(session);
+    var state = attendWindowState();
+    var selfId = teacherPersonId(session);
+    var selfRow = getAttendance(selfId);
     if (!room) {
       return panel(
         "Attendance",
-        "<p class='text-muted'>You are not assigned to a classroom yet. Ask admin to place you in Classrooms.</p>"
+        attendWindowBannerHtml(state, true) +
+          "<p class='text-muted'>You are not assigned to a classroom yet. Ask admin to place you in Classrooms.</p>"
       );
     }
-    var present = 0;
-    var late = 0;
-    var absent = 0;
-    var unmarked = 0;
+    var kids = studentsInTeacherClass(session);
+    var counts = { present: 0, absent: 0, leave: 0, unmarked: 0 };
     var rows = kids.map(function (s) {
       var id = s.id || s.name;
       var row = getAttendance(id);
-      var status = row ? row.status : "";
-      if (status === "present") present++;
-      else if (status === "late") late++;
-      else if (status === "absent") absent++;
-      else unmarked++;
+      var st = row && row.status ? row.status : "";
+      if (st === "present") counts.present++;
+      else if (st === "absent") counts.absent++;
+      else if (st === "leave") counts.leave++;
+      else counts.unmarked++;
       return [
         escapeHtml(s.name),
-        escapeHtml(attendanceStatusLabel(status)),
-        markButtonsHtml(id, "student"),
+        attendanceBadgeHtml(st),
+        state.open
+          ? studentMarkButtonsHtml(id, st)
+          : st
+            ? attendanceBadgeHtml(st)
+            : '<span class="text-muted">Window closed</span>',
       ];
     });
     if (!rows.length) {
       rows = [["—", "No students in this class", ""]];
     }
+    var selfBlock =
+      "<p><strong>Your attendance (present only):</strong> " +
+      (selfRow && selfRow.status === "present"
+        ? attendanceBadgeHtml("present")
+        : state.open
+          ? markPresentBtnHtml(selfId, "teacher-self", false)
+          : '<span class="text-muted">Not marked · window closed</span>') +
+      "</p>";
     return (
-      '<div class="welcome-banner"><h2>Class attendance</h2><p>Only students in <strong>' +
+      '<div class="welcome-banner"><h2>Class attendance</h2><p>From the teachers portal: mark <strong>yourself present</strong>, then mark students in <strong>' +
       escapeHtml(room) +
-      "</strong>. Reset clears marks so children can mark again.</p></div>" +
+      "</strong> as Present, Absent, or Leave — only while the admin window is open.</p></div>" +
+      attendWindowBannerHtml(state, true) +
       kpis([
-        { label: "Present", value: String(present), accent: "accent-mint" },
-        { label: "Late", value: String(late), accent: "accent-sky" },
-        { label: "Absent", value: String(absent), accent: "accent-coral" },
-        { label: "Not marked", value: String(unmarked), accent: "accent-royal" },
+        { label: "Present", value: String(counts.present), accent: "accent-mint" },
+        { label: "Absent / Leave", value: String(counts.absent + counts.leave), accent: "accent-coral" },
+        { label: "Not marked", value: String(counts.unmarked), accent: "accent-royal" },
       ]) +
+      panel("Teacher check-in", selfBlock) +
       panel(
         escapeHtml(room) + " · " + kids.length + " students",
-        '<p style="margin-bottom:1rem"><button type="button" class="btn-bsa btn-bsa-soft" data-reset-attend-room="' +
-          escapeHtml(room) +
-          '">Reset class attendance</button></p>' +
-          table(["Student", "Status", "Mark"], rows)
+        (state.open
+          ? '<p style="margin-bottom:1rem"><button type="button" class="btn-bsa btn-bsa-soft" data-reset-attend-room="' +
+            escapeHtml(room) +
+            '">Clear class marks</button></p>'
+          : "") + table(["Student", "Status", "Action"], rows)
       )
     );
   }
 
   function adminAttendancePanel(session) {
+    var state = attendWindowState();
+    var w = state.win || { start: "08:00", end: "09:00", locked: false };
     var teachers = allTeachers();
     var present = 0;
-    var late = 0;
-    var absent = 0;
-    var unmarked = 0;
     var rows = teachers.map(function (t) {
       var id = t.id || t.name;
       var row = getAttendance(id);
-      var status = row ? row.status : "";
-      if (status === "present") present++;
-      else if (status === "late") late++;
-      else if (status === "absent") absent++;
-      else unmarked++;
+      var isPresent = row && row.status === "present";
+      if (isPresent) present++;
       return [
         escapeHtml(t.name),
         escapeHtml(t.classroom || t.className || "—"),
-        escapeHtml(attendanceStatusLabel(status)),
-        markButtonsHtml(id, "teacher"),
+        escapeHtml(attendanceStatusLabel(isPresent ? "present" : "")),
       ];
     });
+    var form =
+      '<form id="attendWindowForm" class="form-bsa" style="display:grid;gap:0.75rem;max-width:28rem">' +
+      "<p class='text-muted small'>Set when teachers may mark their own attendance and their class. Once saved, teachers cannot change these times.</p>" +
+      '<label>Start <input type="time" name="start" required value="' +
+      escapeHtml(w.start || "08:00") +
+      '" /></label>' +
+      '<label>End <input type="time" name="end" required value="' +
+      escapeHtml(w.end || "09:00") +
+      '" /></label>' +
+      '<button type="submit" class="btn-bsa btn-bsa-primary">Save &amp; fix window</button>' +
+      "</form>";
     return (
-      '<div class="welcome-banner"><h2>Teacher attendance</h2><p>Admin marks staff. Students mark themselves; teachers mark / reset only their own class.</p></div>' +
+      '<div class="welcome-banner"><h2>Attendance window</h2><p>Admin fixes the daily marking window. Teachers mark themselves and their class only inside that time.</p></div>' +
+      attendWindowBannerHtml(state, false) +
+      panel("Fix today’s window", form) +
       kpis([
-        { label: "Present", value: String(present), accent: "accent-mint" },
-        { label: "Late", value: String(late), accent: "accent-sky" },
-        { label: "Absent", value: String(absent), accent: "accent-coral" },
-        { label: "Not marked", value: String(unmarked), accent: "accent-royal" },
+        { label: "Teachers present", value: String(present), accent: "accent-mint" },
+        { label: "Not marked", value: String(Math.max(0, teachers.length - present)), accent: "accent-coral" },
       ]) +
-      panel("Staff today", table(["Teacher", "Class", "Status", "Mark"], rows))
+      panel("Staff check-in today", table(["Teacher", "Class", "Status"], rows))
     );
   }
 
@@ -429,16 +583,106 @@
     });
     var id = child ? child.id || child.name : "seed-alex";
     var row = getAttendance(id);
+    var state = attendWindowState();
     return panel(
       "Attendance",
-      "<p>" +
+      attendWindowBannerHtml(state, false) +
+        "<p>" +
         escapeHtml(child ? child.name : "Alex Rivera") +
         " — <strong>" +
         escapeHtml(attendanceStatusLabel(row && row.status)) +
         "</strong> today</p>" +
         (row
-          ? "<p class='text-muted small'>Updated " + escapeHtml(new Date(row.at).toLocaleString()) + "</p>"
+          ? "<p class='text-muted small'>Updated " +
+            escapeHtml(new Date(row.at).toLocaleString()) +
+            (row.byName ? " · by " + escapeHtml(row.byName) : "") +
+            "</p>"
           : "<p class='text-muted small'>Not marked yet today.</p>")
+    );
+  }
+
+  var SLORSH_REPORT_USAGE = [
+    { type: "weekly", label: "Weekly Report", blurb: "7-day school ops narrative (Cursor)." },
+    { type: "monthly", label: "Monthly Report", blurb: "30-day enrollment, attendance, fees." },
+    { type: "weekly_plus", label: "Weekly Report+", blurb: "Deeper weekly + risks." },
+    { type: "monthly_plus", label: "Monthly Report+", blurb: "Deeper monthly + next steps." },
+  ];
+  var SLORSH_REPORT_MARKET = [
+    { type: "market_competitor", label: "Market + Competitor", blurb: "Portal positioning." },
+    { type: "product_performance", label: "Product Performance", blurb: "Attendance, meetings, desk bot." },
+    { type: "pricing_optimization", label: "Pricing Optimization", blurb: "Fee framing experiments." },
+    { type: "customer_satisfaction", label: "Customer Satisfaction", blurb: "Visits & inbox themes." },
+    { type: "sales_performance", label: "Sales Performance", blurb: "Visits → admissions interest." },
+    { type: "executive_dashboard", label: "Executive Dashboard", blurb: "One-page admin snapshot." },
+  ];
+
+  function schoolReportPack(session) {
+    var attendMap = loadAttendance();
+    var present = 0;
+    var absent = 0;
+    var leave = 0;
+    Object.keys(attendMap).forEach(function (k) {
+      var st = (attendMap[k] && attendMap[k].status) || "";
+      if (st === "present") present++;
+      else if (st === "absent") absent++;
+      else if (st === "leave") leave++;
+    });
+    var win = attendWindowState();
+    return {
+      school: session.className || "BrightFuture Academy",
+      admin: session.name || "School Administrator",
+      role: session.role,
+      teachers: allTeachers().length,
+      students: allStudents().length,
+      classrooms: (typeof loadRooms === "function" ? loadRooms() : []).length,
+      visit_requests: loadVisits().length,
+      results_on_file: loadResults().length,
+      announcements: (typeof loadAnnouncements === "function" ? loadAnnouncements() : []).length,
+      feedback_inbox: (typeof loadFeedback === "function" ? loadFeedback() : []).length,
+      attendance_today: { present: present, absent: absent, leave: leave, marked: present + absent + leave },
+      attendance_window: win.configured
+        ? { label: win.label, open: win.open, remaining: win.remaining }
+        : { configured: false },
+      teacher_names: allTeachers()
+        .slice(0, 12)
+        .map(function (t) {
+          return t.name + (t.classroom || t.className ? " · " + (t.classroom || t.className) : "");
+        }),
+    };
+  }
+
+  function schoolReportsPanel(session) {
+    function cards(list) {
+      return (
+        '<div class="grid-2" style="gap:0.75rem">' +
+        list
+          .map(function (item) {
+            return (
+              '<button type="button" class="btn-bsa btn-bsa-soft" style="display:block;width:100%;text-align:left;padding:1rem" data-school-report="' +
+              escapeHtml(item.type) +
+              '"><strong>' +
+              escapeHtml(item.label) +
+              "</strong><br><span class='text-muted small'>" +
+              escapeHtml(item.blurb) +
+              "</span></button>"
+            );
+          })
+          .join("") +
+        "</div>"
+      );
+    }
+    return (
+      '<div class="welcome-banner"><h2>Slorsh reports</h2><p>Admin seat · 4 usage + 6 market intel types. Narratives via <strong>Cursor API</strong> from live school demo data.</p></div>' +
+      '<p class="text-muted small" style="margin-bottom:1rem">You are <strong>' +
+      escapeHtml(session.name || "Ali") +
+      '</strong> · <span class="badge-soft badge-mint">Admin</span></p>' +
+      '<label class="text-muted small">Niche / topic (optional)<br><input type="text" id="schoolReportTopic" class="form-bsa" maxlength="200" placeholder="e.g. primary school admissions" style="max-width:28rem;width:100%;margin-top:0.35rem" /></label>' +
+      panel("Usage reports", cards(SLORSH_REPORT_USAGE)) +
+      panel("Market intel", cards(SLORSH_REPORT_MARKET)) +
+      panel(
+        "Latest narrative",
+        '<div id="schoolReportOut"><p class="text-muted">Generate a report to see Cursor output here.</p></div>'
+      )
     );
   }
 
@@ -1706,6 +1950,7 @@
       if (section === "feedback") return feedbackPanel(session);
       if (section === "results") return adminResultsPanel(session);
       if (section === "attendance") return adminAttendancePanel(session);
+      if (section === "slorsh-reports") return schoolReportsPanel(session);
       if (section === "settings") {
         return panel(
           "School settings",
@@ -1747,6 +1992,7 @@
     if (section === "feedback") return feedbackPanel(session);
     if (section === "results") return adminResultsPanel(session);
     if (section === "attendance") return adminAttendancePanel(session);
+    if (section === "slorsh-reports") return schoolReportsPanel(session);
     if (section === "admins") {
       return panel(
         "School admins",
@@ -1808,6 +2054,20 @@
     navEl.innerHTML = navHtml;
     content.innerHTML = contentFor(session, section);
     document.title = session.roleLabel + " · BrightSteps Academy";
+
+    if (attendTickTimer) {
+      clearInterval(attendTickTimer);
+      attendTickTimer = null;
+    }
+    if (section === "attendance" && session.role !== "admin" && session.role !== "superadmin") {
+      attendTickTimer = setInterval(function () {
+        var live = (auth.getSession && auth.getSession()) || session;
+        if (!live) return;
+        var el = document.getElementById("dashContent");
+        if (!el) return;
+        el.innerHTML = contentFor(live, "attendance");
+      }, 30000);
+    }
   }
 
   function findPersonById(id) {
@@ -1872,6 +2132,79 @@
         e.preventDefault();
         section = navLink.getAttribute("data-section");
         render(session, section);
+        return;
+      }
+
+      var schoolReportBtn = e.target.closest("[data-school-report]");
+      if (schoolReportBtn) {
+        e.preventDefault();
+        if (session.role !== "admin" && session.role !== "superadmin") {
+          if (window.showToast) window.showToast("Reports are for school admin.", "error");
+          return;
+        }
+        var rType = schoolReportBtn.getAttribute("data-school-report");
+        var topicEl = document.getElementById("schoolReportTopic");
+        var topic = topicEl ? String(topicEl.value || "").trim() : "";
+        var out = document.getElementById("schoolReportOut");
+        if (out) {
+          out.innerHTML = "<p class='text-muted'>Generating with Cursor…</p>";
+        }
+        schoolReportBtn.disabled = true;
+        fetch("/api/demos/brightsteps/reports", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: rType,
+            topic: topic || undefined,
+            pack: schoolReportPack(session),
+          }),
+        })
+          .then(function (res) {
+            return res.json().then(function (data) {
+              return { ok: res.ok, data: data };
+            });
+          })
+          .then(function (result) {
+            schoolReportBtn.disabled = false;
+            if (!result.ok && result.data && result.data.error) {
+              if (out) out.innerHTML = "<p class='text-muted'>" + escapeHtml(result.data.error) + "</p>";
+              if (window.showToast) window.showToast(result.data.error, "error");
+              return;
+            }
+            var data = result.data || {};
+            if (out) {
+              out.innerHTML =
+                "<p><strong>" +
+                escapeHtml(data.title || rType) +
+                "</strong> · <span class='badge-soft " +
+                (data.via === "cursor" ? "badge-mint" : "badge-coral") +
+                "'>" +
+                escapeHtml(data.via === "cursor" ? "via Cursor" : "fallback") +
+                "</span></p>" +
+                "<p class='text-muted small'>" +
+                escapeHtml(data.summary || "") +
+                "</p>" +
+                "<pre style='white-space:pre-wrap;max-height:28rem;overflow:auto;font-size:0.85rem;margin-top:0.75rem'>" +
+                escapeHtml(data.markdown || "") +
+                "</pre>";
+            }
+            if (window.showToast) {
+              window.showToast(
+                data.via === "cursor" ? "Report ready (Cursor)." : "Report saved (fallback).",
+                "success"
+              );
+            }
+          })
+          .catch(function (err) {
+            schoolReportBtn.disabled = false;
+            if (out) {
+              out.innerHTML =
+                "<p class='text-muted'>Could not reach report API. " +
+                escapeHtml(err && err.message ? err.message : "") +
+                "</p>";
+            }
+            if (window.showToast) window.showToast("Report request failed.", "error");
+          });
         return;
       }
 
@@ -1986,35 +2319,51 @@
       var markAttendBtn = e.target.closest("[data-mark-attend]");
       if (markAttendBtn) {
         e.preventDefault();
-        var markId = markAttendBtn.getAttribute("data-mark-attend");
-        var markKind = markAttendBtn.getAttribute("data-attend-kind") || "student";
-        var markStatus = markAttendBtn.getAttribute("data-attend-status") || "present";
-        if (markKind === "teacher") {
-          if (!canManageRoster(session)) {
-            if (window.showToast) window.showToast("Only admin can mark teacher attendance.", "error");
-            return;
+        var winState = attendWindowState();
+        if (!winState.configured || !winState.open) {
+          if (window.showToast) {
+            window.showToast(
+              winState.configured
+                ? "Attendance window is closed (" + winState.label + ")."
+                : "Admin has not set an attendance window yet.",
+              "error"
+            );
           }
-          var teacher = allTeachers().find(function (t) {
-            return (t.id || t.name) === markId;
-          });
-          setAttendance(markId, "teacher", markStatus, session, teacher ? teacher.classroom || "" : "");
-          if (window.showToast) window.showToast("Teacher marked " + attendanceStatusLabel(markStatus) + ".", "success");
-          render(session, "attendance");
           return;
         }
-        // Student marks
-        if (session.role === "student") {
-          var selfId = studentPersonId(session);
-          if (markId !== selfId && markId !== session.personId && markId !== session.login) {
+        var markId = markAttendBtn.getAttribute("data-mark-attend");
+        var markKind = markAttendBtn.getAttribute("data-attend-kind") || "student";
+        var markStatus = (markAttendBtn.getAttribute("data-attend-status") || "present").toLowerCase();
+
+        if (markKind === "teacher-self") {
+          if (session.role !== "teacher") {
+            if (window.showToast) window.showToast("Mark present from the teachers portal only.", "error");
+            return;
+          }
+          if (markStatus !== "present") {
+            if (window.showToast) window.showToast("Teachers can only mark themselves present.", "error");
+            return;
+          }
+          var selfId = teacherPersonId(session);
+          if (markId !== selfId) {
             if (window.showToast) window.showToast("You can only mark your own attendance.", "error");
             return;
           }
-          setAttendance(selfId, "student", markStatus, session, sessionClassroom(session));
-          if (window.showToast) window.showToast("Attendance marked " + attendanceStatusLabel(markStatus) + ".", "success");
+          setAttendance(selfId, "teacher", "present", session, sessionClassroom(session));
+          if (window.showToast) window.showToast("You are marked present.", "success");
           render(session, "attendance");
           return;
         }
-        if (session.role === "teacher") {
+
+        if (markKind === "student") {
+          if (session.role !== "teacher") {
+            if (window.showToast) window.showToast("Only the class teacher can mark students.", "error");
+            return;
+          }
+          if (markStatus !== "present" && markStatus !== "absent" && markStatus !== "leave") {
+            if (window.showToast) window.showToast("Use Present, Absent, or Leave for students.", "error");
+            return;
+          }
           var allowed = studentsInTeacherClass(session).some(function (s) {
             return (s.id || s.name) === markId;
           });
@@ -2030,6 +2379,7 @@
           render(session, "attendance");
           return;
         }
+
         if (window.showToast) window.showToast("Not allowed.", "error");
         return;
       }
@@ -2038,17 +2388,22 @@
       if (resetAttendBtn) {
         e.preventDefault();
         if (session.role !== "teacher" && !canManageRoster(session)) {
-          if (window.showToast) window.showToast("Only the class teacher can reset attendance.", "error");
+          if (window.showToast) window.showToast("Only the class teacher can clear attendance.", "error");
+          return;
+        }
+        var winOk = attendWindowState();
+        if (session.role === "teacher" && (!winOk.configured || !winOk.open)) {
+          if (window.showToast) window.showToast("You can only clear marks while the attendance window is open.", "error");
           return;
         }
         var resetRoom = resetAttendBtn.getAttribute("data-reset-attend-room") || sessionClassroom(session);
         if (session.role === "teacher" && resetRoom !== sessionClassroom(session)) {
-          if (window.showToast) window.showToast("You can only reset your own class.", "error");
+          if (window.showToast) window.showToast("You can only clear your own class.", "error");
           return;
         }
-        if (!window.confirm('Reset attendance for "' + resetRoom + '"? Students can mark again.')) return;
+        if (!window.confirm('Clear attendance marks for "' + resetRoom + '"?')) return;
         clearStudentAttendanceForRoom(resetRoom);
-        if (window.showToast) window.showToast("Class attendance reset.", "success");
+        if (window.showToast) window.showToast("Class marks cleared.", "success");
         render(session, "attendance");
         return;
       }
@@ -2126,6 +2481,35 @@
     });
 
     document.addEventListener("submit", function (e) {
+      var attendWindowForm = e.target.closest("#attendWindowForm");
+      if (attendWindowForm) {
+        e.preventDefault();
+        if (!canManageRoster(session)) {
+          if (window.showToast) window.showToast("Only admin can set the attendance window.", "error");
+          return;
+        }
+        var startVal = String((attendWindowForm.querySelector('[name="start"]') || {}).value || "").trim();
+        var endVal = String((attendWindowForm.querySelector('[name="end"]') || {}).value || "").trim();
+        var startMin = parseHmToMinutes(startVal);
+        var endMin = parseHmToMinutes(endVal);
+        if (startMin == null || endMin == null || endMin <= startMin) {
+          if (window.showToast) window.showToast("Choose a valid start and end time (end must be after start).", "error");
+          return;
+        }
+        saveAttendWindow({
+          start: startVal,
+          end: endVal,
+          locked: true,
+          setAt: new Date().toISOString(),
+          setBy: session.name || session.login || "admin",
+        });
+        if (window.showToast) {
+          window.showToast("Attendance window fixed: " + startVal + " – " + endVal + ". Teachers cannot change it.", "success");
+        }
+        render(session, "attendance");
+        return;
+      }
+
       var roomForm = e.target.closest("#addRoomForm");
       if (roomForm) {
         e.preventDefault();

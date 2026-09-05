@@ -1,0 +1,16 @@
+{
+  "hosting": {
+    "site": "genine-1bc47",
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/node_modules/**",
+      ".git/**",
+      ".next/**"
+    ],
+    "frameworksBackend": {
+      "region": "us-central1",
+      "memory": "1GiB"
+    }
+  }
+}

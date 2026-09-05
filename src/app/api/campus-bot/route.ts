@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { env } from "node:process";
 import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
+import { reportSlorshUsageBackground } from "@/lib/slorsh-usage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -255,6 +256,19 @@ export async function POST(request: NextRequest) {
             controller.enqueue(
               sseEncode({ type: "done", ok: true, reply, runId: waited.id })
             );
+            // Bill admin after reply is already streamed — no latency on the visitor.
+            reportSlorshUsageBackground({
+              feature: "portfolio_chat",
+              question: message,
+              answer: reply,
+              session_id: String(body.visitorName || body.lang || "campus").slice(0, 80),
+              metadata: {
+                runId: waited.id,
+                lang: body.lang || "en",
+                loggedIn: Boolean(body.loggedIn),
+                model: modelId,
+              },
+            });
           }
           controller.close();
         } catch (err) {
@@ -322,6 +336,20 @@ export async function POST(request: NextRequest) {
         { status: 502 }
       );
     }
+
+    reportSlorshUsageBackground({
+      feature: "portfolio_chat",
+      question: message,
+      answer: reply,
+      session_id: String(body.visitorName || body.lang || "campus").slice(0, 80),
+      metadata: {
+        runId: result.id,
+        lang: body.lang || "en",
+        loggedIn: Boolean(body.loggedIn),
+        model: modelId,
+        stream: false,
+      },
+    });
 
     return NextResponse.json({
       ok: true,
