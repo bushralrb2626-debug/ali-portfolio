@@ -8,6 +8,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { env } from "node:process";
 import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
+import { billPortfolioReport } from "@/lib/slorsh-usage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -171,6 +172,25 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  // Agency debit on Slorsh (School Desk) before Cursor spend.
+  const bill = await billPortfolioReport({
+    type,
+    title,
+    source: "brightsteps_school_admin",
+  });
+  if (!bill.ok) {
+    return NextResponse.json(
+      {
+        error:
+          bill.error === "secret_missing"
+            ? "Billing not configured (SLORSH_USAGE_SECRET)."
+            : bill.error || "Not enough credits on Slorsh admin.",
+        credits_required: bill.credits,
+      },
+      { status: 402 }
+    );
+  }
+
   const accuracy = isMarketType(type)
     ? `ACCURACY (market intel):
 - Campus JSON pack = ground truth for THIS school's live tallies (teachers, students, attendance, visits, etc.). Cite those integers exactly.
@@ -200,7 +220,10 @@ ${JSON.stringify({ as_of: asOf, type, topic, pack }, null, 2).slice(0, 14000)}`;
     const result = await Agent.prompt(prompt, {
       apiKey,
       model: { id: envVar("CURSOR_REPORT_MODEL") || envVar("CURSOR_BOT_MODEL") || "auto" },
-      tools: [],
+      // Market / Plus: allow web research. Usage reports stay text-only.
+      tools: isMarketType(type) || type.endsWith("_plus")
+        ? ["webSearch", "webFetch"]
+        : [],
       local: { cwd: path.resolve(process.cwd()) },
     });
     if (result.status === "error") {
@@ -229,6 +252,8 @@ ${JSON.stringify({ as_of: asOf, type, topic, pack }, null, 2).slice(0, 14000)}`;
       markdown: text.slice(0, 24000),
       summary,
       runId: result.id,
+      credits_charged: bill.credits_charged ?? bill.credits,
+      balance_after: bill.balance_after,
     });
   } catch (err) {
     const detail =

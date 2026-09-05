@@ -2351,7 +2351,13 @@
               out.innerHTML = schoolReportResultHtml(data, rType);
             }
             if (window.showToast) {
-              window.showToast("Report ready.", "success");
+              var cr = data.credits_charged;
+              window.showToast(
+                cr
+                  ? "Report ready — " + cr + " credits charged on Slorsh."
+                  : "Report ready.",
+                "success"
+              );
             }
           })
           .catch(function (err) {
