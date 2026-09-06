@@ -1,12 +1,14 @@
 FROM node:22-bookworm-slim AS deps
-RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY prisma ./prisma
-RUN npm ci
+# Skip postinstall during ci; generate explicitly after deps land
+RUN npm ci --ignore-scripts \
+ && npx prisma generate
 
 FROM node:22-bookworm-slim AS builder
-RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -22,7 +24,7 @@ RUN test -n "${DATABASE_URL:-}" || (echo "DATABASE_URL is required (set Aiven Po
  && npx next build --webpack
 
 FROM node:22-bookworm-slim AS runner
-RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV NODE_ENV=production
 ENV AUTH_TRUST_HOST="true"
