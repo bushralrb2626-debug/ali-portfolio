@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { reportSlorshUsageBackground } from "@/lib/slorsh-usage";
+import { reportSlorshUsage } from "@/lib/slorsh-usage";
 
 const ALLOWED = new Set(["en", "it", "ur", "pa", "hi"]);
 
@@ -31,8 +31,8 @@ export async function GET(request: NextRequest) {
       const res = await fetch(url, { headers, cache: "no-store" });
       if (!res.ok) continue;
       const buf = await res.arrayBuffer();
-      // Bill after audio is ready — visitor already gets the bytes in this response.
-      reportSlorshUsageBackground({
+      // Await debit — fire-and-forget is dropped when the response ends on Render.
+      await reportSlorshUsage({
         feature: "portfolio_tts",
         question: q,
         metadata: { lang: tl, bytes: buf.byteLength },

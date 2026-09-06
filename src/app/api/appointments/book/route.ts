@@ -2,7 +2,7 @@ import { notifyBooking } from "@/lib/admin-notify";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-import { reportSlorshUsageBackground } from "@/lib/slorsh-usage";
+import { reportSlorshUsage } from "@/lib/slorsh-usage";
 
 export async function POST(request: Request) {
   let body: { slotId?: string; name?: string; email?: string; note?: string };
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "That time was just taken." }, { status: 409 });
   }
 
-  reportSlorshUsageBackground({
+  await reportSlorshUsage({
     feature: "portfolio_booking",
     question: `Visit booking: ${name} <${email}>`,
     answer: note || "Booked",
