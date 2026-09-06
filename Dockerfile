@@ -11,15 +11,15 @@ RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /v
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Build does NOT need live Aiven — Render often omits secrets from docker build.
-# Real DATABASE_URL is used at container start (see docker-entrypoint.sh).
+# Placeholder only for prisma generate / Next compile — real Aiven URL at container start.
 ENV DATABASE_URL="postgresql://build:build@127.0.0.1:5432/build?sslmode=disable"
 ENV AUTH_TRUST_HOST="true"
 ENV AUTH_SECRET="build-only-secret"
+ENV AUTH_URL="http://localhost:3000"
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npx prisma generate \
- && npx tsx -e "import { writeFileSync } from 'node:fs'; import { adsPortfolioSections } from './prisma/ads-content.ts'; writeFileSync('prisma/seed-data.json', JSON.stringify(adsPortfolioSections));" \
- && npx next build --webpack
+RUN npx prisma generate
+# seed-data.json is committed (scripts/write-seed-data.ts) — no tsx inline at build
+RUN npx next build --webpack
 
 FROM node:22-bookworm-slim AS runner
 RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
@@ -39,10 +39,9 @@ COPY --from=builder /app/node_modules/@cursor ./node_modules/@cursor
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 COPY --from=builder /app/scripts/seed-runtime.mjs ./scripts/seed-runtime.mjs
 COPY scripts/docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
-# Ensure prisma client exists for seed (standalone may already include it)
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 EXPOSE 10000
 CMD ["/app/docker-entrypoint.sh"]
