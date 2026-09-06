@@ -1068,9 +1068,10 @@
     return "Grade 4 · Maple";
   }
 
-  function parentKidsList() {
-    if (!ops) return allStudents().filter(function (s) { return (s.id || s.name) === "seed-alex"; });
-    var ids = ops.kidIdsForParent(auth.getSession && auth.getSession());
+  function parentKidsList(sessionOpt) {
+    var session = sessionOpt || (auth.getSession && auth.getSession()) || null;
+    if (!ops || !session) return allStudents().filter(function (s) { return (s.id || s.name) === "seed-alex"; });
+    var ids = ops.kidIdsForParent(session);
     if (!ids.length) ids = ["seed-alex"];
     return allStudents().filter(function (s) {
       return ids.indexOf(s.id || s.name) !== -1;
