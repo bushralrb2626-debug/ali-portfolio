@@ -3,6 +3,8 @@
  */
 
 const DEFAULT_SLORSH = "https://ramuza.onrender.com/api/v1";
+/** Must match Slorsh `external_usage_service._DEFAULT_PORTFOLIO_BRIDGE_SECRET` when env unset. */
+const DEFAULT_BRIDGE_SECRET = "slorsh-pf-bridge-v1-ali-brightsteps-9f3c2a";
 
 function envVar(name: string): string {
   return String(process.env[name] ?? "").trim();
@@ -50,8 +52,50 @@ function apiBase() {
   return (envVar("SLORSH_API_BASE") || DEFAULT_SLORSH).replace(/\/$/, "");
 }
 
+export function getSlorshApiBase(): string {
+  return apiBase();
+}
+
 function usageSecret() {
-  return envVar("SLORSH_USAGE_SECRET") || envVar("PORTFOLIO_USAGE_SECRET");
+  return (
+    envVar("SLORSH_USAGE_SECRET") ||
+    envVar("PORTFOLIO_USAGE_SECRET") ||
+    DEFAULT_BRIDGE_SECRET
+  );
+}
+
+export function slorshBillingConfigured(): boolean {
+  return Boolean(envVar("SLORSH_USAGE_SECRET") || envVar("PORTFOLIO_USAGE_SECRET"));
+}
+
+export async function pingSlorshUsage(): Promise<{
+  ok: boolean;
+  bridge_ready?: boolean;
+  secret_env_set?: boolean;
+  error?: string;
+}> {
+  try {
+    const res = await fetch(`${apiBase()}/external/usage/ping`, {
+      method: "GET",
+      cache: "no-store",
+    });
+    const data = (await res.json().catch(() => ({}))) as {
+      ok?: boolean;
+      bridge_ready?: boolean;
+      secret_env_set?: boolean;
+    };
+    if (!res.ok) {
+      return { ok: false, error: `http_${res.status}` };
+    }
+    return {
+      ok: Boolean(data.ok),
+      bridge_ready: Boolean(data.bridge_ready),
+      secret_env_set: Boolean(data.secret_env_set),
+    };
+  } catch (err) {
+    console.warn("[slorsh-usage] ping failed", err);
+    return { ok: false, error: "network" };
+  }
 }
 
 export function reportFeatureForReportType(type: string): SlorshUsageFeature {
@@ -79,10 +123,6 @@ export async function reportSlorshUsage(
   payload: SlorshUsagePayload
 ): Promise<SlorshUsageResult> {
   const secret = usageSecret();
-  if (!secret) {
-    console.warn("[slorsh-usage] SLORSH_USAGE_SECRET not set — skip billing");
-    return { ok: false, error: "secret_missing" };
-  }
   try {
     const res = await fetch(`${apiBase()}/external/usage`, {
       method: "POST",

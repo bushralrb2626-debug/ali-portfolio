@@ -13,7 +13,8 @@ services:
       - key: NPM_CONFIG_PRODUCTION
         value: "false"
       - key: DATABASE_URL
-        value: file:/app/prisma/dev.db
+        # Set in Render Dashboard to free Aiven MySQL URL (see .env.example). Do not use file: SQLite.
+        sync: false
       - key: AUTH_TRUST_HOST
         value: "true"
       - key: AUTH_URL
@@ -26,3 +27,8 @@ services:
         value: "12345"
       - key: CURSOR_BOT_MODEL
         value: "auto"
+      - key: SLORSH_API_BASE
+        value: "https://ramuza.onrender.com/api/v1"
+      # Optional override; code falls back to shared bridge secret matching Slorsh.
+      - key: SLORSH_USAGE_SECRET
+        sync: false
