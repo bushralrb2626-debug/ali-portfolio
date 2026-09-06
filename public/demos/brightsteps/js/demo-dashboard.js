@@ -70,9 +70,9 @@
   };
 
   var SCHOOLS = [
-    { name: "Scuola Materna", city: "Riverside", students: 412, teachers: 38, attendance: "94%" },
-    { name: "BrightFuture Academy", city: "Harbor", students: 286, teachers: 24, attendance: "91%" },
-    { name: "Maple Grove Primary", city: "Riverside", students: 198, teachers: 16, attendance: "96%" },
+    { name: "Scuola Materna", city: "Milano", students: 412, teachers: 38, attendance: "94%" },
+    { name: "BrightFuture Academy", city: "Roma", students: 286, teachers: 24, attendance: "91%" },
+    { name: "Maple Grove Primary", city: "Torino", students: 198, teachers: 16, attendance: "96%" },
   ];
   var TEACHERS = [
     { id: "seed-sarah", name: "Sarah Wilson", school: "Scuola Materna", subject: "Mathematics", className: "Maple · 4A", salary: 85000, email: "sarah.wilson@brightsteps.academy" },
