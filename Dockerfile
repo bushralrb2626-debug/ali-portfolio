@@ -3,7 +3,6 @@ RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /v
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY prisma ./prisma
-# Skip postinstall during ci; generate explicitly after deps land
 RUN npm ci --ignore-scripts \
  && npx prisma generate
 
@@ -12,15 +11,14 @@ RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /v
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# DATABASE_URL comes from Render service env (Aiven Postgres). Do not hardcode SQLite.
+# Build does NOT need live Aiven — Render often omits secrets from docker build.
+# Real DATABASE_URL is used at container start (see docker-entrypoint.sh).
+ENV DATABASE_URL="postgresql://build:build@127.0.0.1:5432/build?sslmode=disable"
 ENV AUTH_TRUST_HOST="true"
 ENV AUTH_SECRET="build-only-secret"
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN test -n "${DATABASE_URL:-}" || (echo "DATABASE_URL is required (set Aiven Postgres URI on Render)" && exit 1) \
- && case "$DATABASE_URL" in file:*) echo "DATABASE_URL must be Postgres, not SQLite file:" && exit 1 ;; esac \
- && npx prisma generate \
- && npx prisma db push \
- && npx tsx prisma/seed.ts \
+RUN npx prisma generate \
+ && npx tsx -e "import { writeFileSync } from 'node:fs'; import { adsPortfolioSections } from './prisma/ads-content.ts'; writeFileSync('prisma/seed-data.json', JSON.stringify(adsPortfolioSections));" \
  && npx next build --webpack
 
 FROM node:22-bookworm-slim AS runner
@@ -34,10 +32,17 @@ ENV HOSTNAME=0.0.0.0
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/node_modules/@cursor ./node_modules/@cursor
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/scripts/seed-runtime.mjs ./scripts/seed-runtime.mjs
 COPY scripts/docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
+# Ensure prisma client exists for seed (standalone may already include it)
+COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 EXPOSE 10000
 CMD ["/app/docker-entrypoint.sh"]
