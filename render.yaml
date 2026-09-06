@@ -29,6 +29,6 @@ services:
         value: "auto"
       - key: SLORSH_API_BASE
         value: "https://ramuza.onrender.com/api/v1"
-      # Optional override; code falls back to shared bridge secret matching Slorsh.
+      # Same bridge secret Slorsh accepts by default — so portfolio bills School Desk without dashboard paste.
       - key: SLORSH_USAGE_SECRET
-        sync: false
+        value: "slorsh-pf-bridge-v1-ali-brightsteps-9f3c2a"
