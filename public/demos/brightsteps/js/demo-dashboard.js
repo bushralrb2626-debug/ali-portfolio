@@ -910,17 +910,19 @@
     var id = student.id || student.name;
     if (isFeePaid(id)) {
       return (
-        '<span class="badge-soft badge-mint">Paid</span> ' +
+        '<div class="fee-status fee-status--paid">' +
+        '<strong>Paid</strong>' +
         '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-fee-unpaid="' +
         escapeHtml(id) +
-        '">Mark unpaid</button>'
+        '">Mark pending</button></div>'
       );
     }
     return (
-      '<span class="badge-soft" style="background:#fde8e8;color:#9b1c1c">Unpaid</span> ' +
+      '<div class="fee-status fee-status--pending">' +
+      "<strong>Pending</strong>" +
       '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-primary" data-fee-paid="' +
       escapeHtml(id) +
-      '">Mark paid</button>'
+      '">Mark paid</button></div>'
     );
   }
 
@@ -1898,15 +1900,15 @@
     return (
       kpis([
         { label: "Students", value: String(students.length), accent: "accent-mint" },
-        { label: "Unpaid this month", value: String(unpaid.length), accent: "accent-coral" },
-        { label: "Unpaid total", value: money(unpaidTotal), accent: "accent-royal" },
+        { label: "Pending fees", value: String(unpaid.length), accent: "accent-coral" },
+        { label: "Pending total", value: money(unpaidTotal), accent: "accent-royal" },
         { label: "Monthly fee roll", value: money(total), accent: "accent-sky" },
       ]) +
       panel(
-        "Students who have not paid",
+        "Students with pending fees",
         unpaidRows.length
           ? table(["Student", "Year", "School", "Fee due", "Status", "Actions"], unpaidRows)
-          : "<p class='text-muted'>Everyone on the roll is marked paid.</p>"
+          : "<p class='text-muted'>No pending fees — everyone is marked paid.</p>"
       ) +
       panel(
         "All fees",
@@ -1914,9 +1916,9 @@
           (paid.length
             ? "<p class='text-muted small' style='margin-top:0.75rem'>" +
               paid.length +
-              " marked paid · " +
+              " paid · " +
               unpaid.length +
-              " unpaid</p>"
+              " pending</p>"
             : "")
       )
     );
@@ -2576,7 +2578,7 @@
         e.preventDefault();
         if (!canManageRoster(session)) return;
         setFeePaid(feeUnpaidBtn.getAttribute("data-fee-unpaid"), false);
-        if (window.showToast) window.showToast("Marked as unpaid.", "success");
+        if (window.showToast) window.showToast("Marked as pending.", "success");
         render(session, section);
         return;
       }
