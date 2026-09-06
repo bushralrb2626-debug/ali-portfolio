@@ -732,7 +732,6 @@
       window.clearTimeout(speakTimer);
       speakTimer = null;
     }
-    stopGoogleTts();
     if (window.speechSynthesis) {
       try {
         window.speechSynthesis.cancel();
@@ -861,72 +860,6 @@
     return null;
   }
 
-  var ttsAudio = null;
-
-  function stopGoogleTts() {
-    if (ttsAudio) {
-      try {
-        ttsAudio.pause();
-        ttsAudio.src = "";
-      } catch (e) {}
-      ttsAudio = null;
-    }
-  }
-
-  function ttsSrc(text, tl) {
-    var chunk = String(text || "").replace(/\s+/g, " ").trim().slice(0, 160);
-    return (
-      "/api/tts?tl=" +
-      encodeURIComponent(tl) +
-      "&q=" +
-      encodeURIComponent(chunk)
-    );
-  }
-
-  /** Real Urdu/Punjabi audio via same-origin proxy (Chrome blocks translate.google.com). */
-  function speakGoogleTts(text, tl, onFail) {
-    stopGoogleTts();
-    var chunk = String(text || "").replace(/\s+/g, " ").trim().slice(0, 160);
-    if (!chunk) return false;
-    try {
-      ttsAudio = new Audio();
-      ttsAudio.preload = "auto";
-      ttsAudio.volume = 1;
-      ttsAudio.muted = false;
-      ttsAudio.src = ttsSrc(chunk, tl);
-      ttsAudio.onplaying = function () {
-        setStatus(
-          { en: "Speaking…", it: "Sto parlando…", ur: "بول رہا ہوں…", pa: "بول رہا واں…" }[activeLang()] ||
-            "Speaking…"
-        );
-      };
-      ttsAudio.onended = function () {
-        setStatus("");
-        ttsAudio = null;
-      };
-      ttsAudio.onerror = function () {
-        if (typeof onFail === "function") onFail();
-      };
-      var playPromise = ttsAudio.play();
-      if (playPromise && playPromise.catch) {
-        playPromise.catch(function () {
-          if (typeof onFail === "function") onFail();
-        });
-      }
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function googleTl() {
-    var c = activeLang();
-    if (c === "pa") return "pa";
-    if (c === "ur") return "ur";
-    if (c === "it") return "it";
-    return "en";
-  }
-
   function shouldSpeak() {
     return !!voiceTurn;
   }
@@ -948,25 +881,14 @@
     }, 120);
   }
 
-  /** Must run inside a click/tap handler on phones — delayed speak is muted. */
+  /** Browser speech only — Slorsh owns product TTS/STT; portfolio does not bill voice. */
   function speakNow(text) {
     if (!text) return;
     warmVoices();
     unlockSpeech();
-    stopGoogleTts();
     try {
       if (window.speechSynthesis) window.speechSynthesis.cancel();
     } catch (e) {}
-
-    var c = activeLang();
-
-    if (c === "ur" || c === "pa") {
-      var started = speakGoogleTts(text, googleTl(), function () {
-        speakUtterance(text);
-      });
-      if (started) return;
-    }
-
     speakUtterance(text);
   }
 
@@ -1623,6 +1545,18 @@
       }
     }
 
+    // Short hellos → local FAQ only (never Cursor — avoids bridge.css / repo babble).
+    if (forced == null) {
+      var foldedQuick = foldText(text);
+      var greetKeysQuick = ["hello", "hi", "hey", "ہیلو", "هيلو", "ہائے", "سلام", "السلام علیکم", "ciao", "salam", "hy", "helo"];
+      if (foldedQuick.length <= 18 && hasAny(foldedQuick, greetKeysQuick)) {
+        var greet = FAQS[0][activeLang()] || FAQS[0].en;
+        botSay(greet);
+        reportSlorshChat(text, greet, { local_greeting: true });
+        return;
+      }
+    }
+
     // Free-text → Cursor agent API; chips stay local. FAQ is offline fallback.
     if (forced == null) {
       askCursorAi(text, function (aiReply, errCode, meta) {
@@ -1870,22 +1804,8 @@
     var micStartedAt = Date.now();
     rec.onresult = function (ev) {
       var said = ev.results[0][0].transcript;
-      var durSec = Math.max(1, Math.ceil((Date.now() - micStartedAt) / 1000));
       stopMic();
-      // Agency voice rate for STT (same as TTS) — billed via Slorsh School Desk bot
-      try {
-        fetch("/api/slorsh-usage", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            feature: "portfolio_stt",
-            question: said,
-            duration_sec: durSec,
-            metadata: { lang: activeLang(), channel: "mic" },
-          }),
-          keepalive: true,
-        }).catch(function () {});
-      } catch (e) {}
+      // Mic uses free browser STT only — no portfolio voice billing (Slorsh owns voice).
       handleUser(said, true);
     };
     rec.onerror = function () {

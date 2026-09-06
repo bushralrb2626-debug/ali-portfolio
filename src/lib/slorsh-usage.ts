@@ -26,8 +26,6 @@ export const AGENCY_REPORT_CREDITS: Record<string, number> = {
 
 export type SlorshUsageFeature =
   | "portfolio_chat"
-  | "portfolio_tts"
-  | "portfolio_stt"
   | "portfolio_booking"
   | `portfolio_report_${string}`;
 

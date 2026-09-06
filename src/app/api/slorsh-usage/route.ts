@@ -12,8 +12,6 @@ type Body = {
 };
 
 const ALLOWED = new Set([
-  "portfolio_stt",
-  "portfolio_tts",
   "portfolio_chat",
   "portfolio_booking",
   "portfolio_report_weekly",
