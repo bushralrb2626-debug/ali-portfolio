@@ -1,3 +1,4 @@
+import { notifyBooking } from "@/lib/admin-notify";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
@@ -45,6 +46,14 @@ export async function POST(request: Request) {
     question: `Visit booking: ${name} <${email}>`,
     answer: note || "Booked",
     metadata: { slotId },
+  });
+
+  notifyBooking({
+    name,
+    email,
+    note,
+    slotId,
+    startsAt: slot.startsAt?.toISOString?.() || String(slot.startsAt || ""),
   });
 
   revalidatePath("/");

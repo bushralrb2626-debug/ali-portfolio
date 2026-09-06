@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { env } from "node:process";
 import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
-import { reportSlorshUsageBackground, pingSlorshUsage, slorshBillingConfigured, getSlorshApiBase } from "@/lib/slorsh-usage";
+import { reportSlorshUsage, pingSlorshUsage, slorshBillingConfigured, getSlorshApiBase } from "@/lib/slorsh-usage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -261,24 +261,34 @@ export async function POST(request: NextRequest) {
           const reply = cleanReply(full || waited.result || "");
           if (!reply) {
             controller.enqueue(sseEncode({ type: "error", error: "empty_reply" }));
-          } else {
-            controller.enqueue(
-              sseEncode({ type: "done", ok: true, reply, runId: waited.id })
-            );
-            // Bill admin after reply is already streamed — no latency on the visitor.
-            reportSlorshUsageBackground({
-              feature: "portfolio_chat",
-              question: message,
-              answer: reply,
-              session_id: String(body.visitorName || body.lang || "campus").slice(0, 80),
-              metadata: {
-                runId: waited.id,
-                lang: body.lang || "en",
-                loggedIn: Boolean(body.loggedIn),
-                model: modelId,
-              },
-            });
+            controller.close();
+            return;
           }
+          // Stream the answer first so the visitor is not blocked on billing.
+          controller.enqueue(
+            sseEncode({ type: "done", ok: true, reply, runId: waited.id })
+          );
+          // Must await — fire-and-forget is dropped when SSE closes on Render.
+          const bill = await reportSlorshUsage({
+            feature: "portfolio_chat",
+            question: message,
+            answer: reply,
+            session_id: String(body.visitorName || body.lang || "campus").slice(0, 80),
+            metadata: {
+              runId: waited.id,
+              lang: body.lang || "en",
+              loggedIn: Boolean(body.loggedIn),
+              model: modelId,
+            },
+          });
+          controller.enqueue(
+            sseEncode({
+              type: "billed",
+              ok: Boolean(bill.ok),
+              credits: bill.credits_charged ?? null,
+              error: bill.error || null,
+            })
+          );
           controller.close();
         } catch (err) {
           const detail =
@@ -346,7 +356,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    reportSlorshUsageBackground({
+    const bill = await reportSlorshUsage({
       feature: "portfolio_chat",
       question: message,
       answer: reply,
@@ -364,6 +374,9 @@ export async function POST(request: NextRequest) {
       ok: true,
       reply,
       runId: result.id,
+      billed: Boolean(bill.ok),
+      credits_charged: bill.credits_charged ?? null,
+      bill_error: bill.error || null,
     });
   } catch (err) {
     if (err instanceof CursorAgentError) {
