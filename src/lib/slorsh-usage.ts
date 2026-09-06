@@ -43,6 +43,9 @@ export type SlorshUsageResult = {
   credits_charged?: number;
   balance_after?: number;
   bot_name?: string;
+  bot_id?: string;
+  report_id?: string;
+  conversation_id?: string;
   error?: string;
 };
 
@@ -154,8 +157,8 @@ export function reportSlorshUsageBackground(payload: SlorshUsagePayload): void {
 }
 
 /**
- * Debit Agency report credits on Slorsh before/after generate.
- * Free SKUs (0 cr) skip the HTTP call and return ok.
+ * Debit Agency report credits on Slorsh and create a Reports history row.
+ * Free SKUs (0 cr) still POST so History gets an entry.
  */
 export async function billPortfolioReport(input: {
   type: string;
@@ -163,19 +166,46 @@ export async function billPortfolioReport(input: {
   source?: string;
 }): Promise<SlorshUsageResult & { credits: number }> {
   const credits = agencyCreditsForReportType(input.type);
-  if (credits <= 0) {
-    return { ok: true, credits: 0, credits_charged: 0 };
-  }
   const result = await reportSlorshUsage({
     feature: reportFeatureForReportType(input.type),
-    amount: credits,
+    ...(credits > 0 ? { amount: credits } : {}),
     question: `Portfolio report: ${input.type}`,
     answer: (input.title || input.type).slice(0, 500),
     metadata: {
       report_type: input.type,
+      title: input.title || input.type,
       source: input.source || "portfolio",
     },
   });
   return { ...result, credits };
+}
+
+/**
+ * Attach generated markdown to the Slorsh report created at bill time (no extra debit).
+ */
+export async function attachPortfolioReportToSlorsh(input: {
+  reportId?: string;
+  type: string;
+  title?: string;
+  summary?: string;
+  markdown?: string;
+}): Promise<SlorshUsageResult> {
+  const markdown = (input.markdown || "").trim();
+  if (!markdown && !input.reportId) {
+    return { ok: true };
+  }
+  return reportSlorshUsage({
+    feature: "portfolio_report_attach" as SlorshUsageFeature,
+    question: `Attach portfolio report: ${input.type}`,
+    answer: (input.summary || input.title || input.type).slice(0, 500),
+    metadata: {
+      report_id: input.reportId || undefined,
+      report_type: input.type,
+      title: input.title,
+      summary: input.summary,
+      markdown: markdown.slice(0, 24000),
+      source: "portfolio",
+    },
+  });
 }
 

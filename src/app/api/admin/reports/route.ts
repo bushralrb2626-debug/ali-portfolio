@@ -8,7 +8,7 @@ import {
   USAGE_CATALOG,
 } from "@/lib/portfolio-reports";
 import { prisma } from "@/lib/prisma";
-import { billPortfolioReport } from "@/lib/slorsh-usage";
+import { attachPortfolioReportToSlorsh, billPortfolioReport } from "@/lib/slorsh-usage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -111,6 +111,15 @@ export async function POST(request: NextRequest) {
     }
 
     const report = await generatePortfolioReport(type, body.topic);
+    if (bill.report_id || report.markdown) {
+      void attachPortfolioReportToSlorsh({
+        reportId: bill.report_id,
+        type,
+        title: report.title,
+        summary: report.summary,
+        markdown: report.markdown,
+      });
+    }
     notifyReportReady({
       type,
       title: report.title,
@@ -122,6 +131,7 @@ export async function POST(request: NextRequest) {
       ...report,
       credits_charged: bill.credits_charged ?? bill.credits,
       balance_after: bill.balance_after,
+      slorsh_report_id: bill.report_id,
     });
   } catch (err) {
     const detail = err instanceof Error ? err.message : "generate_failed";

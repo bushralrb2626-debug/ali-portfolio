@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { env } from "node:process";
 import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
-import { billPortfolioReport } from "@/lib/slorsh-usage";
+import { attachPortfolioReportToSlorsh, billPortfolioReport } from "@/lib/slorsh-usage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
   const pack = body.pack && typeof body.pack === "object" ? body.pack : {};
   const topic = String(body.topic || "").trim().slice(0, 200);
   const asOf = new Date().toISOString();
-  const title = `${LABELS[type]} — school admin`;
+  const title = `${LABELS[type]} — Italian school admin`;
 
   const fallback = [
     `# ${title}`,
@@ -249,16 +249,25 @@ ${JSON.stringify({ as_of: asOf, type, topic, market: "Italy", pack }, null, 2).s
     const summary =
       text.split("\n").find((l) => l.trim() && !l.startsWith("#"))?.slice(0, 280) ||
       LABELS[type];
+    const markdown = text.slice(0, 24000);
+    void attachPortfolioReportToSlorsh({
+      reportId: bill.report_id,
+      type,
+      title,
+      summary,
+      markdown,
+    });
     return NextResponse.json({
       ok: true,
       type,
       title,
       via: "ai",
-      markdown: text.slice(0, 24000),
+      markdown,
       summary,
       runId: result.id,
       credits_charged: bill.credits_charged ?? bill.credits,
       balance_after: bill.balance_after,
+      slorsh_report_id: bill.report_id,
     });
   } catch (err) {
     const detail =
@@ -267,6 +276,13 @@ ${JSON.stringify({ as_of: asOf, type, topic, market: "Italy", pack }, null, 2).s
         : err instanceof Error
           ? err.message
           : "unknown";
+    void attachPortfolioReportToSlorsh({
+      reportId: bill.report_id,
+      type,
+      title,
+      summary: "Structured pack — AI temporarily unavailable.",
+      markdown: fallback,
+    });
     return NextResponse.json({
       ok: true,
       type,
@@ -275,6 +291,7 @@ ${JSON.stringify({ as_of: asOf, type, topic, market: "Italy", pack }, null, 2).s
       markdown: fallback,
       summary: "Structured pack — AI temporarily unavailable.",
       detail,
+      slorsh_report_id: bill.report_id,
     });
   }
 }
