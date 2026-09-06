@@ -1499,6 +1499,25 @@
       });
   }
 
+  function reportSlorshChat(question, answer, meta) {
+    try {
+      fetch("/api/slorsh-usage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          feature: "portfolio_chat",
+          question: String(question || "").slice(0, 2000),
+          answer: String(answer || "").slice(0, 4000),
+          session_id: String(
+            (currentSession() && currentSession().name) || activeLang() || "campus"
+          ).slice(0, 80),
+          metadata: Object.assign({ lang: activeLang(), path: "local_faq" }, meta || {}),
+        }),
+        keepalive: true,
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
   function beginTurn(fromVoice) {
     voiceTurn = !!fromVoice;
     if (!voiceTurn) hushVoice();
@@ -1624,6 +1643,8 @@
         }
         var offerCall = /03066638854|phone|tel\.|call |فون|کال|telefon/i.test(String(reply));
         botSay(reply, offerCall ? { offerCall: true } : null);
+        // Cursor path bills on the server; FAQ fallback must bill from the browser.
+        reportSlorshChat(text, reply, { fallback: true, err: errCode || null });
       });
       return;
     }
@@ -1635,6 +1656,7 @@
     }
     var offerCall = /03066638854|phone|tel\.|call |فون|کال|telefon/i.test(String(reply));
     botSay(reply, offerCall ? { offerCall: true } : null);
+    reportSlorshChat(text, reply, { chip_or_forced: Boolean(forced) });
   }
 
   function startBooking() {
@@ -1845,9 +1867,25 @@
     rec.lang = speechRecognitionLocale();
     rec.interimResults = false;
     rec.maxAlternatives = 3;
+    var micStartedAt = Date.now();
     rec.onresult = function (ev) {
       var said = ev.results[0][0].transcript;
+      var durSec = Math.max(1, Math.ceil((Date.now() - micStartedAt) / 1000));
       stopMic();
+      // Agency voice rate for STT (same as TTS) — billed via Slorsh School Desk bot
+      try {
+        fetch("/api/slorsh-usage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            feature: "portfolio_stt",
+            question: said,
+            duration_sec: durSec,
+            metadata: { lang: activeLang(), channel: "mic" },
+          }),
+          keepalive: true,
+        }).catch(function () {});
+      } catch (e) {}
       handleUser(said, true);
     };
     rec.onerror = function () {
