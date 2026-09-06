@@ -881,15 +881,32 @@
     }, 120);
   }
 
+  /** Strip markdown/punctuation TTS should not read aloud (e.g. *bold*). */
+  function speakableText(text) {
+    return String(text || "")
+      .replace(/\*\*([^*]+)\*\*/g, "$1")
+      .replace(/\*([^*]+)\*/g, "$1")
+      .replace(/__([^_]+)__/g, "$1")
+      .replace(/_([^_]+)_/g, "$1")
+      .replace(/`+/g, "")
+      .replace(/#{1,6}\s*/g, "")
+      .replace(/^\s*[-*+]\s+/gm, "")
+      .replace(/\*/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   /** Browser speech only — Slorsh owns product TTS/STT; portfolio does not bill voice. */
   function speakNow(text) {
     if (!text) return;
+    var spoken = speakableText(text);
+    if (!spoken) return;
     warmVoices();
     unlockSpeech();
     try {
       if (window.speechSynthesis) window.speechSynthesis.cancel();
     } catch (e) {}
-    speakUtterance(text);
+    speakUtterance(spoken);
   }
 
   function speakUtterance(text) {
