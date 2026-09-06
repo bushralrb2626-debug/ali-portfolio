@@ -50,6 +50,7 @@
       { icon: "📥", label: "Inbox", id: "feedback" },
       { icon: "📊", label: "Results", id: "results" },
       { icon: "📑", label: "Reports", id: "slorsh-reports" },
+      { icon: "📈", label: "Analytics", id: "analytics" },
       { icon: "⚙️", label: "Settings", id: "settings" },
     ],
     superadmin: [
@@ -65,6 +66,7 @@
       { icon: "📥", label: "Inbox", id: "feedback" },
       { icon: "📊", label: "Results", id: "results" },
       { icon: "📑", label: "Reports", id: "slorsh-reports" },
+      { icon: "📈", label: "Analytics", id: "analytics" },
       { icon: "🛡️", label: "Admins", id: "admins" },
     ],
   };
@@ -1858,6 +1860,55 @@
     );
   }
 
+  function analyticsPanelShell() {
+    return (
+      '<div class="welcome-banner"><h2>Website analytics</h2><p>Unique people who opened the public BrightSteps site (homepage, about, programs, contact, …).</p></div>' +
+      '<div id="webAnalyticsKpis">' +
+      kpis([
+        { label: "Opened today", value: "…", accent: "accent-mint" },
+        { label: "Last 7 days", value: "…", accent: "accent-sky" },
+        { label: "Last 30 days", value: "…", accent: "accent-royal" },
+        { label: "Status", value: "Loading", accent: "accent-coral" },
+      ]) +
+      "</div>" +
+      panel(
+        "About these numbers",
+        "<p>Each browser counts <strong>once per day</strong> when someone opens the public school website. Dashboard, login and register are not counted. After deploy, open the public site once to start the tally.</p>"
+      )
+    );
+  }
+
+  function loadWebAnalyticsInto(host) {
+    if (!host) return;
+    fetch("/api/demos/brightsteps/opens", { cache: "no-store" })
+      .then(function (res) {
+        return res.json().then(function (data) {
+          return { ok: res.ok, data: data };
+        });
+      })
+      .then(function (result) {
+        var d = result.data || {};
+        var today = result.ok ? String(d.today || 0) : "—";
+        var week = result.ok ? String(d.week || 0) : "—";
+        var month = result.ok ? String(d.month || 0) : "—";
+        var status = result.ok ? "Live" : "Unavailable";
+        host.innerHTML = kpis([
+          { label: "Opened today", value: today, accent: "accent-mint" },
+          { label: "Last 7 days", value: week, accent: "accent-sky" },
+          { label: "Last 30 days", value: month, accent: "accent-royal" },
+          { label: "Status", value: status, accent: result.ok ? "accent-mint" : "accent-coral" },
+        ]);
+      })
+      .catch(function () {
+        host.innerHTML = kpis([
+          { label: "Opened today", value: "—", accent: "accent-mint" },
+          { label: "Last 7 days", value: "—", accent: "accent-sky" },
+          { label: "Last 30 days", value: "—", accent: "accent-royal" },
+          { label: "Status", value: "Error", accent: "accent-coral" },
+        ]);
+      });
+  }
+
   function feesPanel() {
     var students = allStudents();
     var unpaid = students.filter(function (s) {
@@ -2265,6 +2316,7 @@
       if (section === "results") return adminResultsPanel(session);
       if (section === "attendance") return adminAttendancePanel(session);
       if (section === "slorsh-reports") return schoolReportsPanel(session);
+      if (section === "analytics") return analyticsPanelShell();
       if (section === "settings") {
         return panel(
           "School settings",
@@ -2307,6 +2359,7 @@
     if (section === "results") return adminResultsPanel(session);
     if (section === "attendance") return adminAttendancePanel(session);
     if (section === "slorsh-reports") return schoolReportsPanel(session);
+    if (section === "analytics") return analyticsPanelShell();
     if (section === "admins") {
       return panel(
         "School admins",

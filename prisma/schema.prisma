@@ -82,3 +82,15 @@ model ReportSchedulePref {
   enabled   Boolean  @default(true)
   updatedAt DateTime @updatedAt
 }
+
+/** Unique BrightSteps public-site visitors per UTC day (admin Analytics). */
+model BrightStepsSiteOpen {
+  id        String   @id @default(cuid())
+  day       String
+  visitorId String
+  path      String   @default("/")
+  createdAt DateTime @default(now())
+
+  @@unique([day, visitorId])
+  @@index([day])
+}

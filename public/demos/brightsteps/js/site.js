@@ -678,10 +678,47 @@
   }
 
   /* --------------------------------------------------------------------------
+     Public site open tracking → admin Analytics (unique visitor / UTC day)
+     -------------------------------------------------------------------------- */
+  function trackPublicSiteOpen() {
+    try {
+      var path = String(location.pathname || "");
+      if (path.indexOf("/demos/brightsteps") === -1) return;
+      if (/dashboard\.html|login\.html|register\.html/i.test(path)) return;
+
+      var VID = "brightsteps-visitor-id";
+      var SENT = "brightsteps-open-sent-day";
+      var day = new Date().toISOString().slice(0, 10);
+      if (localStorage.getItem(SENT) === day) return;
+
+      var visitorId = localStorage.getItem(VID);
+      if (!visitorId) {
+        visitorId =
+          "v_" +
+          Math.random().toString(36).slice(2, 10) +
+          Date.now().toString(36);
+        localStorage.setItem(VID, visitorId);
+      }
+
+      fetch("/api/demos/brightsteps/opens", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visitorId: visitorId, path: path }),
+        keepalive: true,
+      })
+        .then(function (res) {
+          if (res.ok) localStorage.setItem(SENT, day);
+        })
+        .catch(function () {});
+    } catch (e) {}
+  }
+
+  /* --------------------------------------------------------------------------
      Boot
      -------------------------------------------------------------------------- */
   function boot() {
     ensureToastHost();
+    trackPublicSiteOpen();
     initPublicNav();
     initGallery();
     initCounters();
