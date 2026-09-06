@@ -1801,7 +1801,6 @@
     rec.lang = speechRecognitionLocale();
     rec.interimResults = false;
     rec.maxAlternatives = 3;
-    var micStartedAt = Date.now();
     rec.onresult = function (ev) {
       var said = ev.results[0][0].transcript;
       stopMic();
