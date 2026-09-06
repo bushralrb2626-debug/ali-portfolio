@@ -99,6 +99,8 @@
   var RESULTS_KEY = "brightsteps-demo-results";
   var ATTEND_KEY = "brightsteps-demo-attendance";
   var ATTEND_WINDOW_KEY = "brightsteps-demo-attend-window";
+  var FEE_PAID_KEY = "brightsteps-demo-fee-paid";
+  var REPORT_HISTORY_KEY = "brightsteps-demo-report-history";
   var attendTickTimer = null;
 
   var DEFAULT_ROOMS = [
@@ -602,18 +604,18 @@
   }
 
   var SLORSH_REPORT_USAGE = [
-    { type: "weekly", label: "Weekly Report", blurb: "7-day school ops narrative.", tone: "usage", eyebrow: "Usage" },
-    { type: "monthly", label: "Monthly Report", blurb: "30-day enrollment, attendance, fees.", tone: "usage", eyebrow: "Usage" },
-    { type: "weekly_plus", label: "Weekly Report+", blurb: "Deeper weekly + risks.", tone: "usage-plus", eyebrow: "Usage +" },
-    { type: "monthly_plus", label: "Monthly Report+", blurb: "Deeper monthly + next steps.", tone: "usage-plus", eyebrow: "Usage +" },
+    { type: "weekly", label: "Weekly Report", blurb: "7-day Italian school ops narrative.", tone: "usage", eyebrow: "Usage" },
+    { type: "monthly", label: "Monthly Report", blurb: "30-day iscrizioni, presenze, rette.", tone: "usage", eyebrow: "Usage" },
+    { type: "weekly_plus", label: "Weekly Report+", blurb: "Deeper weekly + risks (Italy).", tone: "usage-plus", eyebrow: "Usage +" },
+    { type: "monthly_plus", label: "Monthly Report+", blurb: "Deeper monthly + next steps (Italy).", tone: "usage-plus", eyebrow: "Usage +" },
   ];
   var SLORSH_REPORT_MARKET = [
-    { type: "market_competitor", label: "Market + Competitor", blurb: "Portal positioning vs category.", tone: "market", eyebrow: "Market" },
-    { type: "product_performance", label: "Product Performance", blurb: "Attendance, meetings, desk bot.", tone: "market", eyebrow: "Market" },
-    { type: "pricing_optimization", label: "Pricing Optimization", blurb: "Fee framing experiments.", tone: "market", eyebrow: "Market" },
-    { type: "customer_satisfaction", label: "Customer Satisfaction", blurb: "Visits & inbox themes.", tone: "market", eyebrow: "Market" },
-    { type: "sales_performance", label: "Sales Performance", blurb: "Visits → admissions interest.", tone: "market", eyebrow: "Market" },
-    { type: "executive_dashboard", label: "Executive Dashboard", blurb: "One-page admin snapshot.", tone: "exec", eyebrow: "Exec" },
+    { type: "market_competitor", label: "Market + Competitor", blurb: "Italy EdTech / registro positioning.", tone: "market", eyebrow: "Market" },
+    { type: "product_performance", label: "Product Performance", blurb: "Presenze, colloqui, desk bot.", tone: "market", eyebrow: "Market" },
+    { type: "pricing_optimization", label: "Pricing Optimization", blurb: "Rette framing experiments (EUR).", tone: "market", eyebrow: "Market" },
+    { type: "customer_satisfaction", label: "Customer Satisfaction", blurb: "Visite & inbox themes (IT parents).", tone: "market", eyebrow: "Market" },
+    { type: "sales_performance", label: "Sales Performance", blurb: "Visite → interesse iscrizione.", tone: "market", eyebrow: "Market" },
+    { type: "executive_dashboard", label: "Executive Dashboard", blurb: "One-page Italian admin snapshot.", tone: "exec", eyebrow: "Exec" },
   ];
 
   function inlineMd(text) {
@@ -841,17 +843,18 @@
       );
     }
     return (
-      '<div class="sr-hero"><h2>Reports</h2><p>Professional school intel · 4 usage + 6 market types from live campus data.</p>' +
+      '<div class="sr-hero"><h2>Reports</h2><p>Italian school intel · 4 usage + 6 market types from live campus data (Italy / EUR).</p>' +
       '<div class="sr-seat">Signed in as <strong>' +
       escapeHtml(session.name || "Ali") +
       '</strong> · <span class="badge-soft badge-mint">Admin</span></div></div>' +
       '<div class="sr-topic"><label for="schoolReportTopic">Niche / topic (optional)</label>' +
-      '<input type="text" id="schoolReportTopic" class="form-bsa" maxlength="200" placeholder="e.g. primary school admissions" /></div>' +
+      '<input type="text" id="schoolReportTopic" class="form-bsa" maxlength="200" placeholder="e.g. iscrizioni scuola primaria Milano" /></div>' +
       panel("Usage reports", cards(SLORSH_REPORT_USAGE)) +
       panel("Market intel", cards(SLORSH_REPORT_MARKET)) +
+      reportHistoryPanelHtml() +
       panel(
         "Latest narrative",
-        '<div id="schoolReportOut"><div class="sr-out"><p class="sr-empty">Choose a report type to generate a live narrative.</p></div></div>'
+        '<div id="schoolReportOut"><div class="sr-out"><p class="sr-empty">Choose a report type to generate, or open one from Previous reports.</p></div></div>'
       )
     );
   }
@@ -871,7 +874,100 @@
   }
 
   function money(value) {
-    return "Rs " + parseAmount(value).toLocaleString();
+    return "€ " + parseAmount(value).toLocaleString("it-IT");
+  }
+
+  function loadFeePaidMap() {
+    try {
+      var raw = localStorage.getItem(FEE_PAID_KEY);
+      var map = raw ? JSON.parse(raw) : {};
+      return map && typeof map === "object" ? map : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveFeePaidMap(map) {
+    localStorage.setItem(FEE_PAID_KEY, JSON.stringify(map || {}));
+  }
+
+  function isFeePaid(studentId) {
+    var row = loadFeePaidMap()[studentId];
+    return !!(row && row.paid);
+  }
+
+  function setFeePaid(studentId, paid) {
+    var map = loadFeePaidMap();
+    if (paid) {
+      map[studentId] = { paid: true, at: new Date().toISOString() };
+    } else {
+      delete map[studentId];
+    }
+    saveFeePaidMap(map);
+  }
+
+  function feeStatusCell(student) {
+    var id = student.id || student.name;
+    if (isFeePaid(id)) {
+      return (
+        '<span class="badge-soft badge-mint">Paid</span> ' +
+        '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-fee-unpaid="' +
+        escapeHtml(id) +
+        '">Mark unpaid</button>'
+      );
+    }
+    return (
+      '<span class="badge-soft" style="background:#fde8e8;color:#9b1c1c">Unpaid</span> ' +
+      '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-primary" data-fee-paid="' +
+      escapeHtml(id) +
+      '">Mark paid</button>'
+    );
+  }
+
+  function loadReportHistory() {
+    var list = loadList(REPORT_HISTORY_KEY);
+    return Array.isArray(list) ? list.slice(0, 5) : [];
+  }
+
+  function saveReportHistoryEntry(entry) {
+    var list = loadReportHistory();
+    list.unshift({
+      id: "rep-" + Date.now(),
+      type: entry.type || "",
+      title: entry.title || entry.type || "Report",
+      summary: String(entry.summary || "").slice(0, 280),
+      markdown: String(entry.markdown || "").slice(0, 120000),
+      topic: entry.topic || "",
+      at: entry.at || new Date().toISOString(),
+      credits_charged: entry.credits_charged || 0,
+      via: entry.via || "",
+    });
+    saveList(REPORT_HISTORY_KEY, list.slice(0, 5));
+  }
+
+  function reportHistoryPanelHtml() {
+    var list = loadReportHistory();
+    if (!list.length) {
+      return panel(
+        "Previous reports",
+        "<p class='text-muted'>No saved reports yet. Generate one above — the last 5 stay here for this browser.</p>"
+      );
+    }
+    var rows = list.map(function (r, idx) {
+      var when = r.at ? String(r.at).replace("T", " ").slice(0, 16) : "";
+      return [
+        escapeHtml(when),
+        escapeHtml(r.title || r.type),
+        escapeHtml((r.summary || "").slice(0, 90)),
+        '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-primary" data-view-report="' +
+          escapeHtml(r.id) +
+          '">View</button>',
+      ];
+    });
+    return panel(
+      "Previous reports (last 5)",
+      table(["When", "Report", "Summary", ""], rows)
+    );
   }
 
   function amountFor(id, field, fallback) {
@@ -1041,6 +1137,7 @@
   }
 
   function removePersonBtn(kind, person) {
+    var label = kind === "student" ? "Remove student" : kind === "teacher" ? "Remove teacher" : "Remove";
     return (
       '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-remove-person data-kind="' +
       escapeHtml(kind) +
@@ -1048,7 +1145,9 @@
       escapeHtml(person.id || person.name) +
       '" data-email="' +
       escapeHtml(person.email || "") +
-      '">Remove</button>'
+      '">' +
+      escapeHtml(label) +
+      "</button>"
     );
   }
 
@@ -1084,7 +1183,7 @@
       '<label>School<input name="school" required maxlength="80" value="' +
       school +
       '" /></label>' +
-      '<label>Monthly fee (Rs)<input name="fee" type="number" min="0" step="500" value="10000" required /></label>' +
+      '<label>Monthly fee (€)<input name="fee" type="number" min="0" step="50" value="450" required /></label>' +
       "</div>" +
       '<div class="form-row">' +
       '<label>Student email (login)<input name="email" type="email" required placeholder="child@email.com" /></label>' +
@@ -1129,15 +1228,19 @@
         escapeHtml(s.year),
         inlineRoomSelect(id, s.classroom),
         moneyInput("fee", id, s.fee),
+        feeStatusCell(s),
         portalLockCell(s),
         removePersonBtn("student", s),
       ];
     });
     return (
-      addKidForm(session && session.className ? session.className : "BrightFuture Academy") +
+      addKidForm(session && session.className ? session.className : "Scuola Materna") +
       panel(
-        "Students and monthly fees",
-        table(["Name", "School", "Year", "Classroom", "Monthly fee", "Portal", "Actions"], rows)
+        "Students — edit fees, mark paid, or remove",
+        table(
+          ["Name", "School", "Year", "Classroom", "Monthly fee", "Fee status", "Portal", "Actions"],
+          rows
+        )
       )
     );
   }
@@ -1754,29 +1857,68 @@
   }
 
   function feesPanel() {
-    var rows = allStudents().map(function (s) {
-      var id = s.id || s.name;
-      return [escapeHtml(s.name), escapeHtml(s.year), escapeHtml(s.school), moneyInput("fee", id, s.fee)];
+    var students = allStudents();
+    var unpaid = students.filter(function (s) {
+      return !isFeePaid(s.id || s.name);
     });
-    var total = allStudents().reduce(function (sum, s) {
+    var paid = students.filter(function (s) {
+      return isFeePaid(s.id || s.name);
+    });
+    var unpaidTotal = unpaid.reduce(function (sum, s) {
       return sum + parseAmount(s.fee);
     }, 0);
+    var total = students.reduce(function (sum, s) {
+      return sum + parseAmount(s.fee);
+    }, 0);
+
+    var unpaidRows = unpaid.map(function (s) {
+      var id = s.id || s.name;
+      return [
+        escapeHtml(s.name),
+        escapeHtml(s.year),
+        escapeHtml(s.school),
+        money(s.fee),
+        feeStatusCell(s),
+        removePersonBtn("student", s),
+      ];
+    });
+
+    var allRows = students.map(function (s) {
+      var id = s.id || s.name;
+      return [
+        escapeHtml(s.name),
+        escapeHtml(s.year),
+        escapeHtml(s.school),
+        moneyInput("fee", id, s.fee),
+        feeStatusCell(s),
+        removePersonBtn("student", s),
+      ];
+    });
+
     return (
       kpis([
-        { label: "Students", value: String(allStudents().length), accent: "accent-mint" },
-        { label: "Monthly fee total", value: money(total), accent: "accent-royal" },
-        {
-          label: "Teacher payroll",
-          value: money(
-            allTeachers().reduce(function (sum, t) {
-              return sum + parseAmount(t.salary);
-            }, 0)
-          ),
-          accent: "accent-sky",
-        },
-        { label: "Open visits", value: String(loadVisits().length), accent: "accent-coral" },
+        { label: "Students", value: String(students.length), accent: "accent-mint" },
+        { label: "Unpaid this month", value: String(unpaid.length), accent: "accent-coral" },
+        { label: "Unpaid total", value: money(unpaidTotal), accent: "accent-royal" },
+        { label: "Monthly fee roll", value: money(total), accent: "accent-sky" },
       ]) +
-      panel("Fee of each student", table(["Student", "Year", "School", "Monthly fee"], rows))
+      panel(
+        "Students who have not paid",
+        unpaidRows.length
+          ? table(["Student", "Year", "School", "Fee due", "Status", "Actions"], unpaidRows)
+          : "<p class='text-muted'>Everyone on the roll is marked paid.</p>"
+      ) +
+      panel(
+        "All fees",
+        table(["Student", "Year", "School", "Monthly fee", "Status", "Actions"], allRows) +
+          (paid.length
+            ? "<p class='text-muted small' style='margin-top:0.75rem'>" +
+              paid.length +
+              " marked paid · " +
+              unpaid.length +
+              " unpaid</p>"
+            : "")
+      )
     );
   }
   function loadVisits() {
@@ -2268,6 +2410,7 @@
         return (k.id || k.name) !== id && k.email !== email;
       });
       saveKids(kids);
+      setFeePaid(id, false);
     }
     if (kind === "teacher") {
       var staff = loadStaff().filter(function (t) {
@@ -2347,8 +2490,25 @@
               return;
             }
             var data = result.data || {};
+            if (data.markdown) {
+              saveReportHistoryEntry({
+                type: rType,
+                title: data.title || rType,
+                summary: data.summary || "",
+                markdown: data.markdown,
+                topic: topic,
+                credits_charged: data.credits_charged || 0,
+                via: data.via || "",
+              });
+            }
             if (out) {
               out.innerHTML = schoolReportResultHtml(data, rType);
+            }
+            // Refresh history list without wiping the open narrative.
+            render(session, "slorsh-reports");
+            var outAfter = document.getElementById("schoolReportOut");
+            if (outAfter) {
+              outAfter.innerHTML = schoolReportResultHtml(data, rType);
             }
             if (window.showToast) {
               var cr = data.credits_charged;
@@ -2370,6 +2530,54 @@
             }
             if (window.showToast) window.showToast("Report request failed.", "error");
           });
+        return;
+      }
+
+      var viewReportBtn = e.target.closest("[data-view-report]");
+      if (viewReportBtn) {
+        e.preventDefault();
+        if (session.role !== "admin" && session.role !== "superadmin") return;
+        var viewId = viewReportBtn.getAttribute("data-view-report");
+        var hist = loadReportHistory().find(function (r) {
+          return r.id === viewId;
+        });
+        var viewOut = document.getElementById("schoolReportOut");
+        if (!hist) {
+          if (window.showToast) window.showToast("Report not found.", "error");
+          return;
+        }
+        if (viewOut) {
+          viewOut.innerHTML = schoolReportResultHtml(
+            {
+              title: hist.title,
+              summary: (hist.summary || "") + (hist.at ? " · Saved " + String(hist.at).replace("T", " ").slice(0, 16) : ""),
+              markdown: hist.markdown,
+              via: hist.via || "history",
+            },
+            hist.type
+          );
+          viewOut.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        return;
+      }
+
+      var feePaidBtn = e.target.closest("[data-fee-paid]");
+      if (feePaidBtn) {
+        e.preventDefault();
+        if (!canManageRoster(session)) return;
+        setFeePaid(feePaidBtn.getAttribute("data-fee-paid"), true);
+        if (window.showToast) window.showToast("Marked as paid.", "success");
+        render(session, section);
+        return;
+      }
+
+      var feeUnpaidBtn = e.target.closest("[data-fee-unpaid]");
+      if (feeUnpaidBtn) {
+        e.preventDefault();
+        if (!canManageRoster(session)) return;
+        setFeePaid(feeUnpaidBtn.getAttribute("data-fee-unpaid"), false);
+        if (window.showToast) window.showToast("Marked as unpaid.", "success");
+        render(session, section);
         return;
       }
 
