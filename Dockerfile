@@ -30,14 +30,22 @@ ENV AUTH_URL="https://ali-portfolio-web.onrender.com"
 ENV PORT=10000
 ENV HOSTNAME=0.0.0.0
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# Isolated Prisma CLI install so runtime `db push` has transitive deps (effect, c12, …).
+# Next standalone node_modules omit those and cherry-picking breaks easily.
+WORKDIR /opt/prisma-cli
+COPY --from=builder /app/package.json /app/package-lock.json ./
+COPY --from=builder /app/prisma ./prisma
+RUN npm ci --omit=dev --ignore-scripts \
+ && npx prisma generate
+
+WORKDIR /app
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/node_modules/@cursor ./node_modules/@cursor
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 COPY --from=builder /app/scripts/seed-runtime.mjs ./scripts/seed-runtime.mjs

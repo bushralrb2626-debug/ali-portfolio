@@ -30,7 +30,8 @@ esac
 
 echo "entrypoint: DATABASE_URL present (len=${#DATABASE_URL})"
 echo "entrypoint: prisma db push…"
-node /app/node_modules/prisma/build/index.js db push
+# Use isolated CLI install (/opt/prisma-cli) — standalone image lacks prisma transitive deps.
+node /opt/prisma-cli/node_modules/prisma/build/index.js db push --schema=/app/prisma/schema.prisma
 echo "entrypoint: seed…"
 node /app/scripts/seed-runtime.mjs
 
