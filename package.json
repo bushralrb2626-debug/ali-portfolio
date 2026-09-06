@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack -H 0.0.0.0",
-    "build": "prisma generate && prisma db push && tsx prisma/reseed-ads.ts && next build --webpack",
+    "build": "prisma generate && prisma db push && tsx prisma/seed.ts && next build --webpack",
     "start": "next start -H 0.0.0.0",
     "lint": "eslint",
     "db:push": "prisma db push",
@@ -25,6 +25,7 @@
     "bcryptjs": "^3.0.3",
     "next": "16.3.1",
     "next-auth": "^5.0.0-beta.32",
+    "nodemailer": "^8.0.11",
     "prisma": "^6.19.3",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -35,6 +36,7 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
