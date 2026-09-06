@@ -6,10 +6,12 @@
 
   var auth = window.BrightStepsDemoAuth;
   if (!auth) return;
+  var ops = window.BrightStepsSchoolOps || null;
 
   var NAV = {
     student: [
       { icon: "🏠", label: "Dashboard", id: "home" },
+      { icon: "📅", label: "Book visit", id: "book-visit" },
       { icon: "📅", label: "Timetable", id: "timetable" },
       { icon: "✅", label: "Attendance", id: "attendance" },
       { icon: "📚", label: "Assignments", id: "assignments" },
@@ -19,6 +21,9 @@
     ],
     parent: [
       { icon: "🏠", label: "Dashboard", id: "home" },
+      { icon: "🧒", label: "My children", id: "kids" },
+      { icon: "📊", label: "Results", id: "results" },
+      { icon: "📅", label: "Book visit", id: "book-visit" },
       { icon: "📖", label: "Diary", id: "diary" },
       { icon: "✅", label: "Attendance", id: "attendance" },
       { icon: "📣", label: "Announcements", id: "announcements" },
@@ -27,6 +32,7 @@
     teacher: [
       { icon: "🏠", label: "Dashboard", id: "home" },
       { icon: "👥", label: "My class", id: "class" },
+      { icon: "📅", label: "Book visit", id: "book-visit" },
       { icon: "📝", label: "Assignments", id: "assignments" },
       { icon: "📋", label: "Attendance", id: "attendance" },
       { icon: "📊", label: "Results", id: "results" },
@@ -43,6 +49,7 @@
       { icon: "📅", label: "Meetings", id: "meetings" },
       { icon: "👩‍🏫", label: "Teachers", id: "staff" },
       { icon: "🧒", label: "Students", id: "students" },
+      { icon: "👨‍👩‍👧", label: "Parents", id: "parents" },
       { icon: "✅", label: "Attendance", id: "attendance" },
       { icon: "💵", label: "Fees", id: "fees" },
       { icon: "🏫", label: "Classrooms", id: "classrooms" },
@@ -51,6 +58,7 @@
       { icon: "📊", label: "Results", id: "results" },
       { icon: "📑", label: "Reports", id: "slorsh-reports" },
       { icon: "📈", label: "Analytics", id: "analytics" },
+      { icon: "📅", label: "Book visit", id: "book-visit" },
       { icon: "⚙️", label: "Settings", id: "settings" },
     ],
     superadmin: [
@@ -59,6 +67,7 @@
       { icon: "🏫", label: "Schools", id: "schools" },
       { icon: "👩‍🏫", label: "Teachers", id: "teachers" },
       { icon: "🧒", label: "Students", id: "students" },
+      { icon: "👨‍👩‍👧", label: "Parents", id: "parents" },
       { icon: "✅", label: "Attendance", id: "attendance" },
       { icon: "💵", label: "Fees", id: "fees" },
       { icon: "🏫", label: "Classrooms", id: "classrooms" },
@@ -67,6 +76,7 @@
       { icon: "📊", label: "Results", id: "results" },
       { icon: "📑", label: "Reports", id: "slorsh-reports" },
       { icon: "📈", label: "Analytics", id: "analytics" },
+      { icon: "📅", label: "Book visit", id: "book-visit" },
       { icon: "🛡️", label: "Admins", id: "admins" },
     ],
   };
@@ -103,7 +113,20 @@
   var ATTEND_WINDOW_KEY = "brightsteps-demo-attend-window";
   var FEE_PAID_KEY = "brightsteps-demo-fee-paid";
   var REPORT_HISTORY_KEY = "brightsteps-demo-report-history";
+  var FAMILIES_KEY = "brightsteps-demo-families";
+  var INTERNAL_VISITS_KEY = "brightsteps-demo-internal-visits";
   var attendTickTimer = null;
+
+  var SEED_FAMILIES = [
+    {
+      id: "fam-amelia",
+      name: "Amelia Johnson",
+      email: "amelia.johnson@email.com",
+      phone: "+39 02 555 0142",
+      login: "parent_demo",
+      kidIds: ["seed-alex"],
+    },
+  ];
 
   var DEFAULT_ROOMS = [
     "Grade 1",
@@ -582,27 +605,30 @@
   }
 
   function parentAttendancePanel() {
-    var child = allStudents().find(function (s) {
-      return (s.id || s.name) === "seed-alex";
-    });
-    var id = child ? child.id || child.name : "seed-alex";
-    var row = getAttendance(id);
-    var state = attendWindowState();
-    return panel(
-      "Attendance",
-      attendWindowBannerHtml(state, false) +
-        "<p>" +
-        escapeHtml(child ? child.name : "Alex Rivera") +
-        " — <strong>" +
-        escapeHtml(attendanceStatusLabel(row && row.status)) +
-        "</strong> today</p>" +
-        (row
-          ? "<p class='text-muted small'>Updated " +
-            escapeHtml(new Date(row.at).toLocaleString()) +
-            (row.byName ? " · by " + escapeHtml(row.byName) : "") +
-            "</p>"
-          : "<p class='text-muted small'>Not marked yet today.</p>")
-    );
+    var kids = parentKidsList();
+    if (!kids.length) {
+      return panel("Attendance", "<p class='text-muted'>No linked children.</p>");
+    }
+    var blocks = kids
+      .map(function (child) {
+        var id = child.id || child.name;
+        var row = getAttendance(id);
+        return (
+          "<p><strong>" +
+          escapeHtml(child.name) +
+          "</strong> — <strong>" +
+          escapeHtml(attendanceStatusLabel(row && row.status)) +
+          "</strong>" +
+          (row
+            ? " <span class='text-muted small'>Updated " +
+              escapeHtml(new Date(row.at).toLocaleString()) +
+              "</span>"
+            : " <span class='text-muted small'>Not marked yet today.</span>") +
+          "</p>"
+        );
+      })
+      .join("");
+    return panel("Attendance", blocks);
   }
 
   var SLORSH_REPORT_USAGE = [
@@ -1037,7 +1063,236 @@
   }
 
   function parentLinkedClassroom() {
+    var kids = parentKidsList();
+    if (kids[0] && kids[0].classroom) return kids[0].classroom;
     return "Grade 4 · Maple";
+  }
+
+  function parentKidsList() {
+    if (!ops) return allStudents().filter(function (s) { return (s.id || s.name) === "seed-alex"; });
+    var ids = ops.kidIdsForParent(auth.getSession && auth.getSession());
+    if (!ids.length) ids = ["seed-alex"];
+    return allStudents().filter(function (s) {
+      return ids.indexOf(s.id || s.name) !== -1;
+    });
+  }
+
+  function parentsPanel() {
+    var families = ops ? ops.loadFamilies() : [];
+    var rows = families.map(function (f) {
+      var kidNames = (f.kidIds || [])
+        .map(function (id) {
+          var s = allStudents().find(function (x) { return (x.id || x.name) === id; })
+            || STUDENTS.find(function (x) { return (x.id || x.name) === id; });
+          return s ? s.name : id;
+        })
+        .join(", ") || "—";
+      return [
+        escapeHtml(f.name),
+        escapeHtml(f.email || f.login || ""),
+        escapeHtml(f.phone || "—"),
+        escapeHtml(kidNames),
+      ];
+    });
+    return (
+      panel(
+        "Parents / guardians — contact & children",
+        rows.length
+          ? table(["Parent", "Email / portal login", "Phone", "Children"], rows)
+          : "<p class='text-muted'>No parent records yet. Link a parent when adding a student.</p>"
+      ) +
+      '<form class="form-bsa" id="addParentForm">' +
+      "<p><strong>Add / link parent</strong></p>" +
+      '<div class="form-row">' +
+      '<label>Parent name<input name="name" required maxlength="80" /></label>' +
+      '<label>Email (portal login)<input name="email" type="email" required /></label>' +
+      "</div>" +
+      '<div class="form-row">' +
+      '<label>Phone<input name="phone" maxlength="40" placeholder="+39 …" /></label>' +
+      '<label>Link child<select name="kidId">' +
+      studentOptionsHtml("") +
+      "</select></label>" +
+      "</div>" +
+      '<button type="submit" class="btn-bsa btn-bsa-primary">Save parent</button>' +
+      "</form>"
+    );
+  }
+
+  function parentKidsPanel(session) {
+    var kids = parentKidsList();
+    var rows = kids.map(function (s) {
+      return [
+        escapeHtml(s.name),
+        escapeHtml(s.year || "—"),
+        escapeHtml(s.classroom || "—"),
+        escapeHtml(s.school || "—"),
+        money(s.fee),
+      ];
+    });
+    return (
+      panel(
+        "My children",
+        rows.length
+          ? table(["Name", "Year", "Classroom", "School", "Fee"], rows)
+          : "<p class='text-muted'>No children linked yet.</p>"
+      ) +
+      '<form class="form-bsa" id="parentAddKidForm">' +
+      "<p><strong>Add another child</strong> — creates their student login and links them to you.</p>" +
+      '<div class="form-row">' +
+      '<label>Child name<input name="name" required maxlength="80" /></label>' +
+      '<label>Year<input name="year" required value="Grade 1" /></label>' +
+      "</div>" +
+      '<div class="form-row">' +
+      '<label>Child email (login)<input name="email" type="email" required /></label>' +
+      '<label>Temp password<input name="password" value="Demo@12345" minlength="6" /></label>' +
+      "</div>" +
+      '<button type="submit" class="btn-bsa btn-bsa-primary">Add child</button>' +
+      "</form>"
+    );
+  }
+
+  function bookVisitTargets(session) {
+    var targets = [];
+    allTeachers().forEach(function (t) {
+      targets.push({
+        key: "teacher:" + (t.id || t.name),
+        role: "teacher",
+        label: "Teacher · " + t.name,
+        name: t.name,
+        email: t.email || "",
+      });
+    });
+    if (ops) {
+      ops.loadFamilies().forEach(function (f) {
+        targets.push({
+          key: "parent:" + (f.id || f.email),
+          role: "parent",
+          label: "Parent · " + f.name + (f.kidIds && f.kidIds.length ? " (" + f.kidIds.length + " kids)" : ""),
+          name: f.name,
+          email: f.email || "",
+        });
+      });
+    }
+    targets.push({
+      key: "admin:school",
+      role: "admin",
+      label: "School admin",
+      name: "School Administrator",
+      email: "admin@gmail.com",
+    });
+    return targets.filter(function (t) {
+      if (!ops) return true;
+      return ops.canBookVisit(session.role, t.role);
+    });
+  }
+
+  function bookVisitPanel(session) {
+    var targets = bookVisitTargets(session);
+    var opts = targets
+      .map(function (t) {
+        return (
+          '<option value="' +
+          escapeHtml(t.key) +
+          '" data-role="' +
+          escapeHtml(t.role) +
+          '" data-name="' +
+          escapeHtml(t.name) +
+          '" data-email="' +
+          escapeHtml(t.email || "") +
+          '">' +
+          escapeHtml(t.label) +
+          "</option>"
+        );
+      })
+      .join("");
+    var mine = (ops ? ops.loadInternalVisits() : []).filter(function (v) {
+      return v.fromLogin === session.login || v.toEmail === session.login || v.toName === session.name;
+    });
+    var rows = mine.slice(0, 20).map(function (v) {
+      return [
+        escapeHtml((v.createdAt || "").replace("T", " ").slice(0, 16)),
+        escapeHtml(v.fromName + " → " + v.toName),
+        escapeHtml(v.when || ""),
+        escapeHtml(v.note || ""),
+      ];
+    });
+    return (
+      '<div class="welcome-banner"><h2>Book a visit</h2><p>Teachers ↔ parents, everyone → admin. Students cannot book other students or parents.</p></div>' +
+      '<form class="form-bsa" id="internalVisitForm">' +
+      '<div class="form-row">' +
+      '<label>Meet with<select name="target" required><option value="">Select…</option>' +
+      opts +
+      "</select></label>" +
+      '<label>When<input name="when" required maxlength="80" placeholder="e.g. Friday 10:00" /></label>' +
+      "</div>" +
+      '<label>Note<textarea name="note" maxlength="400" rows="2" placeholder="Reason for the visit"></textarea></label>' +
+      '<button type="submit" class="btn-bsa btn-bsa-primary">Request visit</button>' +
+      "</form>" +
+      panel(
+        "Your visit requests",
+        rows.length ? table(["When logged", "Who", "Slot", "Note"], rows) : "<p class='text-muted'>No internal visits yet.</p>"
+      )
+    );
+  }
+
+  function resultAccessPanel(session) {
+    if (!ops || (session.role !== "admin" && session.role !== "superadmin")) return "";
+    var policy = ops.getResultPolicy();
+    var grantRows = [];
+    Object.keys(policy.grants || {}).forEach(function (sid) {
+      (policy.grants[sid] || []).forEach(function (viewer) {
+        var s = allStudents().find(function (x) { return (x.id || x.name) === sid; });
+        grantRows.push([
+          escapeHtml(s ? s.name : sid),
+          escapeHtml(viewer),
+          '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-revoke-grant data-student="' +
+            escapeHtml(sid) +
+            '" data-viewer="' +
+            escapeHtml(viewer) +
+            '">Revoke</button>',
+        ]);
+      });
+    });
+    return (
+      panel(
+        "Results visibility (admin)",
+        "<p>Default: only the student, their parents, the uploading teacher, and admin can see a result. " +
+          (policy.mode === "open"
+            ? "<strong>Open mode:</strong> anyone signed in can see all results."
+            : "<strong>Private mode:</strong> restricted + optional grants.") +
+          "</p>" +
+          (policy.adminLocked
+            ? '<p class="text-muted">🔒 Locked by ' +
+              escapeHtml(policy.lockedBy || "admin") +
+              " — others cannot change this.</p>"
+            : "") +
+          '<div class="form-row" style="gap:0.5rem;flex-wrap:wrap;margin:0.75rem 0">' +
+          '<button type="button" class="btn-bsa btn-bsa-sm ' +
+          (policy.mode === "private" ? "btn-bsa-primary" : "btn-bsa-soft") +
+          '" data-result-mode="private">Private</button>' +
+          '<button type="button" class="btn-bsa btn-bsa-sm ' +
+          (policy.mode === "open" ? "btn-bsa-primary" : "btn-bsa-soft") +
+          '" data-result-mode="open">Anyone can see all</button>' +
+          '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-lock-result-policy="1">Lock decision</button>' +
+          (policy.adminLocked
+            ? '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-lock-result-policy="0">Unlock</button>'
+            : "") +
+          "</div>" +
+          '<form class="form-bsa" id="grantResultForm">' +
+          "<p><strong>Grant someone access to a student's results</strong></p>" +
+          '<div class="form-row">' +
+          '<label>Student<select name="studentId" required>' +
+          studentOptionsHtml("") +
+          "</select></label>" +
+          '<label>Viewer login / email<input name="viewer" required placeholder="teacher or parent login" /></label>' +
+          "</div>" +
+          '<button type="submit" class="btn-bsa btn-bsa-primary">Grant access</button>' +
+          "</form>" +
+          (grantRows.length
+            ? table(["Student", "Viewer", ""], grantRows)
+            : "<p class='text-muted small'>No extra grants yet.</p>")
+      )
+    );
   }
 
   function saveFeeFor(id, value) {
@@ -1746,8 +2001,17 @@
     );
   }
 
+  function visibleResultsFor(session) {
+    return loadResults().filter(function (r) {
+      if (!ops || !ops.canViewResult) return true;
+      return ops.canViewResult(session, r, function (s) {
+        return ops.kidIdsForParent(s);
+      });
+    });
+  }
+
   function teacherResultsPanel(session) {
-    var mine = loadResults()
+    var mine = visibleResultsFor(session)
       .filter(function (r) {
         return (
           r.teacherLogin === session.login ||
@@ -1760,31 +2024,31 @@
       });
     return (
       resultsUploadForm(session, false) +
-      panel("My uploaded results", resultsTable(session, mine, false))
+      panel("My uploaded tests & papers", resultsTable(session, mine, false))
     );
   }
 
   function adminResultsPanel(session) {
-    var all = loadResults().sort(function (a, b) {
+    var all = visibleResultsFor(session).sort(function (a, b) {
       return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
     });
     return (
       resultsUploadForm(session, true) +
-      panel("All test & paper records (edit marks anytime)", resultsTable(session, all, true))
+      resultAccessPanel(session) +
+      panel("All test & paper records", resultsTable(session, all, true))
     );
   }
 
   function studentMarksPanel(session) {
-    var name = session.name;
-    var items = loadResults()
+    var items = visibleResultsFor(session)
       .filter(function (r) {
-        return r.studentName === name || r.studentId === session.personId;
+        return r.studentName === session.name || r.studentId === session.personId;
       })
       .sort(function (a, b) {
         return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
       });
     if (!items.length) {
-      return panel("Recent marks", "<p class='text-muted'>No marks uploaded for you yet.</p>");
+      return panel("Recent marks", "<p class='text-muted'>No marks visible for you yet.</p>");
     }
     return panel(
       "Recent marks",
@@ -1796,7 +2060,32 @@
             escapeHtml(paperTypeLabel(r.paperType)),
             escapeHtml(r.title),
             escapeHtml(markDisplay(r)),
-            escapeHtml(r.teacher || ""),
+            escapeHtml(r.teacher || "—"),
+          ];
+        })
+      )
+    );
+  }
+
+  function parentResultsPanel(session) {
+    var items = visibleResultsFor(session).sort(function (a, b) {
+      return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+    });
+    if (!items.length) {
+      return panel("Children's results", "<p class='text-muted'>No results visible for your children yet.</p>");
+    }
+    return panel(
+      "Children's test & paper results",
+      table(
+        ["Child", "Subject", "Type", "Title", "Mark", "Teacher"],
+        items.map(function (r) {
+          return [
+            escapeHtml(r.studentName),
+            escapeHtml(r.subject),
+            escapeHtml(paperTypeLabel(r.paperType)),
+            escapeHtml(r.title),
+            escapeHtml(markDisplay(r)),
+            escapeHtml(r.teacher || "—"),
           ];
         })
       )
@@ -2105,6 +2394,7 @@
     section = section || "home";
 
     if (role === "student") {
+      if (section === "book-visit") return bookVisitPanel(session);
       if (section === "timetable") {
         return panel(
           "Today's timetable",
@@ -2160,6 +2450,9 @@
     }
 
     if (role === "parent") {
+      if (section === "kids") return parentKidsPanel(session);
+      if (section === "book-visit") return bookVisitPanel(session);
+      if (section === "results" || section === "marks") return parentResultsPanel(session);
       if (section === "diary") {
         return panel(
           "Class diary",
@@ -2175,26 +2468,39 @@
       if (section === "feedback") {
         return feedbackPanel(session);
       }
+      var kidsHome = parentKidsList();
+      var kidCards = kidsHome
+        .map(function (s) {
+          return (
+            panel(
+              escapeHtml(s.name) + " · " + escapeHtml(s.year || ""),
+              "<p>" +
+                escapeHtml(s.classroom || "") +
+                " · " +
+                escapeHtml(s.school || "") +
+                "</p><p><button type='button' class='btn-bsa btn-bsa-sm btn-bsa-soft' data-section='kids'>Manage children</button> <button type='button' class='btn-bsa btn-bsa-sm btn-bsa-soft' data-section='results'>Results</button></p>"
+            )
+          );
+        })
+        .join("");
       return (
-        welcome(session, "Diary, attendance and announcements for your linked children.") +
+        welcome(session, "Diary, attendance, results and visits for your linked children.") +
         kpis([
-          { label: "Alex's attendance", value: "96%", accent: "accent-mint" },
+          { label: "Children", value: String(kidsHome.length), accent: "accent-mint" },
           {
             label: "Unread notices",
             value: String(filteredAnnouncements(["all", parentLinkedClassroom()]).length),
             accent: "accent-sky",
           },
-          { label: "Average", value: "88%", accent: "accent-royal" },
+          { label: "Visible results", value: String(visibleResultsFor(session).length), accent: "accent-royal" },
           { label: "Events", value: "1", accent: "accent-coral" },
         ]) +
-        panel(
-          "Alex Rivera · Grade 4",
-          "<p>Maple Class · STU-1042</p><p><button type='button' class='btn-bsa btn-bsa-sm btn-bsa-soft' data-section='diary'>Diary</button> <button type='button' class='btn-bsa btn-bsa-sm btn-bsa-soft' data-section='attendance'>Attendance</button></p>"
-        )
+        (kidCards || panel("Children", "<p class='text-muted'>No children linked.</p>"))
       );
     }
 
     if (role === "teacher") {
+      if (section === "book-visit") return bookVisitPanel(session);
       if (section === "class") {
         var myRoom = sessionClassroom(session);
         var classStudents = studentsInTeacherClass(session);
@@ -2309,6 +2615,8 @@
       if (section === "meetings") return meetingsPanel();
       if (section === "staff") return teachersPanel(session);
       if (section === "students") return studentsPanel(session);
+      if (section === "parents") return parentsPanel();
+      if (section === "book-visit") return bookVisitPanel(session);
       if (section === "fees") return feesPanel();
       if (section === "classrooms") return classroomsPanel();
       if (section === "announce") return announcePanel(session);
@@ -2352,6 +2660,8 @@
     }
     if (section === "teachers") return teachersPanel(session);
     if (section === "students") return studentsPanel(session);
+    if (section === "parents") return parentsPanel();
+    if (section === "book-visit") return bookVisitPanel(session);
     if (section === "fees") return feesPanel();
     if (section === "classrooms") return classroomsPanel();
     if (section === "announce") return announcePanel(session);
@@ -2422,6 +2732,10 @@
     content.innerHTML = contentFor(session, section);
     document.title = session.roleLabel + " · BrightSteps Academy";
 
+    if (section === "analytics" && (session.role === "admin" || session.role === "superadmin")) {
+      loadWebAnalyticsInto(document.getElementById("webAnalyticsKpis"));
+    }
+
     if (attendTickTimer) {
       clearInterval(attendTickTimer);
       attendTickTimer = null;
@@ -2458,7 +2772,11 @@
       return;
     }
     var person = findPersonById(id) || { id: id, email: email };
-    auth.markRemoved(personKeys(person));
+    if (kind === "student" && ops && ops.blockPortalsAfterStudentRemove) {
+      ops.blockPortalsAfterStudentRemove(auth, person, personKeys);
+    } else {
+      auth.markRemoved(personKeys(person));
+    }
     if (email) auth.deleteExtraUser(email);
     if (kind === "student") {
       var kids = loadKids().filter(function (k) {
@@ -2476,7 +2794,14 @@
     var map = loadRoomMap();
     delete map[id];
     saveRoomMap(map);
-    if (window.showToast) window.showToast("Removed from portal.", "success");
+    if (window.showToast) {
+      window.showToast(
+        kind === "student"
+          ? "Student removed. Their portal (and parent portal if no other kids) is blocked."
+          : "Removed from portal.",
+        "success"
+      );
+    }
   }
 
   function boot() {
@@ -2670,6 +2995,57 @@
           removeBtn.getAttribute("data-email")
         );
         render(session, section);
+        return;
+      }
+
+      var modeBtn = e.target.closest("[data-result-mode]");
+      if (modeBtn) {
+        e.preventDefault();
+        if (!ops || (session.role !== "admin" && session.role !== "superadmin")) return;
+        var modeRes = ops.setResultPolicy({ mode: modeBtn.getAttribute("data-result-mode") }, session);
+        if (!modeRes.ok) {
+          if (window.showToast) window.showToast(modeRes.message, "error");
+          return;
+        }
+        if (window.showToast) window.showToast("Results visibility updated.", "success");
+        render(session, "results");
+        return;
+      }
+
+      var lockPol = e.target.closest("[data-lock-result-policy]");
+      if (lockPol) {
+        e.preventDefault();
+        if (!ops || (session.role !== "admin" && session.role !== "superadmin")) return;
+        var lockOn = lockPol.getAttribute("data-lock-result-policy") === "1";
+        var lockRes = ops.setResultPolicy({ adminLocked: lockOn }, session);
+        if (!lockRes.ok) {
+          if (window.showToast) window.showToast(lockRes.message, "error");
+          return;
+        }
+        if (window.showToast) {
+          window.showToast(lockOn ? "Decision locked — only admin can change it." : "Decision unlocked.", "success");
+        }
+        render(session, "results");
+        return;
+      }
+
+      var revokeBtn = e.target.closest("[data-revoke-grant]");
+      if (revokeBtn) {
+        e.preventDefault();
+        if (!ops || (session.role !== "admin" && session.role !== "superadmin")) return;
+        var rev = ops.setResultPolicy(
+          {
+            revokeStudentId: revokeBtn.getAttribute("data-student"),
+            revokeViewer: revokeBtn.getAttribute("data-viewer"),
+          },
+          session
+        );
+        if (!rev.ok) {
+          if (window.showToast) window.showToast(rev.message, "error");
+          return;
+        }
+        if (window.showToast) window.showToast("Access revoked.", "success");
+        render(session, "results");
         return;
       }
 
@@ -2909,6 +3285,136 @@
     });
 
     document.addEventListener("submit", function (e) {
+      var grantResultForm = e.target.closest("#grantResultForm");
+      if (grantResultForm) {
+        e.preventDefault();
+        if (!ops || (session.role !== "admin" && session.role !== "superadmin")) return;
+        var gSid = (grantResultForm.querySelector('[name="studentId"]') || {}).value || "";
+        var gViewer = String((grantResultForm.querySelector('[name="viewer"]') || {}).value || "").trim();
+        if (!gSid || !gViewer) return;
+        var gRes = ops.setResultPolicy({ grantStudentId: gSid, grantViewer: gViewer }, session);
+        if (!gRes.ok) {
+          if (window.showToast) window.showToast(gRes.message, "error");
+          return;
+        }
+        if (window.showToast) window.showToast("Access granted.", "success");
+        render(session, "results");
+        return;
+      }
+
+      var addParentForm = e.target.closest("#addParentForm");
+      if (addParentForm) {
+        e.preventDefault();
+        if (!canManageRoster(session)) return;
+        var pName = String((addParentForm.querySelector('[name="name"]') || {}).value || "").trim();
+        var pEmail = String((addParentForm.querySelector('[name="email"]') || {}).value || "").trim();
+        var pPhone = String((addParentForm.querySelector('[name="phone"]') || {}).value || "").trim();
+        var pKid = (addParentForm.querySelector('[name="kidId"]') || {}).value || "";
+        if (!pName || !pEmail) return;
+        var pAcc = auth.addParentAccount
+          ? auth.addParentAccount({ name: pName, email: pEmail, phone: pPhone })
+          : { ok: false, message: "Cannot add parent." };
+        if (!pAcc.ok) {
+          if (window.showToast) window.showToast(pAcc.message, "error");
+          return;
+        }
+        if (ops) {
+          ops.upsertFamily({
+            name: pName,
+            email: pEmail,
+            phone: pPhone,
+            login: pAcc.email,
+            kidId: pKid || undefined,
+          });
+        }
+        if (window.showToast) {
+          window.showToast(
+            pAcc.existing
+              ? "Parent linked."
+              : "Parent saved. Login: " + pAcc.email + (pAcc.password ? " / " + pAcc.password : ""),
+            "success"
+          );
+        }
+        render(session, "parents");
+        return;
+      }
+
+      var parentAddKidForm = e.target.closest("#parentAddKidForm");
+      if (parentAddKidForm) {
+        e.preventDefault();
+        if (session.role !== "parent") return;
+        var cName = String((parentAddKidForm.querySelector('[name="name"]') || {}).value || "").trim();
+        var cYear = String((parentAddKidForm.querySelector('[name="year"]') || {}).value || "Grade 1").trim();
+        var cEmail = String((parentAddKidForm.querySelector('[name="email"]') || {}).value || "").trim();
+        var cPass = String((parentAddKidForm.querySelector('[name="password"]') || {}).value || "Demo@12345");
+        var cCreated = auth.addStudentAccount
+          ? auth.addStudentAccount({ name: cName, year: cYear, email: cEmail, password: cPass })
+          : { ok: false, message: "Cannot add students." };
+        if (!cCreated.ok) {
+          if (window.showToast) window.showToast(cCreated.message, "error");
+          return;
+        }
+        var kidId = "s-" + Date.now();
+        var kidsList = loadKids();
+        kidsList.unshift({
+          id: kidId,
+          name: cName,
+          school: "Scuola Materna",
+          year: cYear,
+          avg: "—",
+          fee: 450,
+          email: cCreated.email,
+        });
+        saveKids(kidsList);
+        if (ops) {
+          ops.upsertFamily({
+            name: session.name,
+            email: session.login,
+            login: session.login,
+            kidId: kidId,
+          });
+        }
+        if (window.showToast) {
+          window.showToast("Child added. Login: " + cCreated.email + " / " + cCreated.password, "success");
+        }
+        render(session, "kids");
+        return;
+      }
+
+      var internalVisitForm = e.target.closest("#internalVisitForm");
+      if (internalVisitForm) {
+        e.preventDefault();
+        var sel = internalVisitForm.querySelector('[name="target"]');
+        if (!sel || !sel.value) return;
+        var opt = sel.options[sel.selectedIndex];
+        var toRole = opt.getAttribute("data-role") || "";
+        if (ops && !ops.canBookVisit(session.role, toRole)) {
+          if (window.showToast) window.showToast("That visit is not allowed for your role.", "error");
+          return;
+        }
+        var when = String((internalVisitForm.querySelector('[name="when"]') || {}).value || "").trim();
+        var note = String((internalVisitForm.querySelector('[name="note"]') || {}).value || "").trim();
+        if (!when) return;
+        var visits = ops ? ops.loadInternalVisits() : [];
+        visits.unshift({
+          id: "iv-" + Date.now(),
+          fromLogin: session.login,
+          fromName: session.name,
+          fromRole: session.role,
+          toRole: toRole,
+          toName: opt.getAttribute("data-name") || opt.textContent,
+          toEmail: opt.getAttribute("data-email") || "",
+          when: when,
+          note: note,
+          createdAt: new Date().toISOString(),
+        });
+        if (ops) ops.saveInternalVisits(visits);
+        else localStorage.setItem("brightsteps-demo-internal-visits", JSON.stringify(visits));
+        if (window.showToast) window.showToast("Visit requested.", "success");
+        render(session, "book-visit");
+        return;
+      }
+
       var attendWindowForm = e.target.closest("#attendWindowForm");
       if (attendWindowForm) {
         e.preventDefault();

@@ -209,10 +209,16 @@
     if (isRemovedKey(found.key) || (found.user.personId && isRemovedKey(found.user.personId))) {
       return { ok: false, message: "This account was removed by the school admin." };
     }
-    if (found.user.role === "student" && isLockedKey(found.key)) {
+    if (
+      (found.user.role === "student" || found.user.role === "parent") &&
+      isLockedKey(found.key)
+    ) {
       return {
         ok: false,
-        message: "Your student portal is locked by the school admin. Contact the office.",
+        message:
+          found.user.role === "parent"
+            ? "Your parent portal is locked by the school admin. Contact the office."
+            : "Your student portal is locked by the school admin. Contact the office.",
       };
     }
     var session = toSession(found.key, found.user);
@@ -294,6 +300,34 @@
     return { ok: true, email: email, password: extra[email].password };
   }
 
+  function addParentAccount(fields) {
+    var email = normalizeLogin(fields.email);
+    var name = String(fields.name || "").trim();
+    var password = String(fields.password || DEMO_PASSWORD);
+    var phone = String(fields.phone || "").trim().slice(0, 40);
+    if (!name || name.length > 80) return { ok: false, message: "Enter the parent / guardian name." };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, message: "Enter a valid parent email." };
+    var existing = lookup(email);
+    if (existing) {
+      if (existing.user.role !== "parent") {
+        return { ok: false, message: "That email is already used by another role." };
+      }
+      return { ok: true, email: email, password: null, existing: true };
+    }
+    var extra = extraUsers();
+    extra[email] = {
+      password: password.length >= 6 ? password : DEMO_PASSWORD,
+      role: "parent",
+      name: name,
+      roleLabel: "Parent / Guardian",
+      className: String(fields.className || "Linked children").trim() || "Linked children",
+      phone: phone,
+      personId: fields.personId || "",
+    };
+    saveExtra(extra);
+    return { ok: true, email: email, password: extra[email].password, existing: false };
+  }
+
   function logout() {
     clearSession();
     window.location.href = LOGIN_PATH;
@@ -305,7 +339,10 @@
       window.location.href = LOGIN_PATH;
       return null;
     }
-    if (session.role === "student" && isLockedKey(session.login)) {
+    if (
+      (session.role === "student" || session.role === "parent") &&
+      isLockedKey(session.login)
+    ) {
       clearSession();
       window.location.href = LOGIN_PATH + "?locked=1";
       return null;
@@ -327,6 +364,7 @@
     register: register,
     addStudentAccount: addStudentAccount,
     addTeacherAccount: addTeacherAccount,
+    addParentAccount: addParentAccount,
     logout: logout,
     getSession: readSession,
     requireAuth: requireAuth,
