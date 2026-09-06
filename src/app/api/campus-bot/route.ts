@@ -4,7 +4,6 @@ import { env } from "node:process";
 import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
 import { reportSlorshUsageBackground, pingSlorshUsage, slorshBillingConfigured, getSlorshApiBase } from "@/lib/slorsh-usage";
-import { logCampusBotTurn } from "@/lib/portfolio-reports";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -279,14 +278,6 @@ export async function POST(request: NextRequest) {
                 model: modelId,
               },
             });
-            void logCampusBotTurn({
-              question: message,
-              answer: reply,
-              lang: body.lang || "en",
-              loggedIn: Boolean(body.loggedIn),
-              sessionId: String(body.visitorName || body.lang || "campus").slice(0, 80),
-              runId: waited.id,
-            });
           }
           controller.close();
         } catch (err) {
@@ -367,14 +358,6 @@ export async function POST(request: NextRequest) {
         model: modelId,
         stream: false,
       },
-    });
-    void logCampusBotTurn({
-      question: message,
-      answer: reply,
-      lang: body.lang || "en",
-      loggedIn: Boolean(body.loggedIn),
-      sessionId: String(body.visitorName || body.lang || "campus").slice(0, 80),
-      runId: result.id,
     });
 
     return NextResponse.json({
