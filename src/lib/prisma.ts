@@ -1,39 +1,30 @@
-import { copyFileSync, existsSync } from "fs";
-import { join } from "path";
 import { PrismaClient } from "@prisma/client";
 
 /**
- * One SQLite file for reads and writes.
- * On Render/Vercel the image/seed copy is read-only or reset per deploy,
- * so we copy once into /tmp (writable) and point Prisma there explicitly.
+ * Aiven PostgreSQL (use $50 trial on a Startup plan — not Free, which auto-powers off).
+ * Set DATABASE_URL in .env / Render — do not use SQLite file URLs.
  */
-function resolveSqliteUrl() {
-  const hosted = Boolean(
-    process.env.RENDER ||
-      process.env.K_SERVICE ||
-      process.env.FUNCTION_TARGET ||
-      process.env.FIREBASE_CONFIG ||
-      process.env.VERCEL,
-  );
-  if (!hosted) {
-    return process.env.DATABASE_URL ?? "file:./dev.db";
+function resolveDatabaseUrl() {
+  const url = String(process.env.DATABASE_URL || "").trim();
+  if (!url) {
+    throw new Error(
+      "DATABASE_URL is missing. Use Aiven PostgreSQL, e.g. postgres://avnadmin:PASSWORD@HOST:PORT/defaultdb?sslmode=require",
+    );
   }
-
-  const dest = "/tmp/ali-portfolio.db";
-  for (const src of [
-    join(process.cwd(), "prisma", "dev.db"),
-    join(process.cwd(), "dev.db"),
-  ]) {
-    if (existsSync(/* turbopackIgnore: true */ src)) {
-      copyFileSync(/* turbopackIgnore: true */ src, dest);
-      break;
-    }
+  if (url.startsWith("file:")) {
+    throw new Error(
+      "DATABASE_URL still points at SQLite (file:…). Switch to Aiven PostgreSQL — see .env.example.",
+    );
   }
-  return `file:${dest}`;
+  if (url.startsWith("mysql:")) {
+    throw new Error(
+      "DATABASE_URL is MySQL but this app expects PostgreSQL. Create an Aiven PostgreSQL service and update the URL.",
+    );
+  }
+  return url;
 }
 
-const dbUrl = resolveSqliteUrl();
-process.env.DATABASE_URL = dbUrl;
+const dbUrl = resolveDatabaseUrl();
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 

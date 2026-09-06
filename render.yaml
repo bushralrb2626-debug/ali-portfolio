@@ -13,7 +13,7 @@ services:
       - key: NPM_CONFIG_PRODUCTION
         value: "false"
       - key: DATABASE_URL
-        # Set in Render Dashboard to free Aiven MySQL URL (see .env.example). Do not use file: SQLite.
+        # Aiven PostgreSQL Startup (trial $50) — see .env.example. Not SQLite. Not Free-tier.
         sync: false
       - key: AUTH_TRUST_HOST
         value: "true"

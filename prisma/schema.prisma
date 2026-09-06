@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -12,9 +12,9 @@ model Section {
   type      String
   title     String
   subtitle  String   @default("")
-  body      String   @default("")
+  body      String   @default("") @db.Text
   imageUrl  String   @default("")
-  items     String   @default("[]")
+  items     String   @default("[]") @db.Text
   sortOrder Int      @default(0)
   visible   Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -25,25 +25,60 @@ model ContactMessage {
   id        String   @id @default(cuid())
   name      String
   email     String
-  message   String
+  message   String   @db.Text
   createdAt DateTime @default(now())
 }
 
 model AppointmentSlot {
-  id        String               @id @default(cuid())
+  id        String              @id @default(cuid())
   startsAt  DateTime
-  label     String               @default("")
-  open      Boolean              @default(true)
-  createdAt DateTime             @default(now())
+  label     String              @default("")
+  open      Boolean             @default(true)
+  createdAt DateTime            @default(now())
   booking   AppointmentBooking?
 }
 
 model AppointmentBooking {
-  id        String           @id @default(cuid())
-  slotId    String           @unique
-  slot      AppointmentSlot  @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  id        String          @id @default(cuid())
+  slotId    String          @unique
+  slot      AppointmentSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
   name      String
   email     String
-  note      String           @default("")
-  createdAt DateTime         @default(now())
+  note      String          @default("") @db.Text
+  createdAt DateTime        @default(now())
+}
+
+/** Campus desk Q&A for Slorsh-style usage reports. */
+model CampusBotTurn {
+  id        String   @id @default(cuid())
+  question  String   @db.Text
+  answer    String   @db.Text
+  lang      String   @default("en")
+  loggedIn  Boolean  @default(false)
+  sessionId String   @default("")
+  runId     String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+/** Generated admin reports (weekly / monthly / visitor intel). */
+model PortfolioReport {
+  id        String   @id @default(cuid())
+  type      String
+  period    String
+  title     String
+  summary   String   @default("") @db.Text
+  markdown  String   @default("") @db.Text
+  content   String   @default("{}") @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([type, createdAt])
+}
+
+model ReportSchedulePref {
+  id        String   @id @default("default")
+  cadence   String   @default("weekly")
+  enabled   Boolean  @default(true)
+  updatedAt DateTime @updatedAt
 }
