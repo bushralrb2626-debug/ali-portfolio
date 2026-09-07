@@ -45,28 +45,29 @@
     </header>
 
     <main>
+        <div id="saPortalSecurityHost"></div>
         <section class="portal-page section">
             <div class="blob accent-yellow"></div>
             <div class="blob accent-sky"></div>
             <div class="section-head reveal">
-                <p class="eyebrow" data-i18n="portal.connected">Your School, Connected.</p>
-                <h1 data-i18n="portal.welcomePortal">Welcome to Your School Portal</h1>
-                <p data-i18n="portal.howConnect">Choose how you connect — teachers, parents and students. Sign in opens a working demo dashboard on this site.</p>
+                <p class="eyebrow" id="portalEyebrow" data-i18n="portal.connected">Your School, Connected.</p>
+                <h1 id="portalTitle" data-i18n="portal.welcomePortal">Welcome to Your School Portal</h1>
+                <p id="portalLead" data-i18n="portal.howConnect">Choose how you connect — teachers, parents and students. Sign in opens a working demo dashboard on this site.</p>
             </div>
             <div class="portal-roles">
-                <a class="portal-role-card card-lift reveal accent-coral" href="/demos/brightsteps/login.html?login=teacher_demo">
+                <a class="portal-role-card card-lift reveal accent-coral" id="portalTeacher" href="/demos/brightsteps/login.html?login=teacher_demo">
                     <span style="font-size:2rem" aria-hidden="true">👩‍🏫</span>
                     <h2>Teacher Portal</h2>
                     <p data-i18n="portal.manageLearn">Manage classes, students and learning activities.</p>
                     <span class="btn-bsa btn-bsa-soft" data-i18n="portal.enterTeacher">Enter Teacher Portal →</span>
                 </a>
-                <a class="portal-role-card card-lift reveal accent-orange" href="/demos/brightsteps/login.html?login=parent_demo">
+                <a class="portal-role-card card-lift reveal accent-orange" id="portalParent" href="/demos/brightsteps/login.html?login=parent_demo">
                     <span style="font-size:2rem" aria-hidden="true">👨‍👩‍👧</span>
                     <h2>Parent Portal</h2>
                     <p data-i18n="portal.stayChild">Stay connected with your child's learning.</p>
                     <span class="btn-bsa btn-bsa-soft" data-i18n="portal.enterParent">Enter Parent Portal →</span>
                 </a>
-                <a class="portal-role-card card-lift reveal accent-pink" href="/demos/brightsteps/login.html?login=student_demo">
+                <a class="portal-role-card card-lift reveal accent-pink" id="portalStudent" href="/demos/brightsteps/login.html?login=student_demo">
                     <span style="font-size:2rem" aria-hidden="true">🧒</span>
                     <h2 data-i18n="hero.portal">Student Portal</h2>
                     <p data-i18n="brand.growLine">Learn, explore and grow.</p>
@@ -75,8 +76,8 @@
             </div>
             <div class="portal-page__foot reveal">
                 <a class="btn-bsa btn-bsa-ghost" href="/demos/brightsteps/index.html" data-i18n="portal.backWeb">Back to website</a>
-                <a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/login.html" data-i18n="portal.signIn">Sign in</a>
-                <a class="btn-bsa btn-bsa-primary" href="/demos/brightsteps/register.html">Register</a>
+                <a class="btn-bsa btn-bsa-soft" id="portalSignIn" href="/demos/brightsteps/login.html" data-i18n="portal.signIn">Sign in</a>
+                <a class="btn-bsa btn-bsa-primary" id="portalRegister" href="/demos/brightsteps/register.html">Register</a>
             </div>
         </section>
     </main>
@@ -109,7 +110,73 @@
     <script src="/demos/brightsteps/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/demos/brightsteps/js/site.js?v=opens23"></script>
     <script src="/demos/brightsteps/js/i18n.js?v=keyed5"></script>
-    <script src="/demos/brightsteps/js/demo-auth.js?v=10"></script>
+    <script src="/demos/brightsteps/js/demo-auth.js?v=14"></script>
+    <script src="/demos/brightsteps/js/demo-school-ops.js?v=3"></script>
+    <script src="/demos/brightsteps/js/demo-superadmin.js?v=1"></script>
     <script src="/demos/brightsteps/js/campus-bot.js?v=26"></script>
+    <script>
+      (function () {
+        var ops = window.BrightStepsSchoolOps;
+        var auth = window.BrightStepsDemoAuth;
+        var sa = window.BrightStepsSuperAdmin;
+        var params = new URLSearchParams(window.location.search || "");
+        var slug = String(params.get("school") || params.get("s") || "").trim();
+        if (!ops || !slug) return;
+        ops.loadSchools();
+        var school = ops.getSchoolBySlug(slug);
+        if (!school) return;
+        var title = document.getElementById("portalTitle");
+        var lead = document.getElementById("portalLead");
+        var eye = document.getElementById("portalEyebrow");
+        if (title) title.textContent = school.name + " Portal";
+        if (eye) eye.textContent = school.city || "Campus portal";
+        if (lead) lead.textContent = "Sign in for " + school.name + " — teachers, parents and students.";
+        var q = "?school=" + encodeURIComponent(school.slug);
+        ["portalTeacher", "portalParent", "portalStudent", "portalSignIn", "portalRegister"].forEach(function (id) {
+          var a = document.getElementById(id);
+          if (!a || !a.href) return;
+          if (a.href.indexOf("login.html") !== -1 || a.href.indexOf("register.html") !== -1) {
+            a.href = a.href.split("?")[0] + (a.href.indexOf("login=") !== -1 ? a.getAttribute("href").replace(/^\//, "/").split("?")[0] : a.pathname) ;
+          }
+        });
+        var teacher = document.getElementById("portalTeacher");
+        var parent = document.getElementById("portalParent");
+        var student = document.getElementById("portalStudent");
+        var signIn = document.getElementById("portalSignIn");
+        var reg = document.getElementById("portalRegister");
+        if (teacher) teacher.href = "/demos/brightsteps/login.html?login=teacher_demo&school=" + encodeURIComponent(school.slug);
+        if (parent) parent.href = "/demos/brightsteps/login.html?login=parent_demo&school=" + encodeURIComponent(school.slug);
+        if (student) student.href = "/demos/brightsteps/login.html?login=student_demo&school=" + encodeURIComponent(school.slug);
+        if (signIn) signIn.href = "/demos/brightsteps/login.html?school=" + encodeURIComponent(school.slug);
+        if (reg) reg.href = "/demos/brightsteps/register.html?school=" + encodeURIComponent(school.slug);
+
+        var session = auth && auth.getSession ? auth.getSession() : null;
+        var host = document.getElementById("saPortalSecurityHost");
+        if (host && sa && session && session.role === "superadmin") {
+          host.innerHTML = sa.portalSecurityBanner(school, ops, session, function (v) {
+            return String(v == null ? "" : v)
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;");
+          });
+          var saveBtn = document.getElementById("saPortalSecSave");
+          if (saveBtn) {
+            saveBtn.addEventListener("click", function () {
+              var patch = {};
+              host.querySelectorAll("[data-portal-sec]").forEach(function (inp) {
+                patch[inp.getAttribute("data-portal-sec")] = !!inp.checked;
+              });
+              var res = ops.setSchoolSecurity(school.id, patch, session);
+              if (window.showToast) {
+                window.showToast(res.ok ? "School security saved (locked)." : res.message || "Failed", res.ok ? "success" : "error");
+              } else {
+                alert(res.ok ? "Saved" : res.message || "Failed");
+              }
+            });
+          }
+        }
+      })();
+    </script>
 </body>
 </html>

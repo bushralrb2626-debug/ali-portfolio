@@ -408,6 +408,190 @@
     return false;
   }
 
+  var SCHOOL_SEC_KEY = "brightsteps-demo-school-security";
+  var ACTIVE_SCHOOL_KEY = "brightsteps-demo-active-school";
+
+  var DEFAULT_SCHOOL_SECURITY = {
+    publicSite: true,
+    studentPortal: true,
+    parentPortal: true,
+    teacherPortal: true,
+    adminPortal: true,
+    announcements: true,
+    registrations: true,
+    resultsEditBySchoolAdmin: true,
+  };
+
+  var SECURITY_LABELS = {
+    publicSite: "Public school website",
+    studentPortal: "Student portal login",
+    parentPortal: "Parent portal login",
+    teacherPortal: "Teacher portal login",
+    adminPortal: "School admin / principal portal",
+    announcements: "School announcements",
+    registrations: "New registrations",
+    resultsEditBySchoolAdmin: "School admin can edit results",
+  };
+
+  function loadSecurityMap() {
+    try {
+      var raw = localStorage.getItem(SCHOOL_SEC_KEY);
+      var parsed = raw ? JSON.parse(raw) : {};
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveSecurityMap(map) {
+    localStorage.setItem(SCHOOL_SEC_KEY, JSON.stringify(map || {}));
+  }
+
+  function getSchoolSecurity(schoolId) {
+    var id = String(schoolId || "").trim();
+    var map = loadSecurityMap();
+    var cur = (id && map[id]) || {};
+    var out = {};
+    Object.keys(DEFAULT_SCHOOL_SECURITY).forEach(function (k) {
+      out[k] = cur[k] != null ? !!cur[k] : DEFAULT_SCHOOL_SECURITY[k];
+    });
+    out.updatedAt = cur.updatedAt || "";
+    out.updatedBy = cur.updatedBy || "";
+    out.superLocked = true;
+    return out;
+  }
+
+  function setSchoolSecurity(schoolId, patch, session) {
+    if (!session || session.role !== "superadmin") {
+      return { ok: false, message: "Only Super Admin can change school security. These settings cannot be overridden." };
+    }
+    var id = String(schoolId || "").trim();
+    if (!id) return { ok: false, message: "Missing school." };
+    var map = loadSecurityMap();
+    var cur = getSchoolSecurity(id);
+    Object.keys(DEFAULT_SCHOOL_SECURITY).forEach(function (k) {
+      if (patch && Object.prototype.hasOwnProperty.call(patch, k)) cur[k] = !!patch[k];
+    });
+    cur.updatedAt = new Date().toISOString();
+    cur.updatedBy = session.name || session.login || "Super Admin";
+    cur.superLocked = true;
+    map[id] = cur;
+    saveSecurityMap(map);
+    return { ok: true, security: cur };
+  }
+
+  function isSchoolFeatureEnabled(schoolId, feature) {
+    var sec = getSchoolSecurity(schoolId);
+    if (!Object.prototype.hasOwnProperty.call(DEFAULT_SCHOOL_SECURITY, feature)) return true;
+    return !!sec[feature];
+  }
+
+  function portalFeatureForRole(role) {
+    if (role === "student") return "studentPortal";
+    if (role === "parent") return "parentPortal";
+    if (role === "teacher") return "teacherPortal";
+    if (role === "admin" || role === "headmaster") return "adminPortal";
+    return "";
+  }
+
+  function getActiveSchoolId() {
+    try {
+      return String(sessionStorage.getItem(ACTIVE_SCHOOL_KEY) || localStorage.getItem(ACTIVE_SCHOOL_KEY) || "").trim();
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function setActiveSchoolId(schoolId) {
+    var id = String(schoolId || "").trim();
+    try {
+      if (id) {
+        sessionStorage.setItem(ACTIVE_SCHOOL_KEY, id);
+        localStorage.setItem(ACTIVE_SCHOOL_KEY, id);
+      } else {
+        sessionStorage.removeItem(ACTIVE_SCHOOL_KEY);
+        localStorage.removeItem(ACTIVE_SCHOOL_KEY);
+      }
+    } catch (e) {}
+    return id;
+  }
+
+  var PAGE_KEY = "brightsteps-demo-school-pages";
+
+  function defaultPageBlocks(school) {
+    return [
+      {
+        id: "hero",
+        type: "hero",
+        title: (school && school.name) || "Our School",
+        body: (school && school.tagline) || "Learn. Explore. Grow.",
+      },
+      {
+        id: "about",
+        type: "about",
+        title: "About",
+        body: (school && school.about) || "A welcoming campus for every child.",
+      },
+      {
+        id: "programs",
+        type: "programs",
+        title: "Programs",
+        body: "Early learning, primary pathways, arts and sport.",
+      },
+      {
+        id: "cta",
+        type: "cta",
+        title: "Visit us",
+        body: "Book a campus visit or open the student portal.",
+      },
+    ];
+  }
+
+  function getSchoolPage(schoolId) {
+    var id = String(schoolId || "").trim();
+    try {
+      var raw = localStorage.getItem(PAGE_KEY);
+      var map = raw ? JSON.parse(raw) : {};
+      if (!map || typeof map !== "object") map = {};
+      if (map[id] && Array.isArray(map[id].blocks) && map[id].blocks.length) {
+        return map[id];
+      }
+    } catch (e) {}
+    var school = getSchoolById(id);
+    return {
+      schoolId: id,
+      blocks: defaultPageBlocks(school),
+      superLocked: true,
+      updatedAt: "",
+      updatedBy: "",
+    };
+  }
+
+  function saveSchoolPage(schoolId, blocks, session) {
+    if (!session || session.role !== "superadmin") {
+      return { ok: false, message: "Only Super Admin can edit school websites. Changes are permanent and locked." };
+    }
+    var id = String(schoolId || "").trim();
+    if (!id) return { ok: false, message: "Missing school." };
+    var map = {};
+    try {
+      var raw = localStorage.getItem(PAGE_KEY);
+      map = raw ? JSON.parse(raw) : {};
+      if (!map || typeof map !== "object") map = {};
+    } catch (e) {
+      map = {};
+    }
+    map[id] = {
+      schoolId: id,
+      blocks: Array.isArray(blocks) ? blocks : [],
+      superLocked: true,
+      updatedAt: new Date().toISOString(),
+      updatedBy: session.name || session.login || "Super Admin",
+    };
+    localStorage.setItem(PAGE_KEY, JSON.stringify(map));
+    return { ok: true, page: map[id] };
+  }
+
   global.BrightStepsSchoolOps = {
     loadFamilies: loadFamilies,
     saveFamilies: saveFamilies,
@@ -432,5 +616,16 @@
     publicSitePath: publicSitePath,
     slugify: slugify,
     seedSchools: SEED_SCHOOLS,
+    getSchoolSecurity: getSchoolSecurity,
+    setSchoolSecurity: setSchoolSecurity,
+    isSchoolFeatureEnabled: isSchoolFeatureEnabled,
+    portalFeatureForRole: portalFeatureForRole,
+    securityLabels: SECURITY_LABELS,
+    defaultSchoolSecurity: DEFAULT_SCHOOL_SECURITY,
+    getActiveSchoolId: getActiveSchoolId,
+    setActiveSchoolId: setActiveSchoolId,
+    getSchoolPage: getSchoolPage,
+    saveSchoolPage: saveSchoolPage,
+    defaultPageBlocks: defaultPageBlocks,
   };
 })(window);

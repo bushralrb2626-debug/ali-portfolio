@@ -1,5 +1,6 @@
 /**
  * BrightSteps — public campus page (school.html?s=slug).
+ * Uses Super Admin locked page blocks when present.
  */
 (function () {
   "use strict";
@@ -45,46 +46,88 @@
       return;
     }
 
+    if (ops.isSchoolFeatureEnabled && !ops.isSchoolFeatureEnabled(school.id, "publicSite")) {
+      root.innerHTML =
+        '<section class="band"><div class="wrap" style="padding:3rem 1rem">' +
+        "<h1>Website disabled</h1>" +
+        "<p>Super Admin has disabled the public site for this school.</p>" +
+        '<p><a class="btn-bsa btn-bsa-primary" href="/demos/brightsteps/schools.html">Browse schools</a></p>' +
+        "</div></section>";
+      document.title = school.name + " · Disabled";
+      return;
+    }
+
     document.title = school.name + " · BrightSteps";
     var brandStrong = document.getElementById("schoolBrandName");
     var brandTag = document.getElementById("schoolBrandTag");
     if (brandStrong) brandStrong.textContent = school.name;
     if (brandTag) brandTag.textContent = school.tagline || "Learn. Explore. Grow.";
 
+    var page = ops.getSchoolPage ? ops.getSchoolPage(school.id) : null;
+    var blocks = (page && page.blocks) || [];
+    var portal = "/demos/brightsteps/portal.html?school=" + encodeURIComponent(school.slug);
+
+    var bodyHtml = blocks
+      .map(function (b) {
+        if (b.type === "hero") {
+          return (
+            '<section class="hero-fancy" id="top">' +
+            '<div class="hero-fancy__grid"><div class="hero-fancy__copy">' +
+            '<p class="eyebrow">' +
+            escapeHtml(school.city || "Campus") +
+            "</p>" +
+            "<h1>" +
+            escapeHtml(b.title || school.name) +
+            "</h1>" +
+            '<p class="hero-fancy__lead">' +
+            escapeHtml(b.body || school.about || "") +
+            "</p>" +
+            '<div class="hero__actions">' +
+            '<a class="btn-bsa btn-hero btn-hero-yellow" href="' +
+            portal +
+            '">Student portal</a>' +
+            '<a class="btn-bsa btn-hero btn-hero-outline" href="/demos/brightsteps/contact.html">Contact</a>' +
+            "</div></div>" +
+            '<div class="hero-stage"><div class="hero-stage__back" role="img" aria-label="' +
+            escapeHtml(school.name) +
+            '"></div>' +
+            '<div class="hero-stage__mid"><img src="/demos/brightsteps/img/photo-1503676260728-1c00da094a0b.jpg" alt="Students learning" loading="eager" /></div>' +
+            "</div></div></section>"
+          );
+        }
+        return (
+          '<section class="band"><div class="wrap" style="padding:1.5rem 1rem 2rem;max-width:960px;margin:0 auto">' +
+          "<h2 style=\"font-family:Fredoka,sans-serif\">" +
+          escapeHtml(b.title || "") +
+          "</h2>" +
+          "<p>" +
+          escapeHtml(b.body || "") +
+          "</p></div></section>"
+        );
+      })
+      .join("");
+
+    if (!bodyHtml) {
+      bodyHtml =
+        '<section class="band"><div class="wrap" style="padding:2rem 1rem"><h1>' +
+        escapeHtml(school.name) +
+        "</h1><p>" +
+        escapeHtml(school.about || "") +
+        "</p></div></section>";
+    }
+
     root.innerHTML =
-      '<section class="hero-fancy" id="top">' +
-      '<div class="hero-fancy__grid"><div class="hero-fancy__copy">' +
-      '<p class="eyebrow">' +
-      escapeHtml(school.city || "Campus") +
-      "</p>" +
-      "<h1>" +
-      escapeHtml(school.name) +
-      "</h1>" +
-      '<p class="hero-fancy__lead">' +
-      escapeHtml(school.about || school.tagline || "A welcoming school community.") +
-      "</p>" +
-      '<div class="hero__actions">' +
-      '<a class="btn-bsa btn-hero btn-hero-yellow" href="/demos/brightsteps/portal.html">Student portal</a>' +
-      '<a class="btn-bsa btn-hero btn-hero-outline" href="/demos/brightsteps/contact.html">Contact</a>' +
-      "</div></div>" +
-      '<div class="hero-stage"><div class="hero-stage__back" role="img" aria-label="' +
-      escapeHtml(school.name) +
-      '"></div>' +
-      '<div class="hero-stage__mid"><img src="/demos/brightsteps/img/photo-1503676260728-1c00da094a0b.jpg" alt="Students learning" loading="eager" /></div>' +
-      "</div></div></section>" +
-      '<section class="band"><div class="wrap" style="padding:2rem 1rem 3rem">' +
-      "<h2>Welcome</h2>" +
-      "<p>" +
-      escapeHtml(school.about || "Families, teachers and students share one campus portal.") +
-      "</p>" +
-      "<p><strong>City:</strong> " +
-      escapeHtml(school.city || "—") +
-      "</p>" +
-      (school.principalEmail
-        ? "<p><strong>Office:</strong> " + escapeHtml(school.principalEmail) + "</p>"
+      bodyHtml +
+      '<section class="band"><div class="wrap" style="padding:1rem 1rem 3rem;max-width:960px;margin:0 auto">' +
+      '<a class="btn-bsa btn-bsa-primary" href="' +
+      portal +
+      '">Accedi / Portal</a> ' +
+      '<a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/schools.html">All campuses</a>' +
+      (page && page.updatedBy
+        ? "<p class='text-muted small' style='margin-top:1rem'>Site locked by Super Admin (" +
+          escapeHtml(page.updatedBy) +
+          ")</p>"
         : "") +
-      '<p style="margin-top:1.25rem"><a class="btn-bsa btn-bsa-primary" href="/demos/brightsteps/portal.html">Accedi / Portal</a> ' +
-      '<a class="btn-bsa btn-bsa-soft" href="/demos/brightsteps/schools.html">All campuses</a></p>' +
       "</div></section>";
   }
 

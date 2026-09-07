@@ -32,12 +32,19 @@
             <div id="schoolsDirectory"></div>
         </div>
     </main>
-    <script src="/demos/brightsteps/js/demo-school-ops.js?v=2"></script>
+    <script src="/demos/brightsteps/js/demo-school-ops.js?v=3"></script>
     <script>
       (function () {
         var ops = window.BrightStepsSchoolOps;
         var el = document.getElementById("schoolsDirectory");
         if (!el || !ops) return;
+        function esc(v) {
+          return String(v == null ? "" : v)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+        }
         var schools = (ops.loadSchools() || []).filter(function (s) { return s.publicEnabled !== false; });
         if (!schools.length) {
           el.innerHTML = "<p>No public campuses yet.</p>";
@@ -47,14 +54,14 @@
           var href = ops.publicSitePath(s);
           return (
             '<article style="margin:1rem 0;padding:1.1rem 1.2rem;border:1px solid #d7e3f4;border-radius:12px;background:#fff">' +
-            "<h2 style=\"font-family:Fredoka,sans-serif;font-size:1.25rem;margin:0 0 0.35rem\">" +
-            s.name +
+            '<h2 style="font-family:Fredoka,sans-serif;font-size:1.25rem;margin:0 0 0.35rem">' +
+            esc(s.name) +
             "</h2>" +
-            "<p style=\"margin:0 0 0.75rem;color:#5a6478\">" +
-            (s.city || "") +
-            (s.tagline ? " · " + s.tagline : "") +
+            '<p style="margin:0 0 0.75rem;color:#5a6478">' +
+            esc(s.city || "") +
+            (s.tagline ? " · " + esc(s.tagline) : "") +
             "</p>" +
-            '<a class="btn-bsa btn-bsa-primary" href="' + href + '">Open school site</a>' +
+            '<a class="btn-bsa btn-bsa-primary" href="' + esc(href) + '">Open school site</a>' +
             "</article>"
           );
         }).join("");

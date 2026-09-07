@@ -7,6 +7,7 @@
   var auth = window.BrightStepsDemoAuth;
   if (!auth) return;
   var ops = window.BrightStepsSchoolOps || null;
+  var sa = window.BrightStepsSuperAdmin || null;
 
   var NAV = {
     student: [
@@ -63,9 +64,11 @@
       { icon: "⚙️", label: "Settings", id: "settings" },
     ],
     superadmin: [
-      { icon: "🏠", label: "Platform", id: "home" },
+      { icon: "🏠", label: "Hub", id: "home" },
       { icon: "🏫", label: "Schools", id: "schools" },
       { icon: "🛡️", label: "Security", id: "security" },
+      { icon: "🔐", label: "School security", id: "school-security" },
+      { icon: "🖼️", label: "Edit website", id: "edit-site" },
       { icon: "📅", label: "Meetings", id: "meetings" },
       { icon: "👩‍🏫", label: "Teachers", id: "teachers" },
       { icon: "🧒", label: "Students", id: "students" },
@@ -1390,6 +1393,14 @@
 
   function schoolNameOf(session) {
     if (!session) return "";
+    if (session.role === "superadmin" && ops && ops.getActiveSchoolId) {
+      var activeId = ops.getActiveSchoolId();
+      if (activeId && ops.getSchoolById) {
+        var active = ops.getSchoolById(activeId);
+        if (active) return String(active.name || "").trim();
+      }
+      return "";
+    }
     return String(session.schoolName || session.className || "").trim();
   }
 
@@ -1405,12 +1416,22 @@
   }
 
   function isPlatformWide(session) {
-    return !!(session && session.role === "superadmin");
+    if (!session || session.role !== "superadmin") return false;
+    if (ops && ops.getActiveSchoolId && ops.getActiveSchoolId()) return false;
+    return true;
+  }
+
+  function activeSchoolRec() {
+    if (!ops || !ops.getActiveSchoolId) return null;
+    var id = ops.getActiveSchoolId();
+    return id && ops.getSchoolById ? ops.getSchoolById(id) : null;
   }
 
   function scopedStudents(session) {
     var all = allStudents();
-    if (isPlatformWide(session) || !session || session.role !== "admin") return all;
+    if (isPlatformWide(session)) return all;
+    if (!session) return all;
+    if (session.role !== "admin" && session.role !== "superadmin") return all;
     var mine = schoolNameOf(session);
     if (!mine || mine === "All schools") return all;
     return all.filter(function (s) {
@@ -1420,7 +1441,9 @@
 
   function scopedTeachers(session) {
     var all = allTeachers();
-    if (isPlatformWide(session) || !session || session.role !== "admin") return all;
+    if (isPlatformWide(session)) return all;
+    if (!session) return all;
+    if (session.role !== "admin" && session.role !== "superadmin") return all;
     var mine = schoolNameOf(session);
     if (!mine || mine === "All schools") return all;
     return all.filter(function (t) {
@@ -1634,11 +1657,17 @@
       });
     }
     var rows = admins.map(function (a) {
-      var actions = a.builtin
-        ? "<span class='text-muted small'>Primary</span>"
-        : '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-remove-admin="' +
-          escapeHtml(a.email) +
-          '">Remove</button>';
+      var canRemovePrimary = session.role === "superadmin" && a.builtin;
+      var actions =
+        a.builtin && !canRemovePrimary
+          ? "<span class='text-muted small'>Primary</span>"
+          : '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-remove-admin="' +
+            escapeHtml(a.email) +
+            '"' +
+            (a.builtin ? ' data-primary-admin="1"' : "") +
+            ">" +
+            (a.builtin ? "Remove primary" : "Remove") +
+            "</button>";
       return [
         escapeHtml(a.name),
         escapeHtml(a.positionLabel || a.roleLabel || a.position),
@@ -1720,10 +1749,10 @@
     }).length;
   }
 
-  function classroomsPanel() {
+  function classroomsPanel(session) {
     var rooms = loadRooms();
-    var students = allStudents();
-    var teachers = allTeachers();
+    var students = scopedStudents(session);
+    var teachers = scopedTeachers(session);
     var roomRows = rooms.map(function (room) {
       return [
         escapeHtml(room),
@@ -1877,14 +1906,43 @@
           return '<option value="' + escapeHtml(r) + '">' + escapeHtml(r) + "</option>";
         })
         .join("");
+    var schoolOpts = "";
+    if (session.role === "superadmin") {
+      schoolOpts =
+        '<label>Target school<select name="schoolId">' +
+        '<option value="">All schools</option>' +
+        liveSchools()
+          .map(function (s) {
+            var active = activeSchoolRec();
+            return (
+              '<option value="' +
+              escapeHtml(s.id) +
+              '"' +
+              (active && active.id === s.id ? " selected" : "") +
+              ">" +
+              escapeHtml(s.name) +
+              "</option>"
+            );
+          })
+          .join("") +
+        "</select></label>";
+    }
     var list = loadAnnouncements().sort(function (a, b) {
       return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
     });
+    if (session.role === "admin") {
+      var mine = schoolNameOf(session);
+      list = list.filter(function (a) {
+        if (!a.schoolId && !a.schoolName) return true;
+        return sameSchoolName(a.schoolName, mine) || a.schoolId === session.schoolId;
+      });
+    }
     return (
       '<form class="form-bsa" id="announceForm" style="margin-bottom:1.25rem">' +
       "<p><strong>Post an announcement</strong></p>" +
       '<label>Title<input name="title" required maxlength="120" placeholder="e.g. Sports day" /></label>' +
       '<label>Message<textarea name="body" required maxlength="800" rows="3" placeholder="Details for parents and students"></textarea></label>' +
+      schoolOpts +
       '<label>Audience<select name="audience">' +
       audienceOpts +
       "</select></label>" +
@@ -2547,12 +2605,17 @@
         escapeHtml(s.principalEmail || "—"),
         '<a class="btn-bsa btn-bsa-sm btn-bsa-soft" href="' +
           escapeHtml(path) +
-          '" target="_blank" rel="noopener">Open site</a>',
-        session.role === "superadmin"
-          ? '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-remove-school="' +
+          '" target="_blank" rel="noopener">Open site</a>' +
+        (session.role === "superadmin"
+          ? ' <button type="button" class="btn-bsa btn-bsa-sm btn-bsa-primary" data-enter-school="' +
+            escapeHtml(s.id) +
+            '" data-goto-section="school-security">Enter desk</button>'
+          : "") +
+        (session.role === "superadmin"
+          ? ' <button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-remove-school="' +
             escapeHtml(s.id) +
             '">Remove</button>'
-          : "—",
+          : "—"),
       ];
     });
 
@@ -2618,11 +2681,13 @@
         escapeHtml(a.school || "—"),
         escapeHtml(a.email),
         escapeHtml(a.positionLabel || a.roleLabel),
-        a.builtin
-          ? "<span class='text-muted small'>Primary</span>"
-          : '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-remove-admin="' +
-            escapeHtml(a.email) +
-            '">Remove access</button>',
+        '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-remove-admin="' +
+          escapeHtml(a.email) +
+          '"' +
+          (a.builtin ? ' data-primary-admin="1"' : "") +
+          ">" +
+          (a.builtin ? "Remove primary" : "Remove access") +
+          "</button>",
       ];
     });
     return (
@@ -2951,7 +3016,7 @@
       if (section === "parents") return parentsPanel();
       if (section === "book-visit") return bookVisitPanel(session);
       if (section === "fees") return feesPanel(session);
-      if (section === "classrooms") return classroomsPanel();
+      if (section === "classrooms") return classroomsPanel(session);
       if (section === "announce") return announcePanel(session);
       if (section === "feedback") return feedbackPanel(session);
       if (section === "results") return adminResultsPanel(session);
@@ -2989,8 +3054,8 @@
         escapeHtml(schoolNameOf(session) || session.className || "") +
         " — manage your staff and students. Results for all students stay editable here.</p></div>" +
         kpis([
-          { label: "Active staff", value: String(allTeachers().length), accent: "accent-sky" },
-          { label: "Students", value: String(allStudents().length), accent: "accent-mint" },
+          { label: "Active staff", value: String(scopedTeachers(session).length), accent: "accent-sky" },
+          { label: "Students", value: String(scopedStudents(session).length), accent: "accent-mint" },
           { label: "Visit requests", value: String(loadVisits().length), accent: "accent-royal" },
           { label: "Pending invites", value: "2", accent: "accent-coral" },
         ]) +
@@ -3001,12 +3066,24 @@
     if (section === "meetings") return meetingsPanel();
     if (section === "schools") return schoolsManagePanel(session);
     if (section === "security") return securityPanel(session);
+    if (section === "school-security") {
+      var schSec = activeSchoolRec();
+      return sa && sa.securityPanelHtml
+        ? sa.securityPanelHtml(schSec, session, ops, escapeHtml)
+        : panel("School security", "<p>Enter a school from the Hub first.</p>");
+    }
+    if (section === "edit-site") {
+      var schEdit = activeSchoolRec();
+      return sa && sa.siteEditorHtml
+        ? sa.siteEditorHtml(schEdit, session, ops, escapeHtml)
+        : panel("Edit website", "<p>Enter a school from the Hub first.</p>");
+    }
     if (section === "teachers") return teachersPanel(session);
     if (section === "students") return studentsPanel(session);
     if (section === "parents") return parentsPanel();
     if (section === "book-visit") return bookVisitPanel(session);
     if (section === "fees") return feesPanel(session);
-    if (section === "classrooms") return classroomsPanel();
+    if (section === "classrooms") return classroomsPanel(session);
     if (section === "announce") return announcePanel(session);
     if (section === "feedback") return feedbackPanel(session);
     if (section === "results") return adminResultsPanel(session);
@@ -3015,24 +3092,18 @@
     if (section === "analytics") return analyticsPanelShell();
     if (section === "admins") return adminsPanel(session);
     var schoolsNow = liveSchools();
+    var hub =
+      sa && sa.hubHtml
+        ? sa.hubHtml(ops, escapeHtml)
+        : '<div class="welcome-banner"><h2>Platform control</h2><p>Super Admin software desk.</p></div>';
     return (
-      '<div class="welcome-banner"><h2>Platform control</h2><p>Super Admin software desk — every school, principal, and security control in one place.</p></div>' +
+      hub +
       kpis([
         { label: "Schools", value: String(schoolsNow.length), accent: "accent-royal" },
         { label: "Teachers", value: String(allTeachers().length), accent: "accent-sky" },
         { label: "Students", value: String(allStudents().length), accent: "accent-mint" },
         { label: "Results on file", value: String(loadResults().length), accent: "accent-coral" },
-      ]) +
-      meetingsPanel() +
-      panel(
-        "Schools",
-        table(
-          ["School", "City", "Public slug"],
-          schoolsNow.map(function (s) {
-            return [escapeHtml(s.name), escapeHtml(s.city || "—"), escapeHtml(s.slug || "")];
-          })
-        )
-      )
+      ])
     );
   }
 
@@ -3071,6 +3142,42 @@
 
     if (section === "analytics" && (session.role === "admin" || session.role === "superadmin")) {
       loadWebAnalyticsInto(document.getElementById("webAnalyticsKpis"));
+    }
+
+    if (section === "edit-site") {
+      var host = document.getElementById("saSiteBlocks");
+      if (host) {
+        var dragEl = null;
+        host.querySelectorAll(".sa-block").forEach(function (block) {
+          block.addEventListener("dragstart", function () {
+            dragEl = block;
+            block.style.opacity = "0.55";
+          });
+          block.addEventListener("dragend", function () {
+            block.style.opacity = "1";
+            dragEl = null;
+          });
+          block.addEventListener("dragover", function (ev) {
+            ev.preventDefault();
+          });
+          block.addEventListener("drop", function (ev) {
+            ev.preventDefault();
+            if (!dragEl || dragEl === block) return;
+            var kids = Array.prototype.slice.call(host.children);
+            var from = kids.indexOf(dragEl);
+            var to = kids.indexOf(block);
+            if (from < 0 || to < 0) return;
+            if (from < to) host.insertBefore(dragEl, block.nextSibling);
+            else host.insertBefore(dragEl, block);
+            host.querySelectorAll(".sa-block").forEach(function (el, i) {
+              el.setAttribute("data-block-index", String(i));
+              el.querySelectorAll("[data-block-index]").forEach(function (inp) {
+                inp.setAttribute("data-block-index", String(i));
+              });
+            });
+          });
+        });
+      }
     }
 
     if (attendTickTimer) {
@@ -3169,21 +3276,101 @@
       var removeAdminBtn = e.target.closest("[data-remove-admin]");
       if (removeAdminBtn) {
         e.preventDefault();
-        if (!canManageSchoolAdmins(session)) {
+        var isPrimaryAdmin = removeAdminBtn.getAttribute("data-primary-admin") === "1";
+        if (isPrimaryAdmin && session.role !== "superadmin") {
+          if (window.showToast) window.showToast("Only Super Admin can remove a primary school admin.", "error");
+          return;
+        }
+        if (!isPrimaryAdmin && !canManageSchoolAdmins(session)) {
           if (window.showToast) window.showToast("Only full school admins can remove admins.", "error");
           return;
         }
         var adminEmail = removeAdminBtn.getAttribute("data-remove-admin");
-        if (!window.confirm("Remove admin " + adminEmail + "? They will not be able to sign in.")) return;
+        var confirmMsg = isPrimaryAdmin
+          ? "Remove PRIMARY admin " + adminEmail + "? They will be blocked from signing in."
+          : "Remove admin " + adminEmail + "? They will not be able to sign in.";
+        if (!window.confirm(confirmMsg)) return;
         var removed = auth.removeAdminAccount
-          ? auth.removeAdminAccount(adminEmail)
+          ? auth.removeAdminAccount(adminEmail, { bySuperAdmin: session.role === "superadmin" })
           : { ok: false, message: "Cannot remove admin." };
         if (!removed.ok) {
           if (window.showToast) window.showToast(removed.message || "Could not remove admin.", "error");
           return;
         }
-        if (window.showToast) window.showToast("Admin removed.", "success");
+        if (window.showToast) window.showToast(isPrimaryAdmin ? "Primary admin removed." : "Admin removed.", "success");
         render(session, section === "security" ? "security" : "admins");
+        return;
+      }
+
+      var enterSchoolBtn = e.target.closest("[data-enter-school]");
+      if (enterSchoolBtn) {
+        e.preventDefault();
+        if (session.role !== "superadmin" || !ops || !ops.setActiveSchoolId) return;
+        var enterId = enterSchoolBtn.getAttribute("data-enter-school");
+        ops.setActiveSchoolId(enterId);
+        var goto = enterSchoolBtn.getAttribute("data-goto-section") || "school-security";
+        if (window.showToast) {
+          var entered = ops.getSchoolById(enterId);
+          window.showToast("Opened desk: " + ((entered && entered.name) || "school"), "success");
+        }
+        render(session, goto);
+        return;
+      }
+
+      var exitSchoolBtn = e.target.closest("[data-exit-school]");
+      if (exitSchoolBtn) {
+        e.preventDefault();
+        if (ops && ops.setActiveSchoolId) ops.setActiveSchoolId("");
+        if (window.showToast) window.showToast("Back to platform hub.", "success");
+        render(session, "home");
+        return;
+      }
+
+      var secToggle = e.target.closest("[data-sec-toggle]");
+      if (secToggle) {
+        e.preventDefault();
+        if (session.role !== "superadmin" || !ops || !ops.setSchoolSecurity) return;
+        var secSchool = secToggle.getAttribute("data-sec-school");
+        var secKey = secToggle.getAttribute("data-sec-toggle");
+        var secVal = secToggle.getAttribute("data-sec-value") === "1";
+        var patch = {};
+        patch[secKey] = secVal;
+        var secRes = ops.setSchoolSecurity(secSchool, patch, session);
+        if (!secRes.ok) {
+          if (window.showToast) window.showToast(secRes.message || "Could not update security.", "error");
+          return;
+        }
+        if (window.showToast) window.showToast("Security updated (locked for school admins).", "success");
+        render(session, "school-security");
+        return;
+      }
+
+      var saveSiteBtn = e.target.closest("[data-save-site]");
+      if (saveSiteBtn) {
+        e.preventDefault();
+        if (session.role !== "superadmin" || !ops || !ops.saveSchoolPage) return;
+        var siteSchoolId = saveSiteBtn.getAttribute("data-save-site");
+        var blockEls = Array.prototype.slice.call(document.querySelectorAll("#saSiteBlocks .sa-block"));
+        var blocks = blockEls.map(function (el) {
+          var idx = el.getAttribute("data-block-index");
+          var titleEl = el.querySelector('[data-block-field="title"]');
+          var bodyEl = el.querySelector('[data-block-field="body"]');
+          var typeEl = el.querySelector(".dash-panel__head h3");
+          var typeText = typeEl ? String(typeEl.textContent || "").replace(/⋮⋮/g, "").trim() : "block";
+          return {
+            id: "b-" + idx,
+            type: typeText,
+            title: titleEl ? titleEl.value : "",
+            body: bodyEl ? bodyEl.value : "",
+          };
+        });
+        var savedPage = ops.saveSchoolPage(siteSchoolId, blocks, session);
+        if (!savedPage.ok) {
+          if (window.showToast) window.showToast(savedPage.message || "Could not save site.", "error");
+          return;
+        }
+        if (window.showToast) window.showToast("Website saved and locked.", "success");
+        render(session, "edit-site");
         return;
       }
 
@@ -3478,6 +3665,13 @@
         e.preventDefault();
         if (!canManageRoster(session)) return;
         var announceId = deleteAnnounceBtn.getAttribute("data-delete-announce");
+        var annItem = loadAnnouncements().find(function (a) {
+          return a.id === announceId;
+        });
+        if (annItem && annItem.superLocked && session.role !== "superadmin") {
+          if (window.showToast) window.showToast("This announcement was locked by Super Admin.", "error");
+          return;
+        }
         saveAnnouncements(
           loadAnnouncements().filter(function (a) {
             return a.id !== announceId;
@@ -3598,12 +3792,36 @@
       if (saveResultBtn) {
         e.preventDefault();
         if (!canManageRoster(session)) return;
+        var activeForResults = activeSchoolRec();
+        if (
+          session.role === "admin" &&
+          activeForResults &&
+          ops &&
+          ops.isSchoolFeatureEnabled &&
+          !ops.isSchoolFeatureEnabled(activeForResults.id || session.schoolId, "resultsEditBySchoolAdmin")
+        ) {
+          if (window.showToast) window.showToast("Super Admin disabled result edits for this school.", "error");
+          return;
+        }
+        if (session.role === "admin" && session.schoolId && ops && ops.isSchoolFeatureEnabled) {
+          if (!ops.isSchoolFeatureEnabled(session.schoolId, "resultsEditBySchoolAdmin")) {
+            if (window.showToast) window.showToast("Super Admin disabled result edits for this school.", "error");
+            return;
+          }
+        }
         var resId = saveResultBtn.getAttribute("data-save-result");
         var resRow = saveResultBtn.closest("tr");
         var markInput = resRow && resRow.querySelector('[data-result-mark="' + resId + '"]');
         var maxInput = resRow && resRow.querySelector('[data-result-max="' + resId + '"]');
         var subjectInput = resRow && resRow.querySelector('[data-result-subject="' + resId + '"]');
         var titleInput = resRow && resRow.querySelector('[data-result-title="' + resId + '"]');
+        var existingRes = loadResults().find(function (r) {
+          return r.id === resId;
+        });
+        if (existingRes && existingRes.superLocked && session.role !== "superadmin") {
+          if (window.showToast) window.showToast("This result was locked by Super Admin.", "error");
+          return;
+        }
         var results = loadResults().map(function (r) {
           if (r.id !== resId) return r;
           var copy = {};
@@ -3616,6 +3834,7 @@
           if (titleInput) copy.title = String(titleInput.value || "").trim() || copy.title;
           copy.updatedAt = new Date().toISOString();
           copy.updatedBy = session.name;
+          if (session.role === "superadmin") copy.superLocked = true;
           return copy;
         });
         saveResults(results);
@@ -3853,14 +4072,30 @@
         var aTitle = String((announceForm.querySelector('[name="title"]') || {}).value || "").trim();
         var aBody = String((announceForm.querySelector('[name="body"]') || {}).value || "").trim();
         var aAudience = (announceForm.querySelector('[name="audience"]') || {}).value || "all";
+        var aSchoolId = (announceForm.querySelector('[name="schoolId"]') || {}).value || "";
         if (!aTitle || !aBody) return;
+        if (session.role === "admin" && session.schoolId && ops && ops.isSchoolFeatureEnabled) {
+          if (!ops.isSchoolFeatureEnabled(session.schoolId, "announcements")) {
+            if (window.showToast) window.showToast("Announcements disabled by Super Admin.", "error");
+            return;
+          }
+        }
+        var schoolMeta =
+          aSchoolId && ops && ops.getSchoolById
+            ? ops.getSchoolById(aSchoolId)
+            : session.role === "admin"
+              ? { id: session.schoolId || "", name: schoolNameOf(session) }
+              : null;
         var announcements = loadAnnouncements();
         announcements.unshift({
           id: "ann-" + Date.now(),
           title: aTitle,
           body: aBody,
           audience: aAudience,
+          schoolId: schoolMeta ? schoolMeta.id || aSchoolId : aSchoolId,
+          schoolName: schoolMeta ? schoolMeta.name : "",
           by: session.name,
+          superLocked: session.role === "superadmin",
           createdAt: new Date().toISOString(),
         });
         saveAnnouncements(announcements);

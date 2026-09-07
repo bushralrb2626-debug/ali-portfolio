@@ -308,6 +308,22 @@
       };
     }
     var session = toSession(found.key, found.user);
+    if (window.BrightStepsSchoolOps && found.user.role !== "superadmin") {
+      var opsAuth = window.BrightStepsSchoolOps;
+      var schoolRec =
+        (found.user.schoolId && opsAuth.getSchoolById && opsAuth.getSchoolById(found.user.schoolId)) ||
+        (opsAuth.getSchoolByName && opsAuth.getSchoolByName(found.user.schoolName || found.user.className));
+      var feature = opsAuth.portalFeatureForRole ? opsAuth.portalFeatureForRole(found.user.role) : "";
+      if (schoolRec && feature && opsAuth.isSchoolFeatureEnabled && !opsAuth.isSchoolFeatureEnabled(schoolRec.id, feature)) {
+        return {
+          ok: false,
+          message:
+            "This school's " +
+            (found.user.role === "admin" ? "admin" : found.user.role) +
+            " portal is disabled by Super Admin security.",
+        };
+      }
+    }
     writeSession(session, !!remember);
     return { ok: true, session: session };
   }
@@ -483,22 +499,30 @@
     return out;
   }
 
-  function removeAdminAccount(email) {
+  function removeAdminAccount(email, opts) {
+    opts = opts || {};
+    var bySuper = !!opts.bySuperAdmin;
     var key = normalizeLogin(email);
     if (!key) return { ok: false, message: "Missing admin email." };
-    if (key === "admin@gmail.com" || key === "admin@brightfuture.academy") {
-      return { ok: false, message: "The primary school admin cannot be removed." };
+    if (key === "superadmin@gmail.com" || key === "superadmin@platform.com") {
+      return { ok: false, message: "Super Admin cannot be removed." };
     }
     var found = lookup(key);
     if (!found || found.user.role !== "admin") {
       return { ok: false, message: "Admin account not found." };
     }
-    if (BUILTIN[key] && !extraUsers()[key]) {
-      return { ok: false, message: "Built-in admin accounts cannot be removed." };
+    var isPrimary =
+      key === "admin@gmail.com" ||
+      key === "admin@brightfuture.academy" ||
+      (!!BUILTIN[key] && !extraUsers()[key]);
+    if (isPrimary && !bySuper) {
+      return { ok: false, message: "Only Super Admin can remove a primary school admin." };
     }
     markRemoved([key]);
+    if (key === "admin@gmail.com") markRemoved(["admin@brightfuture.academy"]);
+    if (key === "admin@brightfuture.academy") markRemoved(["admin@gmail.com"]);
     deleteExtraUser(key);
-    return { ok: true };
+    return { ok: true, primary: isPrimary };
   }
 
   function listSecurityState() {
