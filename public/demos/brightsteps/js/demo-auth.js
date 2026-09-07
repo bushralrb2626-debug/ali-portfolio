@@ -94,6 +94,8 @@
       roleLabel: "School Admin",
       className: "BrightFuture Academy",
       adminPosition: "full",
+      schoolId: "sch-brightfuture",
+      schoolName: "BrightFuture Academy",
     },
     "superadmin@gmail.com": {
       password: "12345",
@@ -242,14 +244,21 @@
   function toSession(key, user) {
     var position = user.role === "admin" ? normalizeAdminPosition(user.adminPosition) : "";
     var meta = position ? positionMeta(position) : null;
+    var roleLabel = user.roleLabel;
+    if (user.role === "admin") {
+      if (meta && position !== "full") roleLabel = meta.shortLabel;
+      else roleLabel = "Principal / School Admin";
+    }
     return {
       login: key,
       role: user.role,
       name: user.name,
-      roleLabel: meta && position !== "full" ? meta.shortLabel : user.roleLabel,
+      roleLabel: roleLabel,
       className: user.className,
       personId: user.personId || "",
       adminPosition: position,
+      schoolId: user.schoolId || "",
+      schoolName: user.schoolName || user.className || "",
       loggedInAt: Date.now(),
     };
   }
@@ -411,7 +420,8 @@
     var password = String(fields.password || DEMO_PASSWORD);
     var position = normalizeAdminPosition(fields.position || fields.adminPosition);
     var meta = positionMeta(position);
-    var school = String(fields.className || fields.school || "BrightFuture Academy").trim() || "BrightFuture Academy";
+    var school = String(fields.className || fields.school || fields.schoolName || "BrightFuture Academy").trim() || "BrightFuture Academy";
+    var schoolId = String(fields.schoolId || "").trim();
     if (!name || name.length > 80) return { ok: false, message: "Enter the admin's name." };
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, message: "Enter a valid email for the admin login." };
     if (lookup(email)) return { ok: false, message: "That email is already registered." };
@@ -420,8 +430,10 @@
       password: password.length >= 6 ? password : DEMO_PASSWORD,
       role: "admin",
       name: name,
-      roleLabel: meta.shortLabel,
+      roleLabel: position === "full" ? "Principal / School Admin" : meta.shortLabel,
       className: school,
+      schoolName: school,
+      schoolId: schoolId,
       adminPosition: position,
       personId: fields.personId || "",
     };
@@ -432,6 +444,8 @@
       password: extra[email].password,
       position: position,
       positionLabel: meta.label,
+      schoolName: school,
+      schoolId: schoolId,
     };
   }
 
@@ -449,7 +463,8 @@
       out.push({
         email: email,
         name: user.name,
-        school: user.className || "",
+        school: user.schoolName || user.className || "",
+        schoolId: user.schoolId || "",
         position: position,
         positionLabel: meta.label,
         roleLabel: user.roleLabel || meta.shortLabel,
@@ -484,6 +499,26 @@
     markRemoved([key]);
     deleteExtraUser(key);
     return { ok: true };
+  }
+
+  function listSecurityState() {
+    var lockMap = locks();
+    var removedMap = removed();
+    var locked = [];
+    var seen = {};
+    Object.keys(lockMap).forEach(function (k) {
+      if (!lockMap[k] || seen[k]) return;
+      seen[k] = true;
+      locked.push(k);
+    });
+    var removedKeys = [];
+    seen = {};
+    Object.keys(removedMap).forEach(function (k) {
+      if (!removedMap[k] || seen[k]) return;
+      seen[k] = true;
+      removedKeys.push(k);
+    });
+    return { locked: locked, removed: removedKeys };
   }
 
   function logout() {
@@ -526,6 +561,7 @@
     addAdminAccount: addAdminAccount,
     listAdmins: listAdmins,
     removeAdminAccount: removeAdminAccount,
+    listSecurityState: listSecurityState,
     adminPositions: ADMIN_POSITIONS,
     canManageAdmins: canManageAdmins,
     canAdminAccessSection: canAdminAccessSection,

@@ -8,6 +8,7 @@
   var FAMILIES_KEY = "brightsteps-demo-families";
   var INTERNAL_VISITS_KEY = "brightsteps-demo-internal-visits";
   var RESULT_POLICY_KEY = "brightsteps-demo-result-policy";
+  var SCHOOLS_KEY = "brightsteps-demo-schools";
 
   var SEED_FAMILIES = [
     {
@@ -17,6 +18,40 @@
       phone: "+39 02 555 0142",
       login: "parent_demo",
       kidIds: ["seed-alex"],
+    },
+  ];
+
+  var SEED_SCHOOLS = [
+    {
+      id: "sch-materna",
+      name: "Scuola Materna",
+      city: "Milano",
+      slug: "scuola-materna",
+      tagline: "Impara. Esplora. Cresci.",
+      about:
+        "A colourful campus where curiosity grows, creativity shines, and every child can learn, explore and dream.",
+      principalEmail: "grace.okonkwo@brightsteps.academy",
+      publicEnabled: true,
+    },
+    {
+      id: "sch-brightfuture",
+      name: "BrightFuture Academy",
+      city: "Roma",
+      slug: "brightfuture-academy",
+      tagline: "Learn. Explore. Grow.",
+      about: "BrightFuture Academy partners with families for strong academics and a warm school community.",
+      principalEmail: "admin@gmail.com",
+      publicEnabled: true,
+    },
+    {
+      id: "sch-maple",
+      name: "Maple Grove Primary",
+      city: "Torino",
+      slug: "maple-grove",
+      tagline: "Rooted in kindness.",
+      about: "Maple Grove Primary is a welcoming neighbourhood school focused on literacy, play and belonging.",
+      principalEmail: "",
+      publicEnabled: true,
     },
   ];
 
@@ -60,6 +95,128 @@
 
   function saveFamilies(list) {
     saveList(FAMILIES_KEY, list);
+  }
+
+  function slugify(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 48);
+  }
+
+  function loadSchools() {
+    var list = loadList(SCHOOLS_KEY);
+    if (!list.length) {
+      list = SEED_SCHOOLS.map(function (s) {
+        return {
+          id: s.id,
+          name: s.name,
+          city: s.city,
+          slug: s.slug,
+          tagline: s.tagline,
+          about: s.about,
+          principalEmail: s.principalEmail || "",
+          publicEnabled: s.publicEnabled !== false,
+          createdAt: "",
+        };
+      });
+      saveList(SCHOOLS_KEY, list);
+    }
+    return list;
+  }
+
+  function saveSchools(list) {
+    saveList(SCHOOLS_KEY, list);
+  }
+
+  function getSchoolBySlug(slug) {
+    var key = slugify(slug);
+    return (
+      loadSchools().find(function (s) {
+        return slugify(s.slug) === key;
+      }) || null
+    );
+  }
+
+  function getSchoolById(id) {
+    return (
+      loadSchools().find(function (s) {
+        return s.id === id;
+      }) || null
+    );
+  }
+
+  function getSchoolByName(name) {
+    var key = norm(name);
+    return (
+      loadSchools().find(function (s) {
+        return norm(s.name) === key;
+      }) || null
+    );
+  }
+
+  function upsertSchool(fields) {
+    var list = loadSchools();
+    var name = String(fields.name || "").trim();
+    if (!name) return { ok: false, message: "Enter the school name." };
+    var city = String(fields.city || "").trim() || "—";
+    var slug = slugify(fields.slug || name);
+    if (!slug) return { ok: false, message: "Enter a URL slug for the public site." };
+    var existingBySlug = list.find(function (s) {
+      return slugify(s.slug) === slug && s.id !== fields.id;
+    });
+    if (existingBySlug) return { ok: false, message: "That public URL slug is already used." };
+
+    var existing =
+      (fields.id &&
+        list.find(function (s) {
+          return s.id === fields.id;
+        })) ||
+      list.find(function (s) {
+        return norm(s.name) === norm(name);
+      });
+
+    if (existing) {
+      existing.name = name;
+      existing.city = city;
+      existing.slug = slug;
+      existing.tagline = String(fields.tagline != null ? fields.tagline : existing.tagline || "").trim();
+      existing.about = String(fields.about != null ? fields.about : existing.about || "").trim();
+      if (fields.principalEmail != null) existing.principalEmail = String(fields.principalEmail || "").trim();
+      if (fields.publicEnabled != null) existing.publicEnabled = !!fields.publicEnabled;
+      saveSchools(list);
+      return { ok: true, school: existing, created: false };
+    }
+
+    var school = {
+      id: "sch-" + Date.now(),
+      name: name,
+      city: city,
+      slug: slug,
+      tagline: String(fields.tagline || "Learn. Explore. Grow.").trim(),
+      about: String(fields.about || "").trim(),
+      principalEmail: String(fields.principalEmail || "").trim(),
+      publicEnabled: fields.publicEnabled !== false,
+      createdAt: new Date().toISOString(),
+    };
+    list.unshift(school);
+    saveSchools(list);
+    return { ok: true, school: school, created: true };
+  }
+
+  function removeSchool(id) {
+    var list = loadSchools().filter(function (s) {
+      return s.id !== id;
+    });
+    saveSchools(list);
+    return { ok: true };
+  }
+
+  function publicSitePath(school) {
+    if (!school || !school.slug) return "/demos/brightsteps/index.html";
+    return "/demos/brightsteps/school.html?s=" + encodeURIComponent(school.slug);
   }
 
   function upsertFamily(fields) {
@@ -265,5 +422,15 @@
     getResultPolicy: getResultPolicy,
     setResultPolicy: setResultPolicy,
     canViewResult: canViewResult,
+    loadSchools: loadSchools,
+    saveSchools: saveSchools,
+    upsertSchool: upsertSchool,
+    removeSchool: removeSchool,
+    getSchoolBySlug: getSchoolBySlug,
+    getSchoolById: getSchoolById,
+    getSchoolByName: getSchoolByName,
+    publicSitePath: publicSitePath,
+    slugify: slugify,
+    seedSchools: SEED_SCHOOLS,
   };
 })(window);

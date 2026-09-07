@@ -64,8 +64,9 @@
     ],
     superadmin: [
       { icon: "🏠", label: "Platform", id: "home" },
-      { icon: "📅", label: "Meetings", id: "meetings" },
       { icon: "🏫", label: "Schools", id: "schools" },
+      { icon: "🛡️", label: "Security", id: "security" },
+      { icon: "📅", label: "Meetings", id: "meetings" },
       { icon: "👩‍🏫", label: "Teachers", id: "teachers" },
       { icon: "🧒", label: "Students", id: "students" },
       { icon: "👨‍👩‍👧", label: "Parents", id: "parents" },
@@ -1387,6 +1388,70 @@
       });
   }
 
+  function schoolNameOf(session) {
+    if (!session) return "";
+    return String(session.schoolName || session.className || "").trim();
+  }
+
+  function sameSchoolName(a, b) {
+    return (
+      String(a || "")
+        .trim()
+        .toLowerCase() ===
+      String(b || "")
+        .trim()
+        .toLowerCase()
+    );
+  }
+
+  function isPlatformWide(session) {
+    return !!(session && session.role === "superadmin");
+  }
+
+  function scopedStudents(session) {
+    var all = allStudents();
+    if (isPlatformWide(session) || !session || session.role !== "admin") return all;
+    var mine = schoolNameOf(session);
+    if (!mine || mine === "All schools") return all;
+    return all.filter(function (s) {
+      return sameSchoolName(s.school, mine);
+    });
+  }
+
+  function scopedTeachers(session) {
+    var all = allTeachers();
+    if (isPlatformWide(session) || !session || session.role !== "admin") return all;
+    var mine = schoolNameOf(session);
+    if (!mine || mine === "All schools") return all;
+    return all.filter(function (t) {
+      return sameSchoolName(t.school, mine);
+    });
+  }
+
+  function liveSchools() {
+    if (ops && ops.loadSchools) return ops.loadSchools();
+    return SCHOOLS.map(function (s, i) {
+      return {
+        id: "seed-" + i,
+        name: s.name,
+        city: s.city,
+        slug: String(s.name || "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-"),
+        tagline: "",
+        about: "",
+        principalEmail: "",
+        publicEnabled: true,
+      };
+    });
+  }
+
+  function countForSchool(schoolName, people) {
+    return people.filter(function (p) {
+      return sameSchoolName(p.school, schoolName);
+    }).length;
+  }
+
   function roomSelectOptions(current) {
     return loadRooms()
       .map(function (room) {
@@ -1562,6 +1627,12 @@
 
   function adminsPanel(session) {
     var admins = auth.listAdmins ? auth.listAdmins() : [];
+    if (session.role === "admin") {
+      var mine = schoolNameOf(session);
+      admins = admins.filter(function (a) {
+        return !mine || sameSchoolName(a.school, mine) || a.email === session.login;
+      });
+    }
     var rows = admins.map(function (a) {
       var actions = a.builtin
         ? "<span class='text-muted small'>Primary</span>"
@@ -1577,12 +1648,18 @@
       ];
     });
     return (
-      '<div class="welcome-banner"><h2>School admins</h2><p>Create extra admins with positions such as Account Admin or Fees Managing Admin. Full school admins keep access to every desk.</p></div>' +
+      '<div class="welcome-banner"><h2>' +
+      (session.role === "superadmin" ? "Principals & school admins" : "School admins") +
+      "</h2><p>" +
+      (session.role === "superadmin"
+        ? "Create principals for each campus, or add position-based admins. Super Admin also manages security across schools."
+        : "Create extra admins with positions such as Account Admin or Fees Managing Admin for your school.") +
+      "</p></div>" +
       (canManageSchoolAdmins(session)
-        ? addAdminForm(session && session.className ? session.className : "BrightFuture Academy")
+        ? addAdminForm(session && schoolNameOf(session) ? schoolNameOf(session) : "BrightFuture Academy")
         : "") +
       panel(
-        "Admins on this school",
+        session.role === "superadmin" ? "All school admins" : "Admins on this school",
         rows.length
           ? table(["Name", "Position", "School", "Login email", "Actions"], rows)
           : "<p class='text-muted'>No admin accounts yet.</p>"
@@ -1591,7 +1668,7 @@
   }
 
   function studentsPanel(session) {
-    var rows = allStudents().map(function (s) {
+    var rows = scopedStudents(session).map(function (s) {
       var id = s.id || s.name;
       return [
         escapeHtml(s.name),
@@ -1605,7 +1682,7 @@
       ];
     });
     return (
-      addKidForm(session && session.className ? session.className : "Scuola Materna") +
+      addKidForm(session && schoolNameOf(session) ? schoolNameOf(session) : "Scuola Materna") +
       panel(
         "Students — edit fees, mark paid, or remove",
         table(
@@ -1617,7 +1694,7 @@
   }
 
   function teachersPanel(session) {
-    var rows = allTeachers().map(function (t) {
+    var rows = scopedTeachers(session).map(function (t) {
       var id = t.id || t.name;
       return [
         escapeHtml(t.name),
@@ -1629,7 +1706,7 @@
       ];
     });
     return (
-      addTeacherForm(session && session.className ? session.className : "BrightFuture Academy") +
+      addTeacherForm(session && schoolNameOf(session) ? schoolNameOf(session) : "BrightFuture Academy") +
       panel(
         "Teachers and monthly salary",
         table(["Name", "School", "Subject", "Classroom", "Monthly salary", "Actions"], rows)
@@ -2076,41 +2153,71 @@
     if (!items.length) {
       return "<p class='text-muted'>No results on file yet.</p>";
     }
+    if (editable) {
+      var editRows = items.map(function (r) {
+        return [
+          escapeHtml(r.studentName),
+          '<input type="text" data-result-subject="' +
+            escapeHtml(r.id) +
+            '" value="' +
+            escapeHtml(r.subject || "") +
+            '" />',
+          escapeHtml(paperTypeLabel(r.paperType)),
+          '<input type="text" data-result-title="' +
+            escapeHtml(r.id) +
+            '" value="' +
+            escapeHtml(r.title || "") +
+            '" />',
+          '<div class="dash-money"><input type="text" data-result-mark="' +
+            escapeHtml(r.id) +
+            '" value="' +
+            escapeHtml(r.mark) +
+            '" /> <input type="text" data-result-max="' +
+            escapeHtml(r.id) +
+            '" value="' +
+            escapeHtml(r.maxMark || "100") +
+            '" style="width:4.5rem" /> <button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-save-result="' +
+            escapeHtml(r.id) +
+            '">Save</button></div>',
+          escapeHtml(r.classroom || ""),
+          escapeHtml(r.school || ""),
+          escapeHtml(r.teacher || ""),
+          escapeHtml(formatDate(r.updatedAt || r.createdAt)),
+          '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-delete-result="' +
+            escapeHtml(r.id) +
+            '">Delete</button>',
+        ];
+      });
+      return table(
+        ["Student", "Subject", "Type", "Title", "Mark", "Class", "School", "Teacher", "Updated", "Actions"],
+        editRows
+      );
+    }
     var rows = items.map(function (r) {
-      var markCell = editable
-        ? '<div class="dash-money"><input type="text" data-result-mark="' +
-          escapeHtml(r.id) +
-          '" value="' +
-          escapeHtml(r.mark) +
-          '" /> <input type="text" data-result-max="' +
-          escapeHtml(r.id) +
-          '" value="' +
-          escapeHtml(r.maxMark || "100") +
-          '" style="width:4.5rem" /> <button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-save-result="' +
-          escapeHtml(r.id) +
-          '">Save</button></div>'
-        : escapeHtml(markDisplay(r));
-      var actions = editable
-        ? '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-delete-result="' +
-          escapeHtml(r.id) +
-          '">Delete</button>'
-        : "—";
       return [
         escapeHtml(r.studentName),
         escapeHtml(r.subject),
         escapeHtml(paperTypeLabel(r.paperType)),
         escapeHtml(r.title),
-        markCell,
+        escapeHtml(markDisplay(r)),
         escapeHtml(r.classroom || ""),
+        escapeHtml(r.school || ""),
         escapeHtml(r.teacher || ""),
         escapeHtml(formatDate(r.updatedAt || r.createdAt)),
-        actions,
+        "—",
       ];
     });
     return table(
-      ["Student", "Subject", "Type", "Title", "Mark", "Class", "Teacher", "Updated", "Actions"],
+      ["Student", "Subject", "Type", "Title", "Mark", "Class", "School", "Teacher", "Updated", "Actions"],
       rows
     );
+  }
+
+  function allResultsForManagers(session) {
+    if (session && (session.role === "admin" || session.role === "superadmin")) {
+      return loadResults().slice();
+    }
+    return visibleResultsFor(session);
   }
 
   function visibleResultsFor(session) {
@@ -2141,10 +2248,11 @@
   }
 
   function adminResultsPanel(session) {
-    var all = visibleResultsFor(session).sort(function (a, b) {
+    var all = allResultsForManagers(session).sort(function (a, b) {
       return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
     });
     return (
+      '<div class="welcome-banner"><h2>All student results</h2><p>Principals and Super Admin can view, edit marks/titles, or delete every result on file.</p></div>' +
       resultsUploadForm(session, true) +
       resultAccessPanel(session) +
       panel("All test & paper records", resultsTable(session, all, true))
@@ -2310,8 +2418,8 @@
       });
   }
 
-  function feesPanel() {
-    var students = allStudents();
+  function feesPanel(session) {
+    var students = scopedStudents(session);
     var unpaid = students.filter(function (s) {
       return !isFeePaid(s.id || s.name);
     });
@@ -2423,6 +2531,119 @@
     if (hour < 12) return "Good morning";
     if (hour < 17) return "Good afternoon";
     return "Good evening";
+  }
+
+  function schoolsManagePanel(session) {
+    var schools = liveSchools();
+    var students = allStudents();
+    var teachers = allTeachers();
+    var rows = schools.map(function (s) {
+      var path = ops && ops.publicSitePath ? ops.publicSitePath(s) : "/demos/brightsteps/school.html?s=" + encodeURIComponent(s.slug);
+      return [
+        escapeHtml(s.name),
+        escapeHtml(s.city || "—"),
+        String(countForSchool(s.name, students)),
+        String(countForSchool(s.name, teachers)),
+        escapeHtml(s.principalEmail || "—"),
+        '<a class="btn-bsa btn-bsa-sm btn-bsa-soft" href="' +
+          escapeHtml(path) +
+          '" target="_blank" rel="noopener">Open site</a>',
+        session.role === "superadmin"
+          ? '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-remove-school="' +
+            escapeHtml(s.id) +
+            '">Remove</button>'
+          : "—",
+      ];
+    });
+
+    var createForm = "";
+    if (session.role === "superadmin") {
+      createForm =
+        '<form class="form-bsa" id="addSchoolForm" style="margin-bottom:1.25rem">' +
+        "<p><strong>Create a school website</strong> — adds a public campus page and (optionally) a principal login who manages that school only.</p>" +
+        '<div class="form-row">' +
+        '<label>School name<input name="name" required maxlength="80" placeholder="e.g. Sunrise Primary" /></label>' +
+        '<label>City<input name="city" required maxlength="60" placeholder="e.g. Firenze" /></label>' +
+        "</div>" +
+        '<div class="form-row">' +
+        '<label>Public URL slug<input name="slug" maxlength="48" placeholder="sunrise-primary" /></label>' +
+        '<label>Tagline<input name="tagline" maxlength="80" placeholder="Learn. Explore. Grow." /></label>' +
+        "</div>" +
+        '<label>About (public site)<textarea name="about" rows="2" maxlength="500" placeholder="Short welcome for the school website"></textarea></label>' +
+        "<p><strong>Principal / school admin</strong> (optional — creates their login)</p>" +
+        '<div class="form-row">' +
+        '<label>Principal name<input name="principalName" maxlength="80" placeholder="e.g. Maria Conti" /></label>' +
+        '<label>Principal email<input name="principalEmail" type="email" placeholder="principal@school.com" /></label>' +
+        "</div>" +
+        '<label>Temporary password<input name="principalPassword" value="Demo@12345" minlength="6" /></label>' +
+        '<button type="submit" class="btn-bsa btn-bsa-primary">Create school + public site</button>' +
+        "</form>";
+    }
+
+    return (
+      '<div class="welcome-banner"><h2>Schools on the platform</h2><p>Super Admin owns the software: create campuses, publish their public sites, and assign principals. Each principal manages staff and students for their school.</p></div>' +
+      createForm +
+      panel(
+        "All schools",
+        table(
+          ["School", "City", "Students", "Teachers", "Principal login", "Public web", "Actions"],
+          rows
+        )
+      ) +
+      '<p class="text-muted small">Directory: <a href="/demos/brightsteps/schools.html">/demos/brightsteps/schools.html</a></p>'
+    );
+  }
+
+  function securityPanel(session) {
+    if (session.role !== "superadmin") {
+      return panel("Security", "<p>Only Super Admin can manage platform security.</p>");
+    }
+    var state = auth.listSecurityState ? auth.listSecurityState() : { locked: [], removed: [] };
+    var admins = auth.listAdmins ? auth.listAdmins() : [];
+    var lockRows = (state.locked || []).map(function (k) {
+      return [
+        escapeHtml(k),
+        "Portal locked",
+        '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-unlock-key="' +
+          escapeHtml(k) +
+          '">Unlock</button>',
+      ];
+    });
+    var removedRows = (state.removed || []).slice(0, 40).map(function (k) {
+      return [escapeHtml(k), "Removed / blocked"];
+    });
+    var adminRows = admins.map(function (a) {
+      return [
+        escapeHtml(a.name),
+        escapeHtml(a.school || "—"),
+        escapeHtml(a.email),
+        escapeHtml(a.positionLabel || a.roleLabel),
+        a.builtin
+          ? "<span class='text-muted small'>Primary</span>"
+          : '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-remove-admin="' +
+            escapeHtml(a.email) +
+            '">Remove access</button>',
+      ];
+    });
+    return (
+      '<div class="welcome-banner"><h2>Platform security</h2><p>Super Admin oversees every school: unlock portals, review removals, and revoke school-admin access.</p></div>' +
+      panel(
+        "Locked portals",
+        lockRows.length
+          ? table(["Account / key", "Status", "Action"], lockRows)
+          : "<p class='text-muted'>No locked portals right now.</p>"
+      ) +
+      panel(
+        "School admins / principals",
+        table(["Name", "School", "Email", "Position", "Actions"], adminRows)
+      ) +
+      panel(
+        "Removed accounts (sample)",
+        removedRows.length
+          ? table(["Key", "Status"], removedRows)
+          : "<p class='text-muted'>No removed accounts recorded.</p>"
+      )
+    );
   }
 
   function kpis(items) {
@@ -2729,7 +2950,7 @@
       if (section === "students") return studentsPanel(session);
       if (section === "parents") return parentsPanel();
       if (section === "book-visit") return bookVisitPanel(session);
-      if (section === "fees") return feesPanel();
+      if (section === "fees") return feesPanel(session);
       if (section === "classrooms") return classroomsPanel();
       if (section === "announce") return announcePanel(session);
       if (section === "feedback") return feedbackPanel(session);
@@ -2762,11 +2983,11 @@
                 "</strong>. Use the sidebar for the areas assigned to this position.</p>"
             );
       return (
-        '<div class="welcome-banner"><h2>School admin' +
+        '<div class="welcome-banner"><h2>Principal desk' +
         posNote +
         "</h2><p>" +
-        escapeHtml(session.className || "") +
-        "</p></div>" +
+        escapeHtml(schoolNameOf(session) || session.className || "") +
+        " — manage your staff and students. Results for all students stay editable here.</p></div>" +
         kpis([
           { label: "Active staff", value: String(allTeachers().length), accent: "accent-sky" },
           { label: "Students", value: String(allStudents().length), accent: "accent-mint" },
@@ -2778,22 +2999,13 @@
     }
 
     if (section === "meetings") return meetingsPanel();
-    if (section === "schools") {
-      return panel(
-        "All schools",
-        table(
-          ["School", "City", "Students", "Teachers", "Attendance"],
-          SCHOOLS.map(function (s) {
-            return [s.name, s.city, String(s.students), String(s.teachers), s.attendance];
-          })
-        )
-      );
-    }
+    if (section === "schools") return schoolsManagePanel(session);
+    if (section === "security") return securityPanel(session);
     if (section === "teachers") return teachersPanel(session);
     if (section === "students") return studentsPanel(session);
     if (section === "parents") return parentsPanel();
     if (section === "book-visit") return bookVisitPanel(session);
-    if (section === "fees") return feesPanel();
+    if (section === "fees") return feesPanel(session);
     if (section === "classrooms") return classroomsPanel();
     if (section === "announce") return announcePanel(session);
     if (section === "feedback") return feedbackPanel(session);
@@ -2802,10 +3014,11 @@
     if (section === "slorsh-reports") return schoolReportsPanel(session);
     if (section === "analytics") return analyticsPanelShell();
     if (section === "admins") return adminsPanel(session);
+    var schoolsNow = liveSchools();
     return (
-      '<div class="welcome-banner"><h2>Platform control</h2><p>All schools, teachers, students and results on one desk.</p></div>' +
+      '<div class="welcome-banner"><h2>Platform control</h2><p>Super Admin software desk — every school, principal, and security control in one place.</p></div>' +
       kpis([
-        { label: "Schools", value: String(SCHOOLS.length), accent: "accent-royal" },
+        { label: "Schools", value: String(schoolsNow.length), accent: "accent-royal" },
         { label: "Teachers", value: String(allTeachers().length), accent: "accent-sky" },
         { label: "Students", value: String(allStudents().length), accent: "accent-mint" },
         { label: "Results on file", value: String(loadResults().length), accent: "accent-coral" },
@@ -2814,9 +3027,9 @@
       panel(
         "Schools",
         table(
-          ["School", "Students", "Teachers"],
-          SCHOOLS.map(function (s) {
-            return [s.name, String(s.students), String(s.teachers)];
+          ["School", "City", "Public slug"],
+          schoolsNow.map(function (s) {
+            return [escapeHtml(s.name), escapeHtml(s.city || "—"), escapeHtml(s.slug || "")];
           })
         )
       )
@@ -2970,7 +3183,30 @@
           return;
         }
         if (window.showToast) window.showToast("Admin removed.", "success");
-        render(session, "admins");
+        render(session, section === "security" ? "security" : "admins");
+        return;
+      }
+
+      var unlockBtn = e.target.closest("[data-unlock-key]");
+      if (unlockBtn) {
+        e.preventDefault();
+        if (session.role !== "superadmin") return;
+        var unlockKey = unlockBtn.getAttribute("data-unlock-key");
+        auth.setLocked(unlockKey, false);
+        if (window.showToast) window.showToast("Unlocked: " + unlockKey, "success");
+        render(session, "security");
+        return;
+      }
+
+      var removeSchoolBtn = e.target.closest("[data-remove-school]");
+      if (removeSchoolBtn) {
+        e.preventDefault();
+        if (session.role !== "superadmin" || !ops || !ops.removeSchool) return;
+        var schoolId = removeSchoolBtn.getAttribute("data-remove-school");
+        if (!window.confirm("Remove this school from the platform list? Public page will stop listing it.")) return;
+        ops.removeSchool(schoolId);
+        if (window.showToast) window.showToast("School removed.", "success");
+        render(session, "schools");
         return;
       }
 
@@ -3366,6 +3602,8 @@
         var resRow = saveResultBtn.closest("tr");
         var markInput = resRow && resRow.querySelector('[data-result-mark="' + resId + '"]');
         var maxInput = resRow && resRow.querySelector('[data-result-max="' + resId + '"]');
+        var subjectInput = resRow && resRow.querySelector('[data-result-subject="' + resId + '"]');
+        var titleInput = resRow && resRow.querySelector('[data-result-title="' + resId + '"]');
         var results = loadResults().map(function (r) {
           if (r.id !== resId) return r;
           var copy = {};
@@ -3374,12 +3612,14 @@
           });
           copy.mark = String(markInput ? markInput.value : r.mark).trim();
           copy.maxMark = String(maxInput ? maxInput.value : r.maxMark || "100").trim();
+          if (subjectInput) copy.subject = String(subjectInput.value || "").trim() || copy.subject;
+          if (titleInput) copy.title = String(titleInput.value || "").trim() || copy.title;
           copy.updatedAt = new Date().toISOString();
           copy.updatedBy = session.name;
           return copy;
         });
         saveResults(results);
-        if (window.showToast) window.showToast("Result mark updated.", "success");
+        if (window.showToast) window.showToast("Result updated.", "success");
         render(session, section);
         return;
       }
@@ -3776,11 +4016,14 @@
         var aSchool = (adminForm.querySelector('[name="school"]') || {}).value || session.className || "School";
         var aEmail = (adminForm.querySelector('[name="email"]') || {}).value || "";
         var aPassword = (adminForm.querySelector('[name="password"]') || {}).value || "Demo@12345";
+        var schoolRec = ops && ops.getSchoolByName ? ops.getSchoolByName(aSchool) : null;
         var aCreated = auth.addAdminAccount
           ? auth.addAdminAccount({
               name: aName,
               position: aPosition,
               className: aSchool,
+              schoolName: aSchool,
+              schoolId: schoolRec ? schoolRec.id : session.schoolId || "",
               email: aEmail,
               password: aPassword,
             })
@@ -3803,6 +4046,70 @@
           );
         }
         render(session, "admins");
+        return;
+      }
+
+      var schoolForm = e.target.closest("#addSchoolForm");
+      if (schoolForm) {
+        e.preventDefault();
+        if (session.role !== "superadmin" || !ops || !ops.upsertSchool) {
+          if (window.showToast) window.showToast("Only Super Admin can create schools.", "error");
+          return;
+        }
+        var sName = (schoolForm.querySelector('[name="name"]') || {}).value || "";
+        var sCity = (schoolForm.querySelector('[name="city"]') || {}).value || "";
+        var sSlug = (schoolForm.querySelector('[name="slug"]') || {}).value || "";
+        var sTag = (schoolForm.querySelector('[name="tagline"]') || {}).value || "";
+        var sAbout = (schoolForm.querySelector('[name="about"]') || {}).value || "";
+        var pName = (schoolForm.querySelector('[name="principalName"]') || {}).value || "";
+        var pEmail = (schoolForm.querySelector('[name="principalEmail"]') || {}).value || "";
+        var pPass = (schoolForm.querySelector('[name="principalPassword"]') || {}).value || "Demo@12345";
+        var createdSchool = ops.upsertSchool({
+          name: sName,
+          city: sCity,
+          slug: sSlug,
+          tagline: sTag,
+          about: sAbout,
+          principalEmail: pEmail,
+          publicEnabled: true,
+        });
+        if (!createdSchool.ok) {
+          if (window.showToast) window.showToast(createdSchool.message, "error");
+          return;
+        }
+        var msg =
+          "School created. Public site: " +
+          (ops.publicSitePath(createdSchool.school) || "/demos/brightsteps/school.html?s=" + createdSchool.school.slug);
+        if (String(pName).trim() && String(pEmail).trim()) {
+          var principal = auth.addAdminAccount({
+            name: pName,
+            email: pEmail,
+            password: pPass,
+            position: "full",
+            className: createdSchool.school.name,
+            schoolName: createdSchool.school.name,
+            schoolId: createdSchool.school.id,
+          });
+          if (!principal.ok) {
+            if (window.showToast) window.showToast(createdSchool.school.name + " saved, but principal failed: " + principal.message, "error");
+            render(session, "schools");
+            return;
+          }
+          ops.upsertSchool({
+            id: createdSchool.school.id,
+            name: createdSchool.school.name,
+            city: createdSchool.school.city,
+            slug: createdSchool.school.slug,
+            tagline: createdSchool.school.tagline,
+            about: createdSchool.school.about,
+            principalEmail: principal.email,
+            publicEnabled: true,
+          });
+          msg +=
+            " · Principal login: " + principal.email + " / " + principal.password;
+        }
+        if (window.showToast) window.showToast(msg, "success");
+        render(session, "schools");
         return;
       }
 

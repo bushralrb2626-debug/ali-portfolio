@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Schools · BrightSteps</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/demos/brightsteps/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/site.css?v=mobile6" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/bridge.css?v=7eZ7z0-isDSPkIrEmY5kX2w3anNvmJBqC8XONQyJlhc" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/vibrant.css?v=_MlOwKhNsDIIyZrj__65eFxm0nqMbGR8UMI4j8NWuoA" />
+</head>
+<body class="site-body" data-no-translate>
+    <header class="site-nav">
+        <div class="site-nav__inner">
+            <a class="brand-logo" href="/demos/brightsteps/index.html">
+                <span class="brand-mark" aria-hidden="true">🎓</span>
+                <span class="brand-text">
+                    <strong>BrightSteps</strong>
+                    <small>School network</small>
+                </span>
+            </a>
+            <a class="btn-bsa btn-bsa-primary" href="/demos/brightsteps/portal.html">Accedi</a>
+        </div>
+    </header>
+    <main class="band">
+        <div class="wrap" style="padding:2.5rem 1rem 3rem;max-width:960px;margin:0 auto">
+            <h1 style="font-family:Fredoka,sans-serif">Our campuses</h1>
+            <p class="text-muted">Public websites created by Super Admin for each school.</p>
+            <div id="schoolsDirectory"></div>
+        </div>
+    </main>
+    <script src="/demos/brightsteps/js/demo-school-ops.js?v=2"></script>
+    <script>
+      (function () {
+        var ops = window.BrightStepsSchoolOps;
+        var el = document.getElementById("schoolsDirectory");
+        if (!el || !ops) return;
+        var schools = (ops.loadSchools() || []).filter(function (s) { return s.publicEnabled !== false; });
+        if (!schools.length) {
+          el.innerHTML = "<p>No public campuses yet.</p>";
+          return;
+        }
+        el.innerHTML = schools.map(function (s) {
+          var href = ops.publicSitePath(s);
+          return (
+            '<article style="margin:1rem 0;padding:1.1rem 1.2rem;border:1px solid #d7e3f4;border-radius:12px;background:#fff">' +
+            "<h2 style=\"font-family:Fredoka,sans-serif;font-size:1.25rem;margin:0 0 0.35rem\">" +
+            s.name +
+            "</h2>" +
+            "<p style=\"margin:0 0 0.75rem;color:#5a6478\">" +
+            (s.city || "") +
+            (s.tagline ? " · " + s.tagline : "") +
+            "</p>" +
+            '<a class="btn-bsa btn-bsa-primary" href="' + href + '">Open school site</a>' +
+            "</article>"
+          );
+        }).join("");
+      })();
+    </script>
+</body>
+</html>
