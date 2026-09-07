@@ -59,6 +59,7 @@
       { icon: "📑", label: "Reports", id: "slorsh-reports" },
       { icon: "📈", label: "Analytics", id: "analytics" },
       { icon: "📅", label: "Book visit", id: "book-visit" },
+      { icon: "🛡️", label: "Admins", id: "admins" },
       { icon: "⚙️", label: "Settings", id: "settings" },
     ],
     superadmin: [
@@ -1017,6 +1018,40 @@
     return session && (session.role === "admin" || session.role === "superadmin");
   }
 
+  function canManageSchoolAdmins(session) {
+    if (auth.canManageAdmins) return auth.canManageAdmins(session);
+    return !!(session && (session.role === "superadmin" || session.role === "admin"));
+  }
+
+  function navItemsFor(session) {
+    var items = (NAV[session.role] || NAV.student).slice();
+    if (session.role === "admin") {
+      if (!canManageSchoolAdmins(session)) {
+        items = items.filter(function (item) {
+          return item.id !== "admins";
+        });
+      }
+      if (auth.adminAllowedSections) {
+        var allowed = auth.adminAllowedSections(session);
+        if (allowed) {
+          items = items.filter(function (item) {
+            return allowed.indexOf(item.id) !== -1;
+          });
+        }
+      }
+    }
+    return items;
+  }
+
+  function ensureAdminSection(session, section) {
+    if (session.role !== "admin") return section;
+    if (auth.canAdminAccessSection && !auth.canAdminAccessSection(session, section)) {
+      return "home";
+    }
+    if (section === "admins" && !canManageSchoolAdmins(session)) return "home";
+    return section;
+  }
+
   function isPersonRemoved(person) {
     var id = person.id || person.name;
     if (auth.isRemoved(id)) return true;
@@ -1476,6 +1511,82 @@
       '<label>Temporary password<input name="password" value="Demo@12345" minlength="6" /></label>' +
       '<button type="submit" class="btn-bsa btn-bsa-primary">Add teacher</button>' +
       "</form>"
+    );
+  }
+
+  function adminPositionOptionsHtml(selected) {
+    var positions = auth.adminPositions || {};
+    var keys = Object.keys(positions);
+    if (!keys.length) {
+      return '<option value="full">School Admin (full access)</option>';
+    }
+    return keys
+      .map(function (id) {
+        var p = positions[id];
+        var sel = id === selected ? " selected" : "";
+        return (
+          '<option value="' +
+          escapeHtml(id) +
+          '"' +
+          sel +
+          ">" +
+          escapeHtml(p.label || p.shortLabel || id) +
+          "</option>"
+        );
+      })
+      .join("");
+  }
+
+  function addAdminForm(schoolDefault) {
+    var school = escapeHtml(schoolDefault || "BrightFuture Academy");
+    return (
+      '<form class="form-bsa" id="addAdminForm" style="margin-bottom:1.25rem">' +
+      "<p><strong>Create an admin</strong> — choose a position so they only see the desks they need.</p>" +
+      '<div class="form-row">' +
+      '<label>Full name<input name="name" required maxlength="80" placeholder="e.g. Nadia Khan" /></label>' +
+      '<label>Position<select name="position" required>' +
+      adminPositionOptionsHtml("fees") +
+      "</select></label>" +
+      "</div>" +
+      '<div class="form-row">' +
+      '<label>School / campus<input name="school" required maxlength="80" value="' +
+      school +
+      '" /></label>' +
+      '<label>Email (login)<input name="email" type="email" required placeholder="fees.admin@school.com" /></label>' +
+      "</div>" +
+      '<label>Temporary password<input name="password" value="Demo@12345" minlength="6" /></label>' +
+      '<button type="submit" class="btn-bsa btn-bsa-primary">Create admin</button>' +
+      "</form>"
+    );
+  }
+
+  function adminsPanel(session) {
+    var admins = auth.listAdmins ? auth.listAdmins() : [];
+    var rows = admins.map(function (a) {
+      var actions = a.builtin
+        ? "<span class='text-muted small'>Primary</span>"
+        : '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-remove-admin="' +
+          escapeHtml(a.email) +
+          '">Remove</button>';
+      return [
+        escapeHtml(a.name),
+        escapeHtml(a.positionLabel || a.roleLabel || a.position),
+        escapeHtml(a.school || "—"),
+        escapeHtml(a.email),
+        actions,
+      ];
+    });
+    return (
+      '<div class="welcome-banner"><h2>School admins</h2><p>Create extra admins with positions such as Account Admin or Fees Managing Admin. Full school admins keep access to every desk.</p></div>' +
+      (canManageSchoolAdmins(session)
+        ? addAdminForm(session && session.className ? session.className : "BrightFuture Academy")
+        : "") +
+      panel(
+        "Admins on this school",
+        rows.length
+          ? table(["Name", "Position", "School", "Login email", "Actions"], rows)
+          : "<p class='text-muted'>No admin accounts yet.</p>"
+      )
     );
   }
 
@@ -2626,15 +2737,35 @@
       if (section === "attendance") return adminAttendancePanel(session);
       if (section === "slorsh-reports") return schoolReportsPanel(session);
       if (section === "analytics") return analyticsPanelShell();
+      if (section === "admins") return adminsPanel(session);
       if (section === "settings") {
         return panel(
           "School settings",
           "<p>Website banner, term dates and admissions notices (demo).</p><p><button type='button' class='btn-bsa btn-bsa-primary' data-demo-action='save'>Save (demo)</button></p>"
         );
       }
+      var posNote =
+        session.adminPosition && session.adminPosition !== "full"
+          ? " · " + escapeHtml(session.roleLabel || "Admin")
+          : "";
+      var homeExtra =
+        !session.adminPosition || session.adminPosition === "full"
+          ? meetingsPanel() +
+            panel(
+              "Recent activity",
+              "<p>New teacher account created</p><p>Website banner updated</p><p>Admissions visits appear under Meetings</p>"
+            )
+          : panel(
+              "Your desk",
+              "<p>You are signed in as <strong>" +
+                escapeHtml(session.roleLabel || "Admin") +
+                "</strong>. Use the sidebar for the areas assigned to this position.</p>"
+            );
       return (
-        '<div class="welcome-banner"><h2>School admin</h2><p>' +
-        session.className +
+        '<div class="welcome-banner"><h2>School admin' +
+        posNote +
+        "</h2><p>" +
+        escapeHtml(session.className || "") +
         "</p></div>" +
         kpis([
           { label: "Active staff", value: String(allTeachers().length), accent: "accent-sky" },
@@ -2642,8 +2773,7 @@
           { label: "Visit requests", value: String(loadVisits().length), accent: "accent-royal" },
           { label: "Pending invites", value: "2", accent: "accent-coral" },
         ]) +
-        meetingsPanel() +
-        panel("Recent activity", "<p>New teacher account created</p><p>Website banner updated</p><p>Admissions visits appear under Meetings</p>")
+        homeExtra
       );
     }
 
@@ -2671,15 +2801,7 @@
     if (section === "attendance") return adminAttendancePanel(session);
     if (section === "slorsh-reports") return schoolReportsPanel(session);
     if (section === "analytics") return analyticsPanelShell();
-    if (section === "admins") {
-      return panel(
-        "School admins",
-        table(["Name", "School", "Email"], [
-          ["School Administrator", "BrightFuture Academy", "admin@gmail.com"],
-          ["Grace Okonkwo", "Scuola Materna", "grace.okonkwo@brightsteps.academy"],
-        ])
-      );
-    }
+    if (section === "admins") return adminsPanel(session);
     return (
       '<div class="welcome-banner"><h2>Platform control</h2><p>All schools, teachers, students and results on one desk.</p></div>' +
       kpis([
@@ -2704,7 +2826,8 @@
   function render(session, section) {
     ensureRooms();
     ensureRoomMap();
-    var navItems = NAV[session.role] || NAV.student;
+    section = ensureAdminSection(session, section || "home");
+    var navItems = navItemsFor(session);
     var navHtml = navItems
       .map(function (item) {
         var active = item.id === section ? " active" : "";
@@ -2825,7 +2948,29 @@
       if (navLink && (navLink.closest("#dashNav") || navLink.closest("#dashContent"))) {
         e.preventDefault();
         section = navLink.getAttribute("data-section");
+        session = (auth.getSession && auth.getSession()) || session;
         render(session, section);
+        return;
+      }
+
+      var removeAdminBtn = e.target.closest("[data-remove-admin]");
+      if (removeAdminBtn) {
+        e.preventDefault();
+        if (!canManageSchoolAdmins(session)) {
+          if (window.showToast) window.showToast("Only full school admins can remove admins.", "error");
+          return;
+        }
+        var adminEmail = removeAdminBtn.getAttribute("data-remove-admin");
+        if (!window.confirm("Remove admin " + adminEmail + "? They will not be able to sign in.")) return;
+        var removed = auth.removeAdminAccount
+          ? auth.removeAdminAccount(adminEmail)
+          : { ok: false, message: "Cannot remove admin." };
+        if (!removed.ok) {
+          if (window.showToast) window.showToast(removed.message || "Could not remove admin.", "error");
+          return;
+        }
+        if (window.showToast) window.showToast("Admin removed.", "success");
+        render(session, "admins");
         return;
       }
 
@@ -3616,6 +3761,48 @@
           window.showToast("Added " + tName.trim() + ". Login: " + tCreated.email + " / " + tCreated.password, "success");
         }
         render(session, session.role === "superadmin" ? "teachers" : "staff");
+        return;
+      }
+
+      var adminForm = e.target.closest("#addAdminForm");
+      if (adminForm) {
+        e.preventDefault();
+        if (!canManageSchoolAdmins(session)) {
+          if (window.showToast) window.showToast("Only full school admins can create admins.", "error");
+          return;
+        }
+        var aName = (adminForm.querySelector('[name="name"]') || {}).value || "";
+        var aPosition = (adminForm.querySelector('[name="position"]') || {}).value || "fees";
+        var aSchool = (adminForm.querySelector('[name="school"]') || {}).value || session.className || "School";
+        var aEmail = (adminForm.querySelector('[name="email"]') || {}).value || "";
+        var aPassword = (adminForm.querySelector('[name="password"]') || {}).value || "Demo@12345";
+        var aCreated = auth.addAdminAccount
+          ? auth.addAdminAccount({
+              name: aName,
+              position: aPosition,
+              className: aSchool,
+              email: aEmail,
+              password: aPassword,
+            })
+          : { ok: false, message: "Cannot create admins." };
+        if (!aCreated.ok) {
+          if (window.showToast) window.showToast(aCreated.message, "error");
+          return;
+        }
+        if (window.showToast) {
+          window.showToast(
+            "Created " +
+              aName.trim() +
+              " (" +
+              (aCreated.positionLabel || aPosition) +
+              "). Login: " +
+              aCreated.email +
+              " / " +
+              aCreated.password,
+            "success"
+          );
+        }
+        render(session, "admins");
         return;
       }
 

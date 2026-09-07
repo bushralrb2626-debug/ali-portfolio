@@ -13,6 +13,46 @@
   var DASHBOARD_PATH = "/demos/brightsteps/dashboard.html";
   var DEMO_PASSWORD = "Demo@12345";
 
+  /** School-admin desk positions (role stays "admin"; access is scoped by position). */
+  var ADMIN_POSITIONS = {
+    full: {
+      id: "full",
+      label: "School Admin (full access)",
+      shortLabel: "School Admin",
+      sections: null,
+    },
+    fees: {
+      id: "fees",
+      label: "Fees Managing Admin",
+      shortLabel: "Fees Admin",
+      sections: ["home", "fees", "students", "parents"],
+    },
+    accounts: {
+      id: "accounts",
+      label: "Account Admin",
+      shortLabel: "Account Admin",
+      sections: ["home", "fees", "staff", "students", "slorsh-reports"],
+    },
+    admissions: {
+      id: "admissions",
+      label: "Admissions Admin",
+      shortLabel: "Admissions Admin",
+      sections: ["home", "meetings", "book-visit", "parents", "students"],
+    },
+    academics: {
+      id: "academics",
+      label: "Academics Admin",
+      shortLabel: "Academics Admin",
+      sections: ["home", "results", "attendance", "classrooms", "staff", "students", "announce"],
+    },
+    communications: {
+      id: "communications",
+      label: "Communications Admin",
+      shortLabel: "Comms Admin",
+      sections: ["home", "announce", "feedback", "meetings"],
+    },
+  };
+
   var BUILTIN = {
     student_demo: {
       password: DEMO_PASSWORD,
@@ -53,6 +93,7 @@
       name: "School Administrator",
       roleLabel: "School Admin",
       className: "BrightFuture Academy",
+      adminPosition: "full",
     },
     "superadmin@gmail.com": {
       password: "12345",
@@ -189,16 +230,52 @@
     localStorage.removeItem(STORAGE_KEY);
   }
 
+  function normalizeAdminPosition(value) {
+    var id = String(value || "full").trim().toLowerCase();
+    return ADMIN_POSITIONS[id] ? id : "full";
+  }
+
+  function positionMeta(positionId) {
+    return ADMIN_POSITIONS[normalizeAdminPosition(positionId)] || ADMIN_POSITIONS.full;
+  }
+
   function toSession(key, user) {
+    var position = user.role === "admin" ? normalizeAdminPosition(user.adminPosition) : "";
+    var meta = position ? positionMeta(position) : null;
     return {
       login: key,
       role: user.role,
       name: user.name,
-      roleLabel: user.roleLabel,
+      roleLabel: meta && position !== "full" ? meta.shortLabel : user.roleLabel,
       className: user.className,
       personId: user.personId || "",
+      adminPosition: position,
       loggedInAt: Date.now(),
     };
+  }
+
+  function canManageAdmins(session) {
+    if (!session) return false;
+    if (session.role === "superadmin") return true;
+    if (session.role !== "admin") return false;
+    return normalizeAdminPosition(session.adminPosition) === "full";
+  }
+
+  function adminAllowedSections(session) {
+    if (!session) return [];
+    if (session.role === "superadmin") return null;
+    if (session.role !== "admin") return [];
+    var meta = positionMeta(session.adminPosition);
+    return meta.sections;
+  }
+
+  function canAdminAccessSection(session, sectionId) {
+    if (!session) return false;
+    if (session.role === "superadmin") return true;
+    if (session.role !== "admin") return false;
+    var allowed = adminAllowedSections(session);
+    if (!allowed) return true;
+    return allowed.indexOf(String(sectionId || "home")) !== -1;
   }
 
   function login(loginId, password, remember) {
@@ -328,6 +405,87 @@
     return { ok: true, email: email, password: extra[email].password, existing: false };
   }
 
+  function addAdminAccount(fields) {
+    var email = normalizeLogin(fields.email);
+    var name = String(fields.name || "").trim();
+    var password = String(fields.password || DEMO_PASSWORD);
+    var position = normalizeAdminPosition(fields.position || fields.adminPosition);
+    var meta = positionMeta(position);
+    var school = String(fields.className || fields.school || "BrightFuture Academy").trim() || "BrightFuture Academy";
+    if (!name || name.length > 80) return { ok: false, message: "Enter the admin's name." };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, message: "Enter a valid email for the admin login." };
+    if (lookup(email)) return { ok: false, message: "That email is already registered." };
+    var extra = extraUsers();
+    extra[email] = {
+      password: password.length >= 6 ? password : DEMO_PASSWORD,
+      role: "admin",
+      name: name,
+      roleLabel: meta.shortLabel,
+      className: school,
+      adminPosition: position,
+      personId: fields.personId || "",
+    };
+    saveExtra(extra);
+    return {
+      ok: true,
+      email: email,
+      password: extra[email].password,
+      position: position,
+      positionLabel: meta.label,
+    };
+  }
+
+  function listAdmins() {
+    var out = [];
+    var seen = {};
+    function pushAdmin(key, user, builtin) {
+      if (!user || user.role !== "admin") return;
+      var email = normalizeLogin(key);
+      if (!email || seen[email]) return;
+      if (isRemovedKey(email) || (user.personId && isRemovedKey(user.personId))) return;
+      seen[email] = true;
+      var position = normalizeAdminPosition(user.adminPosition);
+      var meta = positionMeta(position);
+      out.push({
+        email: email,
+        name: user.name,
+        school: user.className || "",
+        position: position,
+        positionLabel: meta.label,
+        roleLabel: user.roleLabel || meta.shortLabel,
+        builtin: !!builtin,
+      });
+    }
+    pushAdmin("admin@gmail.com", BUILTIN["admin@gmail.com"], true);
+    var extra = extraUsers();
+    Object.keys(extra).forEach(function (key) {
+      pushAdmin(key, extra[key], false);
+    });
+    out.sort(function (a, b) {
+      if (a.builtin !== b.builtin) return a.builtin ? -1 : 1;
+      return String(a.name).localeCompare(String(b.name));
+    });
+    return out;
+  }
+
+  function removeAdminAccount(email) {
+    var key = normalizeLogin(email);
+    if (!key) return { ok: false, message: "Missing admin email." };
+    if (key === "admin@gmail.com" || key === "admin@brightfuture.academy") {
+      return { ok: false, message: "The primary school admin cannot be removed." };
+    }
+    var found = lookup(key);
+    if (!found || found.user.role !== "admin") {
+      return { ok: false, message: "Admin account not found." };
+    }
+    if (BUILTIN[key] && !extraUsers()[key]) {
+      return { ok: false, message: "Built-in admin accounts cannot be removed." };
+    }
+    markRemoved([key]);
+    deleteExtraUser(key);
+    return { ok: true };
+  }
+
   function logout() {
     clearSession();
     window.location.href = LOGIN_PATH;
@@ -365,6 +523,13 @@
     addStudentAccount: addStudentAccount,
     addTeacherAccount: addTeacherAccount,
     addParentAccount: addParentAccount,
+    addAdminAccount: addAdminAccount,
+    listAdmins: listAdmins,
+    removeAdminAccount: removeAdminAccount,
+    adminPositions: ADMIN_POSITIONS,
+    canManageAdmins: canManageAdmins,
+    canAdminAccessSection: canAdminAccessSection,
+    adminAllowedSections: adminAllowedSections,
     logout: logout,
     getSession: readSession,
     requireAuth: requireAuth,
