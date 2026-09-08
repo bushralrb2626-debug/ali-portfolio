@@ -2596,20 +2596,32 @@
     var students = allStudents();
     var teachers = allTeachers();
     var rows = schools.map(function (s) {
-      var path = ops && ops.publicSitePath ? ops.publicSitePath(s) : "/demos/brightsteps/school.html?s=" + encodeURIComponent(s.slug);
+      var path =
+        ops && ops.publicSitePath
+          ? ops.publicSitePath(s)
+          : "/demos/brightsteps/school.html?s=" + encodeURIComponent(s.slug);
+      var edit = path + (path.indexOf("?") >= 0 ? "&" : "?") + "edit=1";
       return [
-        escapeHtml(s.name),
+        session.role === "superadmin"
+          ? '<button type="button" class="btn-bsa btn-bsa-ghost btn-bsa-sm" style="padding:0;border:0;background:transparent;font-weight:700;color:inherit" data-enter-school="' +
+            escapeHtml(s.id) +
+            '" data-goto-section="home">' +
+            escapeHtml(s.name) +
+            "</button>"
+          : escapeHtml(s.name),
         escapeHtml(s.city || "—"),
         String(countForSchool(s.name, students)),
         String(countForSchool(s.name, teachers)),
         escapeHtml(s.principalEmail || "—"),
         '<a class="btn-bsa btn-bsa-sm btn-bsa-soft" href="' +
+          escapeHtml(edit) +
+          '">Edit website</a> <a class="btn-bsa btn-bsa-sm btn-bsa-soft" href="' +
           escapeHtml(path) +
-          '" target="_blank" rel="noopener">Open site</a>' +
+          '" target="_blank" rel="noopener">View live</a>' +
         (session.role === "superadmin"
           ? ' <button type="button" class="btn-bsa btn-bsa-sm btn-bsa-primary" data-enter-school="' +
             escapeHtml(s.id) +
-            '" data-goto-section="school-security">Enter desk</button>'
+            '" data-goto-section="home">Open desk</button>'
           : "") +
         (session.role === "superadmin"
           ? ' <button type="button" class="btn-bsa btn-bsa-sm btn-bsa-soft" data-remove-school="' +
@@ -2649,7 +2661,7 @@
       panel(
         "All schools",
         table(
-          ["School", "City", "Students", "Teachers", "Principal login", "Public web", "Actions"],
+          ["School", "City", "Students", "Teachers", "Principal login", "Actions"],
           rows
         )
       ) +
@@ -3091,6 +3103,25 @@
     if (section === "slorsh-reports") return schoolReportsPanel(session);
     if (section === "analytics") return analyticsPanelShell();
     if (section === "admins") return adminsPanel(session);
+    // Super Admin with an open school: same desk home as Principal
+    if (activeSchoolRec()) {
+      return (
+        '<div class="welcome-banner"><h2>Principal desk</h2><p>' +
+        escapeHtml(schoolNameOf(session) || "School") +
+        " — manage staff and students. Results for all students stay editable here.</p></div>" +
+        kpis([
+          { label: "Active staff", value: String(scopedTeachers(session).length), accent: "accent-sky" },
+          { label: "Students", value: String(scopedStudents(session).length), accent: "accent-mint" },
+          { label: "Visit requests", value: String(loadVisits().length), accent: "accent-royal" },
+          { label: "Pending invites", value: "2", accent: "accent-coral" },
+        ]) +
+        meetingsPanel() +
+        panel(
+          "Recent activity",
+          "<p>New teacher account created</p><p>Website banner updated</p><p>Admissions visits appear under Meetings</p>"
+        )
+      );
+    }
     var schoolsNow = liveSchools();
     var hub =
       sa && sa.hubHtml
@@ -3141,21 +3172,25 @@
     if (session.role === "superadmin") {
       var active = activeSchoolRec();
       var editHref = "/demos/brightsteps/platform.html";
+      var liveHref = "/demos/brightsteps/platform.html";
       if (active && ops && ops.publicSitePath) {
-        editHref = ops.publicSitePath(active);
-        editHref += (editHref.indexOf("?") >= 0 ? "&" : "?") + "edit=1";
+        liveHref = ops.publicSitePath(active);
+        editHref = liveHref + (liveHref.indexOf("?") >= 0 ? "&" : "?") + "edit=1";
       }
       banner =
         '<div style="background:#eef5ff;border:1px solid #c5d8f0;border-radius:12px;padding:0.75rem 1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;justify-content:space-between">' +
         "<div><strong>School desk</strong> · " +
-        escapeHtml((active && active.name) || "School") +
-        ' <span class="text-muted small">(sidebar only after opening a school)</span></div>' +
+        escapeHtml((active && active.name) || "Choose a school") +
+        "</div>" +
         '<div style="display:flex;flex-wrap:wrap;gap:0.4rem">' +
         '<a class="btn-bsa btn-bsa-sm btn-bsa-soft" href="' +
         escapeHtml(editHref) +
         '">Edit website</a>' +
-        '<a class="btn-bsa btn-bsa-sm btn-bsa-primary" href="/demos/brightsteps/platform.html">Back to platform</a>' +
-        '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-ghost" data-exit-school>Exit desk</button>' +
+        '<a class="btn-bsa btn-bsa-sm btn-bsa-soft" href="' +
+        escapeHtml(liveHref) +
+        '" target="_blank" rel="noopener">View live</a>' +
+        '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-ghost" data-section="home" data-exit-school>Switch school</button>' +
+        '<a class="btn-bsa btn-bsa-sm btn-bsa-ghost" href="/demos/brightsteps/platform.html">Websites platform</a>' +
         "</div></div>";
     }
     content.innerHTML = banner + contentFor(session, section);
@@ -3280,7 +3315,7 @@
       return;
     }
 
-    // Super Admin platform is a full website — sidebar desk only after entering a school
+    // Super Admin lands on dashboard desk; auto-open a school if none selected
     if (session.role === "superadmin") {
       var params = new URLSearchParams(window.location.search || "");
       var enterId = params.get("enter") || "";
@@ -3290,9 +3325,9 @@
           history.replaceState({}, "", "/demos/brightsteps/dashboard.html");
         } catch (e) {}
       }
-      if (!ops || !ops.getActiveSchoolId || !ops.getActiveSchoolId()) {
-        window.location.replace((auth.paths && auth.paths.platform) || "/demos/brightsteps/platform.html");
-        return;
+      if (ops && ops.setActiveSchoolId && (!ops.getActiveSchoolId || !ops.getActiveSchoolId())) {
+        var firstSchool = (ops.loadSchools && ops.loadSchools()[0]) || null;
+        if (firstSchool && firstSchool.id) ops.setActiveSchoolId(firstSchool.id);
       }
     }
 
@@ -3381,7 +3416,7 @@
         if (session.role !== "superadmin" || !ops || !ops.setActiveSchoolId) return;
         var enterId = enterSchoolBtn.getAttribute("data-enter-school");
         ops.setActiveSchoolId(enterId);
-        var goto = enterSchoolBtn.getAttribute("data-goto-section") || "school-security";
+        var goto = enterSchoolBtn.getAttribute("data-goto-section") || "home";
         if (window.showToast) {
           var entered = ops.getSchoolById(enterId);
           window.showToast("Opened desk: " + ((entered && entered.name) || "school"), "success");
@@ -3394,8 +3429,8 @@
       if (exitSchoolBtn) {
         e.preventDefault();
         if (ops && ops.setActiveSchoolId) ops.setActiveSchoolId("");
-        if (window.showToast) window.showToast("Back to platform.", "success");
-        window.location.href = (auth.paths && auth.paths.platform) || "/demos/brightsteps/platform.html";
+        if (window.showToast) window.showToast("Pick a school to open its desk.", "success");
+        render(session, "home");
         return;
       }
 

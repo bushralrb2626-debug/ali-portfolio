@@ -61,9 +61,11 @@
           "/demos/brightsteps/dashboard.html?enter=" + encodeURIComponent(s.id);
         return (
           '<article class="sa-school-card">' +
-          "<h3>" +
+          '<h3><a href="' +
+          esc(desk) +
+          '" style="color:inherit;text-decoration:none">' +
           esc(s.name) +
-          "</h3>" +
+          "</a></h3>" +
           "<p class='text-muted' style='margin:0 0 0.85rem'>" +
           esc(s.city || "") +
           " · /" +

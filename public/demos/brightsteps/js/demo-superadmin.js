@@ -24,13 +24,19 @@
     var active = activeSchool(ops);
     var cards = schools
       .map(function (s) {
-        var path = ops.publicSitePath ? ops.publicSitePath(s) : "/demos/brightsteps/school.html?s=" + encodeURIComponent(s.slug);
+        var path = ops.publicSitePath
+          ? ops.publicSitePath(s)
+          : "/demos/brightsteps/school.html?s=" + encodeURIComponent(s.slug);
+        var edit = path + (path.indexOf("?") >= 0 ? "&" : "?") + "edit=1";
         var portal = "/demos/brightsteps/portal.html?school=" + encodeURIComponent(s.slug);
         var isActive = active && active.id === s.id;
         return (
           '<article class="dash-panel" style="margin-bottom:0.85rem">' +
-          '<div class="dash-panel__head"><h3>' +
+          '<div class="dash-panel__head"><h3><button type="button" class="btn-bsa btn-bsa-ghost btn-bsa-sm" style="padding:0;font-size:inherit;font-weight:700;border:0;background:transparent;color:inherit;text-align:left" data-enter-school="' +
+          e(s.id) +
+          '" data-goto-section="home">' +
           e(s.name) +
+          "</button>" +
           (isActive ? ' <span class="text-muted small">(open desk)</span>' : "") +
           "</h3></div>" +
           "<p class='text-muted'>" +
@@ -41,27 +47,27 @@
           '<div style="display:flex;flex-wrap:wrap;gap:0.5rem">' +
           '<button type="button" class="btn-bsa btn-bsa-primary btn-bsa-sm" data-enter-school="' +
           e(s.id) +
-          '">Enter school desk</button>' +
+          '" data-goto-section="home">Open desk</button>' +
+          '<a class="btn-bsa btn-bsa-soft btn-bsa-sm" href="' +
+          e(edit) +
+          '">Edit website</a>' +
+          '<a class="btn-bsa btn-bsa-soft btn-bsa-sm" href="' +
+          e(path) +
+          '" target="_blank" rel="noopener">View live</a>' +
           '<a class="btn-bsa btn-bsa-soft btn-bsa-sm" href="' +
           e(portal) +
           '">School portal</a>' +
-          '<a class="btn-bsa btn-bsa-soft btn-bsa-sm" href="' +
-          e(path) +
-          '" target="_blank" rel="noopener">Public site</a>' +
           '<button type="button" class="btn-bsa btn-bsa-soft btn-bsa-sm" data-enter-school="' +
           e(s.id) +
           '" data-goto-section="school-security">Security</button>' +
-          '<button type="button" class="btn-bsa btn-bsa-soft btn-bsa-sm" data-enter-school="' +
-          e(s.id) +
-          '" data-goto-section="edit-site">Edit website</button>' +
           "</div></article>"
         );
       })
       .join("");
     return (
-      '<div class="welcome-banner"><h2>Super Admin hub</h2><p>Open any school desk, portal, or public site. Security and website edits you make are permanent and cannot be changed by school admins.</p></div>' +
+      '<div class="welcome-banner"><h2>Super Admin hub</h2><p>Click a school name to open its dashboard desk. Use Edit website / View live for the public site.</p></div>' +
       (active
-        ? '<p><button type="button" class="btn-bsa btn-bsa-ghost btn-bsa-sm" data-exit-school>Exit school desk (' +
+        ? '<p><button type="button" class="btn-bsa btn-bsa-ghost btn-bsa-sm" data-exit-school>Switch school (' +
           e(active.name) +
           ")</button></p>"
         : "") +

@@ -554,7 +554,6 @@
   }
 
   function homePathForRole(role) {
-    if (role === "superadmin") return PLATFORM_PATH;
     return DASHBOARD_PATH;
   }
 
