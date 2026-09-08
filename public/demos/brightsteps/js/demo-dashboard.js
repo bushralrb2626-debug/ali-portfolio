@@ -3137,7 +3137,28 @@
     if (badge) badge.textContent = session.roleLabel;
     if (nameEl) nameEl.textContent = session.name;
     navEl.innerHTML = navHtml;
-    content.innerHTML = contentFor(session, section);
+    var banner = "";
+    if (session.role === "superadmin") {
+      var active = activeSchoolRec();
+      var editHref = "/demos/brightsteps/platform.html";
+      if (active && ops && ops.publicSitePath) {
+        editHref = ops.publicSitePath(active);
+        editHref += (editHref.indexOf("?") >= 0 ? "&" : "?") + "edit=1";
+      }
+      banner =
+        '<div style="background:#eef5ff;border:1px solid #c5d8f0;border-radius:12px;padding:0.75rem 1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;justify-content:space-between">' +
+        "<div><strong>School desk</strong> · " +
+        escapeHtml((active && active.name) || "School") +
+        ' <span class="text-muted small">(sidebar only after opening a school)</span></div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:0.4rem">' +
+        '<a class="btn-bsa btn-bsa-sm btn-bsa-soft" href="' +
+        escapeHtml(editHref) +
+        '">Edit website</a>' +
+        '<a class="btn-bsa btn-bsa-sm btn-bsa-primary" href="/demos/brightsteps/platform.html">Back to platform</a>' +
+        '<button type="button" class="btn-bsa btn-bsa-sm btn-bsa-ghost" data-exit-school>Exit desk</button>' +
+        "</div></div>";
+    }
+    content.innerHTML = banner + contentFor(session, section);
     document.title = session.roleLabel + " · BrightSteps Academy";
 
     if (section === "analytics" && (session.role === "admin" || session.role === "superadmin")) {
@@ -3252,6 +3273,22 @@
     var session = auth.requireAuth();
     if (!session) return;
 
+    // Super Admin platform is a full website — sidebar desk only after entering a school
+    if (session.role === "superadmin") {
+      var params = new URLSearchParams(window.location.search || "");
+      var enterId = params.get("enter") || "";
+      if (enterId && ops && ops.setActiveSchoolId) {
+        ops.setActiveSchoolId(enterId);
+        try {
+          history.replaceState({}, "", "/demos/brightsteps/dashboard.html");
+        } catch (e) {}
+      }
+      if (!ops || !ops.getActiveSchoolId || !ops.getActiveSchoolId()) {
+        window.location.replace((auth.paths && auth.paths.platform) || "/demos/brightsteps/platform.html");
+        return;
+      }
+    }
+
     var section = "home";
     render(session, section);
 
@@ -3321,8 +3358,8 @@
       if (exitSchoolBtn) {
         e.preventDefault();
         if (ops && ops.setActiveSchoolId) ops.setActiveSchoolId("");
-        if (window.showToast) window.showToast("Back to platform hub.", "success");
-        render(session, "home");
+        if (window.showToast) window.showToast("Back to platform.", "success");
+        window.location.href = (auth.paths && auth.paths.platform) || "/demos/brightsteps/platform.html";
         return;
       }
 

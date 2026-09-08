@@ -69,7 +69,7 @@
     <script src="/demos/brightsteps/lib/jquery/dist/jquery.min.js"></script>
     <script src="/demos/brightsteps/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/demos/brightsteps/js/site.js?v=opens23"></script>
-    <script src="/demos/brightsteps/js/demo-auth.js?v=10"></script>
+    <script src="/demos/brightsteps/js/demo-auth.js?v=15"></script>
     <script>
     (function () {
       var auth = window.BrightStepsDemoAuth;
@@ -78,8 +78,16 @@
       var field = document.getElementById("loginId");
       if (field && login) field.value = login;
 
+      function goHome(session) {
+        var path =
+          auth.homePathForRole && session
+            ? auth.homePathForRole(session.role)
+            : auth.paths.dashboard;
+        window.location.replace(path);
+      }
+
       if (auth && auth.getSession()) {
-        window.location.replace(auth.paths.dashboard);
+        goHome(auth.getSession());
         return;
       }
 
@@ -93,7 +101,7 @@
       if (auth && login && auth.isDemoAccount(login)) {
         var auto = auth.login(login, auth.demoPassword, false);
         if (auto.ok) {
-          window.location.replace(auth.paths.dashboard);
+          goHome(auto.session);
           return;
         }
       }
@@ -112,7 +120,7 @@
         }
         if (window.showToast) window.showToast("Welcome, " + result.session.name + "!", "success");
         window.setTimeout(function () {
-          window.location.href = auth.paths.dashboard;
+          goHome(result.session);
         }, 400);
       });
     })();

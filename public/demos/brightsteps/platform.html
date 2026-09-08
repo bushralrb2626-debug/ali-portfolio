@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BrightSteps Platform · Super Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/demos/brightsteps/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/site.css?v=mobile6" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/bridge.css?v=7eZ7z0-isDSPkIrEmY5kX2w3anNvmJBqC8XONQyJlhc" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/vibrant.css?v=_MlOwKhNsDIIyZrj__65eFxm0nqMbGR8UMI4j8NWuoA" />
+    <link rel="stylesheet" href="/demos/brightsteps/css/fancy.css?v=mobile6" />
+    <style>
+      .sa-platform-bar {
+        position: sticky; top: 0; z-index: 40;
+        background: linear-gradient(100deg, #0b4fbf, #1565d8);
+        color: #fff; padding: 0.65rem 1rem;
+        display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between;
+      }
+      .sa-platform-bar a, .sa-platform-bar button { color: #fff; }
+      .sa-school-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+      .sa-school-card {
+        background: #fff; border: 1px solid #c5d8f0; border-radius: 14px; padding: 1.1rem 1.15rem;
+        box-shadow: 0 8px 24px rgba(11, 79, 191, 0.06);
+      }
+      .sa-school-card h3 { font-family: Fredoka, sans-serif; font-size: 1.2rem; margin: 0 0 0.35rem; }
+      .sa-editor-hint { background: #eef5ff; border: 1px dashed #7aa7e8; border-radius: 12px; padding: 0.85rem 1rem; }
+    </style>
+</head>
+<body class="site-body" data-no-translate>
+    <div class="sa-platform-bar">
+        <div>
+            <strong>BrightSteps Platform</strong>
+            <span style="opacity:0.85;margin-left:0.5rem" id="saBarUser">Super Admin</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
+            <a class="btn-bsa btn-bsa-sm btn-bsa-soft" href="/demos/brightsteps/schools.html">Public campuses</a>
+            <button type="button" class="btn-bsa btn-bsa-sm btn-bsa-ghost" id="saLogout" style="border-color:rgba(255,255,255,0.45)">Log out</button>
+        </div>
+    </div>
+
+    <header class="site-nav">
+        <div class="site-nav__inner">
+            <a class="brand-logo" href="/demos/brightsteps/platform.html">
+                <span class="brand-mark" aria-hidden="true">🎓</span>
+                <span class="brand-text">
+                    <strong>BrightSteps</strong>
+                    <small>School software platform</small>
+                </span>
+            </a>
+            <nav class="site-nav__menu" style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center">
+                <a class="site-nav__link is-active" href="#schools">Schools</a>
+                <a class="site-nav__link" href="#create">Create school</a>
+                <a class="site-nav__link" href="#security">Security</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-fancy" id="top">
+            <div class="hero-fancy__grid">
+                <div class="hero-fancy__copy">
+                    <p class="eyebrow">Platform control</p>
+                    <h1>Your schools. One platform.</h1>
+                    <p class="hero-fancy__lead">Super Admin manages the software: create campuses, edit each school website with drag-and-drop (saved permanently), lock security, and open a school desk only when you need the portal tools.</p>
+                    <div class="hero__actions">
+                        <a class="btn-bsa btn-hero btn-hero-yellow" href="#schools">Browse schools</a>
+                        <a class="btn-bsa btn-hero btn-hero-outline" href="#create">Add a school</a>
+                    </div>
+                </div>
+                <div class="hero-stage">
+                    <div class="hero-stage__back" role="img" aria-label="Platform"></div>
+                    <div class="hero-stage__mid">
+                        <img src="/demos/brightsteps/img/photo-1503676260728-1c00da094a0b.jpg" alt="Learning" loading="eager" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="band" id="schools" style="padding:2rem 1rem 1rem">
+            <div class="wrap" style="max-width:1100px;margin:0 auto">
+                <h2 style="font-family:Fredoka,sans-serif">Schools on the platform</h2>
+                <p class="text-muted">Open the public website editor (full page, like Ali’s portfolio visual editor) or enter that school’s portal desk (sidebar tools).</p>
+                <p class="sa-editor-hint">Tip: <strong>Edit website</strong> opens the live school page with drag handles — changes save to the database and stay locked from school admins.</p>
+                <div class="sa-school-grid" id="saSchoolGrid" style="margin-top:1rem"></div>
+            </div>
+        </section>
+
+        <section class="band" id="create" style="padding:1rem 1rem 2rem;background:#f7fbff">
+            <div class="wrap" style="max-width:720px;margin:0 auto">
+                <h2 style="font-family:Fredoka,sans-serif">Create school + principal</h2>
+                <form class="form-bsa" id="saCreateSchoolForm">
+                    <div class="form-row">
+                        <label>School name<input name="name" required maxlength="80" placeholder="Sunrise Primary" /></label>
+                        <label>City<input name="city" required maxlength="60" placeholder="Firenze" /></label>
+                    </div>
+                    <div class="form-row">
+                        <label>URL slug<input name="slug" maxlength="48" placeholder="sunrise-primary" /></label>
+                        <label>Tagline<input name="tagline" maxlength="80" placeholder="Learn. Explore. Grow." /></label>
+                    </div>
+                    <label>About<textarea name="about" rows="2" maxlength="500"></textarea></label>
+                    <div class="form-row">
+                        <label>Principal name<input name="principalName" maxlength="80" /></label>
+                        <label>Principal email<input name="principalEmail" type="email" /></label>
+                    </div>
+                    <label>Temp password<input name="principalPassword" value="Demo@12345" minlength="6" /></label>
+                    <button type="submit" class="btn-bsa btn-bsa-primary">Create school</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="band" id="security" style="padding:1rem 1rem 3rem">
+            <div class="wrap" style="max-width:1100px;margin:0 auto">
+                <h2 style="font-family:Fredoka,sans-serif">Platform security</h2>
+                <p class="text-muted">Pick a school below to enable/disable portals. Or open the school portal while signed in as Super Admin to see the same switches.</p>
+                <div id="saSecurityHost"></div>
+            </div>
+        </section>
+    </main>
+
+    <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+    <script src="/demos/brightsteps/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/demos/brightsteps/js/site.js?v=opens23"></script>
+    <script src="/demos/brightsteps/js/demo-auth.js?v=15"></script>
+    <script src="/demos/brightsteps/js/demo-school-ops.js?v=4"></script>
+    <script src="/demos/brightsteps/js/demo-superadmin.js?v=2"></script>
+    <script src="/demos/brightsteps/js/platform.js?v=1"></script>
+</body>
+</html>

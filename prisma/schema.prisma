@@ -94,3 +94,16 @@ model BrightStepsSiteOpen {
   @@unique([day, visitorId])
   @@index([day])
 }
+
+/** Super Admin–locked school public page blocks (persistent visual editor). */
+model BrightStepsSchoolSite {
+  id        String   @id @default(cuid())
+  schoolId  String   @unique
+  slug      String
+  blocksJson String  @db.Text
+  updatedBy String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+}

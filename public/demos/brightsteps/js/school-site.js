@@ -1,6 +1,6 @@
 /**
  * BrightSteps — public campus page (school.html?s=slug).
- * Uses Super Admin locked page blocks when present.
+ * Loads Super Admin locked blocks from API (persistent) then localStorage.
  */
 (function () {
   "use strict";
@@ -24,27 +24,22 @@
     }
   }
 
-  function boot() {
+  function isEditMode() {
+    try {
+      return new URLSearchParams(window.location.search || "").get("edit") === "1";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function renderPage(school, page) {
     var root = document.getElementById("schoolSiteRoot");
     if (!root) return;
-    if (!ops || !ops.getSchoolBySlug || !ops.loadSchools) {
-      root.innerHTML =
-        '<section class="band"><div class="wrap"><p class="text-muted">School directory unavailable.</p></div></section>';
-      return;
-    }
-    ops.loadSchools();
-    var slug = querySlug();
-    var school = slug ? ops.getSchoolBySlug(slug) : null;
-    if (!school || school.publicEnabled === false) {
-      root.innerHTML =
-        '<section class="band"><div class="wrap" style="padding:3rem 1rem">' +
-        "<h1>Campus not found</h1>" +
-        "<p>This school website is not published yet.</p>" +
-        '<p><a class="btn-bsa btn-bsa-primary" href="/demos/brightsteps/schools.html">Browse schools</a></p>' +
-        "</div></section>";
-      document.title = "Campus not found · BrightSteps";
-      return;
-    }
+    document.title = school.name + " · BrightSteps";
+    var brandStrong = document.getElementById("schoolBrandName");
+    var brandTag = document.getElementById("schoolBrandTag");
+    if (brandStrong) brandStrong.textContent = school.name;
+    if (brandTag) brandTag.textContent = school.tagline || "Learn. Explore. Grow.";
 
     if (ops.isSchoolFeatureEnabled && !ops.isSchoolFeatureEnabled(school.id, "publicSite")) {
       root.innerHTML =
@@ -53,20 +48,11 @@
         "<p>Super Admin has disabled the public site for this school.</p>" +
         '<p><a class="btn-bsa btn-bsa-primary" href="/demos/brightsteps/schools.html">Browse schools</a></p>' +
         "</div></section>";
-      document.title = school.name + " · Disabled";
       return;
     }
 
-    document.title = school.name + " · BrightSteps";
-    var brandStrong = document.getElementById("schoolBrandName");
-    var brandTag = document.getElementById("schoolBrandTag");
-    if (brandStrong) brandStrong.textContent = school.name;
-    if (brandTag) brandTag.textContent = school.tagline || "Learn. Explore. Grow.";
-
-    var page = ops.getSchoolPage ? ops.getSchoolPage(school.id) : null;
     var blocks = (page && page.blocks) || [];
     var portal = "/demos/brightsteps/portal.html?school=" + encodeURIComponent(school.slug);
-
     var bodyHtml = blocks
       .map(function (b) {
         if (b.type === "hero") {
@@ -97,7 +83,7 @@
         }
         return (
           '<section class="band"><div class="wrap" style="padding:1.5rem 1rem 2rem;max-width:960px;margin:0 auto">' +
-          "<h2 style=\"font-family:Fredoka,sans-serif\">" +
+          '<h2 style="font-family:Fredoka,sans-serif">' +
           escapeHtml(b.title || "") +
           "</h2>" +
           "<p>" +
@@ -129,6 +115,34 @@
           ")</p>"
         : "") +
       "</div></section>";
+  }
+
+  function boot() {
+    var root = document.getElementById("schoolSiteRoot");
+    if (!root || !ops || !ops.getSchoolBySlug) return;
+    if (isEditMode()) return; // visual editor owns the page
+
+    ops.loadSchools();
+    var slug = querySlug();
+    var school = slug ? ops.getSchoolBySlug(slug) : null;
+    if (!school || school.publicEnabled === false) {
+      root.innerHTML =
+        '<section class="band"><div class="wrap" style="padding:3rem 1rem">' +
+        "<h1>Campus not found</h1>" +
+        "<p>This school website is not published yet.</p>" +
+        '<p><a class="btn-bsa btn-bsa-primary" href="/demos/brightsteps/schools.html">Browse schools</a></p>' +
+        "</div></section>";
+      return;
+    }
+
+    var localPage = ops.getSchoolPage(school.id);
+    if (ops.fetchSchoolPageRemote) {
+      ops.fetchSchoolPageRemote(school.id, school.slug).then(function (remote) {
+        renderPage(school, remote || localPage);
+      });
+    } else {
+      renderPage(school, localPage);
+    }
   }
 
   if (document.readyState === "loading") {

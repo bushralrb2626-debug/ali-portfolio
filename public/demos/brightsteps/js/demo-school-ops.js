@@ -581,8 +581,10 @@
     } catch (e) {
       map = {};
     }
+    var school = getSchoolById(id);
     map[id] = {
       schoolId: id,
+      slug: school ? school.slug : "",
       blocks: Array.isArray(blocks) ? blocks : [],
       superLocked: true,
       updatedAt: new Date().toISOString(),
@@ -590,6 +592,31 @@
     };
     localStorage.setItem(PAGE_KEY, JSON.stringify(map));
     return { ok: true, page: map[id] };
+  }
+
+  function fetchSchoolPageRemote(schoolId, slug) {
+    var q = schoolId
+      ? "schoolId=" + encodeURIComponent(schoolId)
+      : "slug=" + encodeURIComponent(slug || "");
+    return fetch("/api/demos/brightsteps/school-sites?" + q)
+      .then(function (r) {
+        return r.json();
+      })
+      .then(function (data) {
+        if (data && data.ok && data.found && Array.isArray(data.blocks) && data.blocks.length) {
+          return {
+            schoolId: data.schoolId,
+            blocks: data.blocks,
+            superLocked: true,
+            updatedAt: data.updatedAt || "",
+            updatedBy: data.updatedBy || "",
+          };
+        }
+        return null;
+      })
+      .catch(function () {
+        return null;
+      });
   }
 
   global.BrightStepsSchoolOps = {
@@ -626,6 +653,7 @@
     setActiveSchoolId: setActiveSchoolId,
     getSchoolPage: getSchoolPage,
     saveSchoolPage: saveSchoolPage,
+    fetchSchoolPageRemote: fetchSchoolPageRemote,
     defaultPageBlocks: defaultPageBlocks,
   };
 })(window);

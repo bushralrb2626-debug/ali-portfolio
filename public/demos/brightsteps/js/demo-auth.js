@@ -11,6 +11,7 @@
   var LOGIN_PATH = "/demos/brightsteps/login.html";
   var REGISTER_PATH = "/demos/brightsteps/register.html";
   var DASHBOARD_PATH = "/demos/brightsteps/dashboard.html";
+  var PLATFORM_PATH = "/demos/brightsteps/platform.html";
   var DEMO_PASSWORD = "Demo@12345";
 
   /** School-admin desk positions (role stays "admin"; access is scoped by position). */
@@ -545,6 +546,11 @@
     return { locked: locked, removed: removedKeys };
   }
 
+  function homePathForRole(role) {
+    if (role === "superadmin") return PLATFORM_PATH;
+    return DASHBOARD_PATH;
+  }
+
   function logout() {
     clearSession();
     window.location.href = LOGIN_PATH;
@@ -570,7 +576,7 @@
       return null;
     }
     if (allowedRoles && allowedRoles.length && allowedRoles.indexOf(session.role) === -1) {
-      window.location.href = DASHBOARD_PATH;
+      window.location.href = homePathForRole(session.role);
       return null;
     }
     return session;
@@ -593,6 +599,7 @@
     logout: logout,
     getSession: readSession,
     requireAuth: requireAuth,
+    homePathForRole: homePathForRole,
     isLocked: isLockedKey,
     setLocked: setLocked,
     isRemoved: isRemovedKey,
@@ -601,6 +608,11 @@
     isDemoAccount: isPublicDemoAccount,
     isPublicDemoAccount: isPublicDemoAccount,
     demoPassword: DEMO_PASSWORD,
-    paths: { login: LOGIN_PATH, register: REGISTER_PATH, dashboard: DASHBOARD_PATH },
+    paths: {
+      login: LOGIN_PATH,
+      register: REGISTER_PATH,
+      dashboard: DASHBOARD_PATH,
+      platform: PLATFORM_PATH,
+    },
   };
 })();
