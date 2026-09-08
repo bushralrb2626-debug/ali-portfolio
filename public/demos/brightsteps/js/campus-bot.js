@@ -35,7 +35,7 @@
       admissions:
         "Admissions start with a campus visit. Tell me you’d like to book, and I’ll take your name, email, a preferred day/time, and your child’s age.",
       portal:
-        "Parents, teachers and students sign in from the Student Portal / Accedi button. Demo logins work on this site (student_demo, parent_demo, teacher_demo — password Demo@12345).",
+        "Parents, teachers and students sign in from the Student Portal / Accedi button. Use Accedi on the website — the office can help if you need access.",
       address:
         "We’re at 42 Maple Grove, Riverside. Email hello@brightsteps.academy or call 03066638854.",
       teachers:
@@ -61,7 +61,7 @@
       confirm:
         "Here’s what I have:\n• Name: {name}\n• Email: {email}\n• When: {when}\n• Child: {age}\n\nShall I send this to the school office? Reply yes to confirm.",
       booked:
-        "Done — your visit is booked. School admin and super admin can see it on their Meetings page. We look forward to meeting your family!",
+        "Done — your visit is booked. The school office can see it. We look forward to meeting your family!",
       bookFail:
         "I couldn’t save the visit. Please sign in again and try once more, or use the contact form.",
       needLogin:
@@ -103,7 +103,7 @@
       admissions:
         "Le iscrizioni iniziano con una visita al campus. Dimmi che vuoi prenotare: chiederò nome, email, giorno/orario e l’età del bambino.",
       portal:
-        "Genitori, insegnanti e studenti accedono dal pulsante Accedi / Portale studenti. Su questo sito funzionano gli accessi demo (student_demo, parent_demo, teacher_demo — password Demo@12345).",
+        "Genitori, insegnanti e studenti accedono dal pulsante Accedi / Portale studenti. Usa Accedi sul sito — la segreteria può aiutarti se serve l’accesso.",
       address:
         "Siamo in 42 Maple Grove, Riverside. Email hello@brightsteps.academy oppure tel. 03066638854.",
       teachers:
@@ -129,7 +129,7 @@
       confirm:
         "Ecco i dati:\n• Nome: {name}\n• Email: {email}\n• Quando: {when}\n• Bambino: {age}\n\nInvio la richiesta in segreteria? Rispondi sì per confermare.",
       booked:
-        "Fatto — la visita è prenotata. Admin e super admin la vedono in Incontri. Non vediamo l’ora di incontrare la vostra famiglia!",
+        "Fatto — la visita è prenotata. La segreteria la vede. Non vediamo l’ora di incontrare la vostra famiglia!",
       bookFail:
         "Non riesco a salvare la visita. Accedi di nuovo e riprova, oppure usa il modulo Contatti.",
       needLogin:
@@ -166,7 +166,7 @@
       hours: "دفتر پیر تا جمعہ صبح 8:00 سے شام 4:00 تک کھلا ہے۔ پتہ: 42 Maple Grove, Riverside۔ فون 03066638854۔",
       programs: "راستے: Early Learning، پرائمری، مڈل اسکول، آرٹس، اسپورٹس، اور سائنس و ٹیکنالوجی۔ ہر راستے میں کھیل، تجسس اور مضبوط تعلیم ہے۔",
       admissions: "داخلہ کیمپس وزٹ سے شروع ہوتا ہے۔ کہیں کہ وزٹ بک کرنی ہے — نام، ای میل، دن/وقت اور بچے کی عمر پوچھوں گا۔",
-      portal: "والدین، اساتذہ اور طلبہ Student Portal / Accedi سے لاگ اِن کریں۔ ڈیمو: student_demo، parent_demo، teacher_demo — پاس ورڈ Demo@12345۔",
+      portal: "والدین، اساتذہ اور طلبہ Accedi / Student Portal سے لاگ اِن کریں۔ رسائی کے لیے دفتر مدد کر سکتا ہے۔",
       address: "پتہ: 42 Maple Grove, Riverside۔ ای میل hello@brightsteps.academy یا فون 03066638854۔",
       teachers: "محبت کرنے والے، اہل اساتذہ جو ہر بچے کا نام جانتے ہیں — ریاضی، سائنس، انگریزی، آرٹ، موسیقی، کھیلیں اور کمپیوٹر۔",
       facilities: "لائبریری، سائنس و کمپیوٹر لیبز، کھیلوں کا میدان، آرٹ و موسیقی کے کمرے، سمارٹ کلاسز، کیفے اور محفوظ کھیل کا علاقہ۔",
@@ -218,7 +218,7 @@
       hours: "دفتر پیر توں جمعہ صبح 8:00 توں شام 4:00 کھلا۔ پتہ: 42 Maple Grove, Riverside۔ فون 03066638854۔",
       programs: "راستے: Early Learning، پرائمری، مڈل سکول، آرٹس، کھیڈاں، سائنس تے ٹیکنالوجی۔ ہر پاسے کھیل، تجسس تے مضبوط سکھیا۔",
       admissions: "داخلہ کیمپس وزٹ نال شروع ہوندا اے۔ کہو وزٹ بک کرنی اے — ناں، ای میل، دن/وقت تے بچے دی عمر پُچھاں گا۔",
-      portal: "ماپے، استاد تے طالب علم Accedi / Student Portal توں لاگ اِن کرن۔ ڈیمو: student_demo، parent_demo، teacher_demo — پاس ورڈ Demo@12345۔",
+      portal: "ماپے، استاد تے طالب علم Accedi / Student Portal توں لاگ اِن کرن۔ رسائی لئی دفتر مدد کر سکدا اے۔",
       address: "پتہ: 42 Maple Grove, Riverside۔ ای میل hello@brightsteps.academy یا فون 03066638854۔",
       teachers: "پیار والے استاد جو ہر بچے دا ناں جاندے نے — ریاضی، سائنس، انگریزی، آرٹ، موسیقی، کھیڈاں تے کمپیوٹر۔",
       facilities: "لائبریری، سائنس تے کمپیوٹر لیبز، کھیڈاں دا میدان، آرٹ تے موسیقی دے کمرے، سمارٹ کلاس، کیفے تے محفوظ کھیڈ دا تھاں۔",
@@ -456,7 +456,7 @@
     { keys: ["teacher","insegn","staff","faculty","استاد","استانی","ٹیچر","ustad","teacher urdu","استاد کون","ٹیچرز","teachers kaise"], en: "Warm, qualified teachers who know every child by name — maths, science, English, art, music, PE and computing.", it: "Insegnanti preparati che conoscono ogni bambino per nome — matematica, scienze, inglese, arte, musica, motoria e informatica.", ur: "محبت کرنے والے، اہل اساتذہ جو ہر بچے کا نام جانتے ہیں — ریاضی، سائنس، انگریزی، آرٹ، موسیقی، کھیلیں، کمپیوٹر۔", pa: "پیار والے استاد جو ہر بچے دا ناں جاندے نے — ریاضی، سائنس، انگریزی، آرٹ، موسیقی، کھیڈاں، کمپیوٹر۔" },
     { keys: ["class size","how many children","quanti bambini","ratio","کلاس سائز","کتنے بچے","kitne bachay","کلاس میں کتنے","کتنے بچے کلاس"], en: "Classes stay small enough that teachers know every child. Ask on your visit for the current year-group sizes.", it: "Classi contenute: gli insegnanti conoscono ogni bambino. I numeri precisi si vedono in visita.", ur: "کلاسز اتنی چھوٹی رہتی ہیں کہ استاد ہر بچے کو جانتے ہیں۔ موجودہ سائز وزٹ پر پوچھیں۔", pa: "کلاسز اتنی چھوٹیاں رہندیاں نے کہ استاد ہر بچے نوں جاندے نے۔ موجودہ سائز وزٹ تے پُچھو۔" },
     { keys: ["language","english","italian","italiano","inglese","bilingual","اردو","پنجابی","urdu","punjabi","panjabi","اردو","پنجابی","زبان","urdu","punjabi","panjabi","zaban","اردو بولتے","پنجابی بولتے","urdu mein","punjabi mein"], en: "The site switches English and Italian with EN | IT. In this chat I also understand and reply in Urdu and Punjabi — just write or speak.", it: "Il sito passa da inglese a italiano con EN | IT. In chat capisco e rispondo anche in urdu e punjabi — scrivi o parla pure.", ur: "سائٹ EN | IT سے انگریزی/اطالوی بدل سکتی ہے۔ چیٹ میں اردو اور پنجابی بھی سمجھتا اور جواب دیتا ہوں۔", pa: "سائٹ EN | IT نال انگریزی/اطالوی بدل سکدی اے۔ چیٹ وچ اردو تے پنجابی وی سمجھدا تے جواب دیندا واں۔" },
-    { keys: ["portal","login","acced","password","demo","پورٹل","لاگ ان","پاس ورڈ","login urdu","پورٹل کیسے","لاگ ان کیسے","login kaise"], en: "Parents, teachers and students sign in from Accedi. Demo: student_demo, parent_demo, teacher_demo — password Demo@12345. You can also register.", it: "Si accede da Accedi. Demo: student_demo, parent_demo, teacher_demo — password Demo@12345. Puoi anche registrarti.", ur: "Accedi سے لاگ اِن۔ ڈیمو: student_demo، parent_demo، teacher_demo — پاس ورڈ Demo@12345۔ رجسٹر بھی کر سکتے ہیں۔", pa: "Accedi توں لاگ اِن۔ ڈیمو: student_demo، parent_demo، teacher_demo — پاس ورڈ Demo@12345۔ رجسٹر وی کر سکدے او۔" },
+    { keys: ["portal","login","acced","password","demo","پورٹل","لاگ ان","پاس ورڈ","login urdu","پورٹل کیسے","لاگ ان کیسے","login kaise"], en: "Parents, teachers and students sign in from Accedi on the school site. For login help, please ask the school office.", it: "Genitori, insegnanti e studenti accedono da Accedi sul sito. Per l’accesso, chiedi alla segreteria.", ur: "والدین، اساتذہ اور طلبہ Accedi سے لاگ اِن کریں۔ مدد کے لیے اسکول آفس سے پوچھیں۔", pa: "ماپے، استاد تے طالب علم Accedi توں لاگ اِن کرن۔ مدد لئی سکول آفس توں پچھو۔" },
     { keys: ["parent portal","portale genitori","والدین پورٹل","پیرنٹ پورٹل","پیرنٹس پورٹل"], en: "The parent portal shows diary, attendance and announcements for your child.", it: "Il portale genitori mostra diario, presenze e avvisi.", ur: "والدین پورٹل میں ڈائری، حاضری اور اعلانات ملتے ہیں۔", pa: "والدین پورٹل وچ ڈائری، حاضری تے اعلانات ملدے نے۔" },
     { keys: ["student portal","portale student","طالب علم پورٹل","سٹوڈنٹ پورٹل","سٹوڈنٹس پورٹل"], en: "The student portal has timetable, assignments and marks.", it: "Il portale studenti ha orario, compiti e voti.", ur: "طالب علم پورٹل میں ٹائم ٹیبل، ہوم ورک اور نمبر ہیں۔", pa: "طالب علم پورٹل وچ ٹائم ٹیبل، ہوم ورک تے نمبر نے۔" },
     { keys: ["homework","compiti","assignment","ہوم ورک","کام","اسائنمنٹ","homework urdu","ہوم ورک ہوتا","homework hota"], en: "Homework is short and meaningful. Parents see it in the diary on the portal.", it: "I compiti sono brevi e utili. I genitori li vedono nel diario del portale.", ur: "ہوم ورک مختصر اور مفید ہے۔ والدین اسے پورٹل ڈائری میں دیکھتے ہیں۔", pa: "ہوم ورک مختصر تے فائدے مند اے۔ ماپے اسنوں پورٹل ڈائری وچ ویکھدے نے۔" },
@@ -596,6 +596,37 @@
     var folded = foldText(text);
     if (wantsBook(folded)) return null;
     var code = activeLang();
+
+    // Never discuss admin / platform / credentials / security.
+    var blocked = [
+      "admin",
+      "superadmin",
+      "super admin",
+      "password",
+      "passcode",
+      "credential",
+      "12345",
+      "123456",
+      "demo@",
+      "platform",
+      "security",
+      "hack",
+      "login id",
+      "how to login admin",
+      "ادمن",
+      "سپر",
+      "پاس ورڈ",
+      "پاسورڈ",
+    ];
+    if (hasAny(folded, blocked)) {
+      var refuse = {
+        en: "I can’t help with that. Please contact the school office in person.",
+        it: "Non posso aiutarti su questo. Contatta la segreteria di persona.",
+        ur: "اس بارے میں میں مدد نہیں کر سکتا۔ براہ کرم اسکول آفس سے رابطہ کریں۔",
+        pa: "اس بارے وچ میں مدد نہیں کر سکدا۔ براہ کرم سکول آفس نال رابطہ کرو۔",
+      };
+      return refuse[code] || refuse.en;
+    }
 
     // Short hellos like "ہیلو" / "hello" must hit greeting, not the fallback.
     var greetKeys = ["hello", "hi", "hey", "ہیلو", "هيلو", "ہائے", "سلام", "السلام علیکم", "ciao", "salam", "hy", "helo"];

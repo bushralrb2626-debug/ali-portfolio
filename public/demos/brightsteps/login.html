@@ -12,7 +12,15 @@
     <link rel="stylesheet" href="/demos/brightsteps/css/bridge.css?v=7eZ7z0-isDSPkIrEmY5kX2w3anNvmJBqC8XONQyJlhc" />
     <link rel="stylesheet" href="/demos/brightsteps/css/vibrant.css?v=_MlOwKhNsDIIyZrj__65eFxm0nqMbGR8UMI4j8NWuoA" />
     <link rel="stylesheet" href="/demos/brightsteps/css/fancy.css?v=mobile6" />
-    <link rel="stylesheet" href="/demos/brightsteps/css/campus-bot.css?v=25" />
+    <style>
+      @media (max-width: 768px) {
+        .login-page { display: block !important; }
+        .login-page__visual { min-height: 180px !important; }
+        .login-page__form { padding: 1.25rem 1rem 2rem !important; }
+        .login-page__form .btn-bsa { width: 100%; min-height: 2.75rem; justify-content: center; }
+        .login-page__form input { font-size: 16px !important; }
+      }
+    </style>
 </head>
 <body class="site-body">
     <main>
@@ -69,7 +77,8 @@
     <script src="/demos/brightsteps/lib/jquery/dist/jquery.min.js"></script>
     <script src="/demos/brightsteps/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/demos/brightsteps/js/site.js?v=opens23"></script>
-    <script src="/demos/brightsteps/js/demo-auth.js?v=15"></script>
+    <script src="/demos/brightsteps/js/mobile-gate.js?v=1"></script>
+    <script src="/demos/brightsteps/js/demo-auth.js?v=16"></script>
     <script>
     (function () {
       var auth = window.BrightStepsDemoAuth;
@@ -115,6 +124,10 @@
         var remember = !!(form.querySelector('[name="remember"]') || {}).checked;
         var result = auth.login(loginId, password, remember);
         if (!result.ok) {
+          if (result.mobileBlocked && window.BrightStepsMobileGate) {
+            window.BrightStepsMobileGate.showNotAccessible();
+            return;
+          }
           if (window.showToast) window.showToast(result.message, "error");
           return;
         }

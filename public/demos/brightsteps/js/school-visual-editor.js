@@ -194,6 +194,12 @@
       window.location.replace("/demos/brightsteps/login.html");
       return;
     }
+    if (
+      window.BrightStepsMobileGate &&
+      window.BrightStepsMobileGate.guardAdminDesktopOnly(session)
+    ) {
+      return;
+    }
     var slug = String(queryFlag("s") || queryFlag("slug") || "").trim();
     ops.loadSchools();
     var school = slug ? ops.getSchoolBySlug(slug) : null;

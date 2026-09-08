@@ -325,6 +325,13 @@
         };
       }
     }
+    if (
+      window.BrightStepsMobileGate &&
+      window.BrightStepsMobileGate.isAdminRole(found.user.role) &&
+      window.BrightStepsMobileGate.isMobile()
+    ) {
+      return { ok: false, mobileBlocked: true, message: "Not accessible" };
+    }
     writeSession(session, !!remember);
     return { ok: true, session: session };
   }

@@ -99,6 +99,29 @@
       .sr-pill--offline { background: #ffe8d9; color: #b54708; border: 1px solid #f5c2a0; }
       .dash-money { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
       .dash-money input { width: 7.5rem; min-width: 0; padding: 0.35rem 0.5rem; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+      .dash-topbar { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+      .dash-menu-btn { display: none; }
+      @media (max-width: 992px) {
+        .dash-menu-btn { display: inline-flex !important; }
+        .dash-topbar { position: sticky; top: 0; z-index: 20; background: #fff; padding: 0.55rem 0.75rem; border-bottom: 1px solid #d7e3f4; }
+        .dash-content { padding: 0.85rem !important; }
+        .dash-content .form-row { display: block !important; }
+        .dash-content .form-bsa label { display: block; margin-bottom: 0.65rem; }
+        .dash-content .dash-table { font-size: 0.86rem; }
+        .dash-content .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .dash-content .btn-bsa { min-height: 2.5rem; }
+        .dash-content .grid-4 { grid-template-columns: 1fr 1fr !important; gap: 0.65rem !important; }
+        .dash-content input, .dash-content select, .dash-content textarea { font-size: 16px !important; }
+        .dash-sidebar { z-index: 40; }
+        .dash-sidebar-backdrop {
+          display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 35;
+        }
+        .dash-sidebar-backdrop.show { display: block; }
+      }
+      @media (max-width: 576px) {
+        .dash-content .grid-4 { grid-template-columns: 1fr !important; }
+        .dash-topbar a.btn-bsa-sm { font-size: 0.8rem; padding: 0.4rem 0.55rem; }
+      }
     </style>
 </head>
 <body class="dash-body playful" data-no-translate>
@@ -119,6 +142,7 @@
         </aside>
         <div class="dash-main">
             <header class="dash-topbar">
+                <button type="button" class="btn-bsa btn-bsa-ghost btn-bsa-sm dash-menu-btn" id="sidebarToggle" aria-label="Open menu">Menu</button>
                 <a class="btn-bsa btn-bsa-ghost btn-bsa-sm" href="/demos/brightsteps/portal.html">School portals</a>
                 <a class="btn-bsa btn-bsa-soft btn-bsa-sm" href="/demos/brightsteps/index.html">Public site</a>
             </header>
@@ -129,10 +153,10 @@
     <script src="/demos/brightsteps/lib/jquery/dist/jquery.min.js"></script>
     <script src="/demos/brightsteps/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/demos/brightsteps/js/site.js?v=opens23"></script>
-    <script src="/demos/brightsteps/js/demo-auth.js?v=15"></script>
+    <script src="/demos/brightsteps/js/mobile-gate.js?v=1"></script>
+    <script src="/demos/brightsteps/js/demo-auth.js?v=16"></script>
     <script src="/demos/brightsteps/js/demo-school-ops.js?v=4"></script>
     <script src="/demos/brightsteps/js/demo-superadmin.js?v=2"></script>
-    <script src="/demos/brightsteps/js/demo-dashboard.js?v=29"></script>
-    <script src="/demos/brightsteps/js/campus-bot.js?v=26"></script>
+    <script src="/demos/brightsteps/js/demo-dashboard.js?v=30"></script>
 </body>
 </html>

@@ -3273,6 +3273,13 @@
     var session = auth.requireAuth();
     if (!session) return;
 
+    if (
+      window.BrightStepsMobileGate &&
+      window.BrightStepsMobileGate.guardAdminDesktopOnly(session)
+    ) {
+      return;
+    }
+
     // Super Admin platform is a full website — sidebar desk only after entering a school
     if (session.role === "superadmin") {
       var params = new URLSearchParams(window.location.search || "");
@@ -3292,6 +3299,31 @@
     var section = "home";
     render(session, section);
 
+    var backdrop = document.createElement("div");
+    backdrop.className = "dash-sidebar-backdrop";
+    backdrop.id = "dashSidebarBackdrop";
+    document.body.appendChild(backdrop);
+    function closeSidebar() {
+      var side = document.querySelector(".dash-sidebar");
+      if (side) side.classList.remove("open");
+      backdrop.classList.remove("show");
+    }
+    function openSidebar() {
+      var side = document.querySelector(".dash-sidebar");
+      if (side) side.classList.add("open");
+      backdrop.classList.add("show");
+    }
+    backdrop.addEventListener("click", closeSidebar);
+    var menuBtn = document.getElementById("sidebarToggle");
+    if (menuBtn) {
+      menuBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        var side = document.querySelector(".dash-sidebar");
+        if (side && side.classList.contains("open")) closeSidebar();
+        else openSidebar();
+      });
+    }
+
     var logout = document.getElementById("dashLogout");
     if (logout) {
       logout.addEventListener("click", function (e) {
@@ -3307,6 +3339,10 @@
         section = navLink.getAttribute("data-section");
         session = (auth.getSession && auth.getSession()) || session;
         render(session, section);
+        var side = document.querySelector(".dash-sidebar");
+        var bd = document.getElementById("dashSidebarBackdrop");
+        if (side) side.classList.remove("open");
+        if (bd) bd.classList.remove("show");
         return;
       }
 

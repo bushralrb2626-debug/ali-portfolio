@@ -19,6 +19,12 @@
   function boot() {
     var session = auth.requireAuth(["superadmin"]);
     if (!session) return;
+    if (
+      window.BrightStepsMobileGate &&
+      window.BrightStepsMobileGate.guardAdminDesktopOnly(session)
+    ) {
+      return;
+    }
     // Leaving school desk when on platform
     if (ops.setActiveSchoolId) ops.setActiveSchoolId("");
 
